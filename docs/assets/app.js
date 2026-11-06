@@ -18,7 +18,8 @@
     const fmtInt = v => num(v, 0);
     const fmt = (v, d = 1) => num(v, d);
     const signed = (v, d = 1) => (v > 0 ? '+' : v < 0 ? '−' : '') + fmt(Math.abs(v), d);
-    const range = (vals, f = fmtInt) => { const v = vals.filter(isNum); const a = f(Math.min(...v)), b = f(Math.max(...v)); return a === b ? a : `${a}–${b}`; };
+    // a range with a negative end reads better with "to" than with a dash ("−50 to 171", not "−50–171")
+    const range = (vals, f = fmtInt) => { const v = vals.filter(isNum); const a = f(Math.min(...v)), b = f(Math.max(...v)); return a === b ? a : Math.min(...v) < 0 ? `${a} to ${b}` : `${a}–${b}`; };
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const coarse = matchMedia('(pointer: coarse)').matches;
@@ -76,9 +77,32 @@
             ownV2: own.chirps2 ? fmtInt(own.chirps2.mean_closure_residual_mm) : '—', ownV3: own.chirps3 ? fmtInt(own.chirps3.mean_closure_residual_mm) : '—',
             selName: PROD[k], selCum: fmtInt(ck.cumulative_residual_mm),
             selRiseRange: `${fmtInt(ck.water_table_rise_if_stored_m[0])}–${fmtInt(ck.water_table_rise_if_stored_m[1])}`,
-            needET: fmt(ck.et_increase_needed_pct, 1), needRain: fmt(ck.rain_decrease_needed_pct, 1), needRatio: fmt(ck.runoff_ratio_needed, 2)
+            needET: fmt(ck.et_increase_needed_pct, 1), needRain: fmt(ck.rain_decrease_needed_pct, 1), needRatio: fmt(ck.runoff_ratio_needed, 2),
+            gUpArea: fmtInt(props('upper_ogun').hydrobasins_up_area_km2),
+            needRatioRange: range(PRODS.map(p => c[p].runoff_ratio_needed), v => fmt(v, 2)),
+            ratioMult: range(PRODS.map(p => c[p].runoff_ratio_needed / ratioObs()), v => fmt(v, 1)),
+            plausRise: fmtInt(D.summary.plausible_rise_m),
+            syPlausRange: range(PRODS.map(p => 100 * c[p].sy_for_plausible_rise), v => fmt(v, 1)),
+            corrO: agree('upper_oueme', 'pearson_r', v => fmt(v, 2)), madO: agree('upper_oueme', 'mean_abs_diff_mm', fmtInt),
+            corrG: agree('upper_ogun', 'pearson_r', v => fmt(v, 2)), madG: agree('upper_ogun', 'mean_abs_diff_mm', fmtInt),
+            etCvO: fmt(q.upper_oueme_et_cv_pct, 1), pCvO: range(PRODS.map(p => q.upper_oueme_interannual_cv_pct[p]), v => fmt(v, 1)),
+            et10: fmtInt(0.1 * o.et_wapor_mm),
+            perHundredth: fmtInt(0.01 * o.p_chirps2_mm),
+            resAtDongaLo: fmtInt(Math.max(...PRODS.map(p => residualAt(p, 0.14)))),
+            resAtDongaHi: fmtInt(Math.min(...PRODS.map(p => residualAt(p, 0.28)))),
+            ownRange: range(Object.values(own).map(v => v.mean_closure_residual_mm)),
+            ownDiffRange: (() => { const d = Object.entries(own).map(([p, v]) => v.mean_closure_residual_mm - c[p].mean_closure_residual_mm); return `${fmtInt(Math.min(...d))} to +${fmtInt(Math.max(...d))}`; })(),
+            oCellRange: range(D.grid.upper_oueme.values.rain_chirps2.mean), gCellRange: range(D.grid.upper_ogun.values.rain_chirps2.mean)
         };
     }
+    // range of one agreement statistic over the three pairs of rainfall products
+    const agree = (b, key, f) => {
+        const v = Object.values(D.summary.qa[`${b}_product_agreement`]).map(x => x[key]);
+        // a range that crosses zero reads better with "to" than with a dash
+        return key === 'pearson_r' ? `${f(Math.min(...v))} to ${f(Math.max(...v))}` : range(v, f);
+    };
+    // mean 2018-2024 residual for product p with runoff ratio r (Eq. 1 and 2)
+    const residualAt = (p, r) => { const o = rec('upper_oueme'); return o[`p_${p}_mm`] - o.et_wapor_mm - r * o[`p_${p}_mm`]; };
     function fill() { const v = values(); $$('[data-v]').forEach(el => { if (el.dataset.v in v) el.textContent = v[el.dataset.v]; }); }
 
     // ---------- Figure 1: locator map ----------
@@ -277,6 +301,96 @@
     }
 
     // ---------- Tables 2 and 3 ----------
+    // ---------- shared chart helpers ----------
+    const niceTicks = (lo, hi, step) => { const t = []; for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) t.push(Math.round(v * 1000) / 1000); return t; };
+    function axisY(g, ticks, y, x0, x1, fmtT) {
+        ticks.forEach(t => {
+            g.append(svg('line', { x1: x0, x2: x1, y1: y(t), y2: y(t), class: t === 0 ? 'ch-zero' : 'ch-grid' }));
+            g.append(svg('text', { x: x0 - 8, y: y(t) + 4, 'text-anchor': 'end', class: 'ch-tick' }, fmtT(t)));
+        });
+    }
+
+    // ---------- Figure 3: annual rainfall by product and evapotranspiration ----------
+    function renderRainChart() {
+        const el = $('#rainchart'); el.innerHTML = '';
+        const all = D.annual.flatMap(r => PRODS.map(p => r[`p_${p}_mm`]).concat(r.et_wapor_mm));
+        const lo = Math.floor((Math.min(...all) - 50) / 100) * 100, hi = Math.ceil((Math.max(...all) + 50) / 100) * 100;
+        const W = 480, H = 300, m = { l: 52, r: 14, t: 34, b: 30 };
+        const x = i => m.l + (W - m.l - m.r) * (i / (YEARS.length - 1)), y = v => m.t + (H - m.t - m.b) * (1 - (v - lo) / (hi - lo));
+        const series = [...PRODS.map(p => ({ key: `p_${p}_mm`, name: PROD[p], color: pcol(p), cls: 'ch-line' })), { key: 'et_wapor_mm', name: 'Evapotranspiration, WaPOR v3', color: css('--air'), cls: 'ch-line ch-et' }];
+        const legend = document.createElement('ul'); legend.className = 'keylist ch-legend';
+        legend.innerHTML = series.map(s => `<li><i style="background:${s.color}"></i><span>${s.name}</span></li>`).join('') + '<li><i class="dash"></i><span>Rainfall, 1991–2020 mean (CHIRPS v2.0)</span></li>';
+        el.append(legend);
+        BIDS.forEach(b => {
+            const rows = rowsOf(b), base = D.summary.basins[b].baseline_1991_2020_mean_chirps2_mm;
+            const s = svg('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', class: 'chart' });
+            s.setAttribute('aria-label', `${BASIN[b]}: annual rainfall and evapotranspiration 2018–2024. ` + rows.map(r => `${r.year}: ${PRODS.map(p => `${PROD[p]} ${fmtInt(r[`p_${p}_mm`])}`).join(', ')}, ET ${fmtInt(r.et_wapor_mm)} mm`).join('; '));
+            s.append(svg('text', { x: m.l, y: 16, class: 'ch-title' }, BASIN[b]));
+            axisY(s, niceTicks(lo, hi, 200), y, m.l, W - m.r, fmtInt);
+            YEARS.forEach((yr, i) => s.append(svg('text', { x: x(i), y: H - 8, 'text-anchor': 'middle', class: 'ch-tick' }, yr)));
+            s.append(svg('line', { x1: m.l, x2: W - m.r, y1: y(base), y2: y(base), class: 'ch-base' }));
+            series.forEach(se => {
+                s.append(svg('path', { d: rows.map((r, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(r[se.key]).toFixed(1)}`).join(''), class: se.cls, stroke: se.color }));
+                rows.forEach((r, i) => {
+                    const c = svg('circle', { cx: x(i), cy: y(r[se.key]), r: 4, fill: se.color, class: 'ch-pt' });
+                    c.append(svg('title', {}, `${BASIN[b]}, ${r.year}: ${se.name} ${fmtInt(r[se.key])} mm`));
+                    s.append(c);
+                });
+            });
+            el.append(s);
+        });
+    }
+
+    // ---------- Figure 5: residual against the runoff ratio ----------
+    function renderRatioChart() {
+        const el = $('#ratiochart'); el.innerHTML = '';
+        const sens = D.summary.runoff_ratio_sensitivity, rr = sens.ratio, ref = sens.reference_ratios;
+        const vals = PRODS.flatMap(p => sens.mean_residual_mm[p]);
+        const lo = Math.floor(Math.min(0, ...vals) / 50) * 50, hi = Math.ceil(Math.max(...vals) / 50) * 50;
+        const W = 680, H = 360, m = { l: 56, r: 16, t: 20, b: 46 };
+        const x = v => m.l + (W - m.l - m.r) * (v - rr[0]) / (rr[rr.length - 1] - rr[0]), y = v => m.t + (H - m.t - m.b) * (1 - (v - lo) / (hi - lo));
+        const s = svg('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', class: 'chart' });
+        const [d0, d1] = ref.donga_single_years_kamagate2007, [b0, b1] = ref.beterou_1971_2010;
+        s.append(svg('rect', { x: x(d0), y: m.t, width: x(d1) - x(d0), height: H - m.t - m.b, class: 'ch-band' }));
+        s.append(svg('rect', { x: x(b0), y: m.t, width: Math.max(2, x(b1) - x(b0)), height: H - m.t - m.b, class: 'ch-band-dark' }));
+        axisY(s, niceTicks(lo, hi, 50), y, m.l, W - m.r, fmtInt);
+        niceTicks(rr[0], rr[rr.length - 1], 0.05).forEach(t => s.append(svg('text', { x: x(t), y: H - m.b + 18, 'text-anchor': 'middle', class: 'ch-tick' }, fmt(t, 2))));
+        s.append(svg('text', { x: (m.l + W - m.r) / 2, y: H - 8, 'text-anchor': 'middle', class: 'ch-axis' }, 'Runoff ratio r'));
+        s.append(svg('text', { x: 14, y: (m.t + H - m.b) / 2, 'text-anchor': 'middle', class: 'ch-axis', transform: `rotate(-90 14 ${(m.t + H - m.b) / 2})` }, 'Mean residual ε, mm per year'));
+        s.append(svg('text', { x: x(d0) + 6, y: m.t + 14, class: 'ch-note' }, 'Donga, single years'));
+        s.append(svg('text', { x: x(b1) + 6, y: m.t + 30, class: 'ch-note' }, 'Bétérou 1971–2010'));
+        PRODS.forEach(p => {
+            const v = sens.mean_residual_mm[p];
+            s.append(svg('path', { d: rr.map((r, i) => `${i ? 'L' : 'M'}${x(r).toFixed(1)} ${y(v[i]).toFixed(1)}`).join(''), class: 'ch-line', stroke: pcol(p) }));
+            const need = D.summary.closure_upper_oueme_2018_2024[p].runoff_ratio_needed;
+            const c = svg('circle', { cx: x(need), cy: y(0), r: 4.5, fill: pcol(p), class: 'ch-pt' });
+            c.append(svg('title', {}, `${PROD[p]}: balance closes at r = ${fmt(need, 3)}`));
+            s.append(c);
+        });
+        const legend = document.createElement('ul'); legend.className = 'keylist ch-legend';
+        legend.innerHTML = PRODS.map(p => `<li><i style="background:${pcol(p)}"></i><span>${PROD[p]}</span></li>`).join('') + '<li><i class="dot"></i><span>Ratio that closes the balance</span></li>';
+        el.append(legend);
+        s.setAttribute('aria-label', `Mean residual against runoff ratio. ${PRODS.map(p => `${PROD[p]}: ${fmtInt(sens.mean_residual_mm[p][0])} mm at r = ${fmt(rr[0], 2)}, zero at r = ${fmt(D.summary.closure_upper_oueme_2018_2024[p].runoff_ratio_needed, 2)}`).join('; ')}.`);
+        el.append(s);
+    }
+
+    // ---------- Table 4: sources of uncertainty ----------
+    function renderUncertainty() {
+        const o = rec('upper_oueme'), r = ratioObs(), obs = D.summary.beterou_observed_runoff, own = D.summary.closure_check_own_product_ratio;
+        const res = (p, rr = r, etf = 1) => o[`p_${p}_mm`] - etf * o.et_wapor_mm - rr * o[`p_${p}_mm`];
+        const span = f => range(PRODS.flatMap(f));
+        const A = obs.area_km2, areas = [obs.published_area_km2[0], props('upper_oueme').hydrobasins_up_area_km2];
+        const rows = [
+            ['Rainfall product (Table 2)', `CHIRPS v2.0, CHIRPS v3.0, TAMSAT v3.1, with <var>r</var> = ${fmt(r, 3)}`, span(p => [res(p)])],
+            ['Runoff ratio, observed', `<var>r</var> = ${fmt(obs.periods['1971-1987'].runoff_ratio, 3)} (1971–1987) instead of ${fmt(r, 3)}`, span(p => [res(p, obs.periods['1971-1987'].runoff_ratio)])],
+            ['Runoff ratio, rainfall basis', 'Each product\'s own 1988–2010 rainfall instead of gauge rainfall', range(Object.values(own).map(v => v.mean_closure_residual_mm))],
+            ['Runoff ratio, single years', '0.14–0.28, Donga sub-basin (Kamagaté et al., 2007)', range(PRODS.flatMap(p => [res(p, 0.14), res(p, 0.28)]))],
+            ['Evapotranspiration', 'WaPOR v3 ± 10%', span(p => [res(p, r, 1.1), res(p, r, 0.9)])],
+            ['Catchment area', `${fmtInt(areas[0])}–${fmtInt(areas[1])} km² instead of ${fmtInt(A)} km²`, span(p => areas.map(a => res(p, r * A / a)))]
+        ];
+        $('#table-unc tbody').innerHTML = rows.map(([a, b, c]) => `<tr><td class="text">${a}</td><td class="text">${b}</td><td>${c}</td></tr>`).join('');
+    }
+
     function renderTables() {
         const o = rec('upper_oueme'), g = rec('upper_ogun'), c = clo();
         $('#table-2 tbody').innerHTML = PRODS.map(p => `<tr><td><span class="swatch" style="background:${pcol(p)}"></span>${PROD[p]}</td><td>${fmtInt(o[`p_${p}_mm`])}</td><td>${fmtInt(o.et_wapor_mm)}</td><td>${fmtInt(o[`surplus_${p}_mm`])}</td><td>${fmtInt(o[`q_expected_${p}_mm`])}</td><td>${fmtInt(c[p].mean_closure_residual_mm)}</td><td>${fmt(c[p].residual_pct_of_rainfall, 1)}</td></tr>`).join('');
@@ -543,6 +657,9 @@
         drawLocator();
         new ResizeObserver(() => { if (($('#locator').getBoundingClientRect().width < 520) !== locSmall) drawLocator(); }).observe($('#locator'));
         renderTables();
+        renderRainChart();
+        renderRatioChart();
+        renderUncertainty();
         buildProdSegs();
         drawSection();
         renderScale();
