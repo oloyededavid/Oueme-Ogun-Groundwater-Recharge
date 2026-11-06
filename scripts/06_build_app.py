@@ -1,4 +1,16 @@
-"""Export data and map images for the static one-page app in docs/."""
+"""Export data and map overlays for the web atlas in docs/.
+
+Writes
+  docs/data/app_data.json      annual table, long-term rainfall, summary and map-layer metadata
+  docs/data/*.csv, *.geojson   downloadable copies of the analysis outputs
+  docs/overlays/*.png          map overlays: one pixel per grid cell, transparent outside the catchment
+
+Overlay layers (per catchment, for the 2018-2024 mean and each year):
+  surplus  rainfall (CHIRPS v2.0) minus actual ET (WaPOR v3), on the 5 km CHIRPS grid
+  rain     rainfall, CHIRPS v2.0, 5 km
+  et       actual evapotranspiration and interception, WaPOR v3, 300 m
+Each layer uses one colour scale for all years and both catchments, so maps can be compared.
+"""
 
 from __future__ import annotations
 
@@ -7,63 +19,106 @@ import shutil
 import sys
 from pathlib import Path
 
-import geopandas as gpd
-import matplotlib
-
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
-import numpy as np  # noqa: E402
-import pandas as pd  # noqa: E402
-from matplotlib.colors import LinearSegmentedColormap, TwoSlopeNorm  # noqa: E402
+import numpy as np
+import pandas as pd
+from matplotlib.colors import LinearSegmentedColormap
+from PIL import Image
+from shapely.geometry import shape
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from recharge.rasters import load_subset  # noqa: E402
+from recharge.rasters import inside_mask, load_subset  # noqa: E402
 
 DOCS = ROOT / "docs"
+MAPS = ROOT / "outputs/maps"
+RASTERS = ROOT / "data/processed/rasters"
 YEARS = list(range(2018, 2025))
-BIDS = ["upper_oueme", "upper_ogun"]
-CMAP = LinearSegmentedColormap.from_list("rb", ["#b8302f", "#e34948", "#f0efec", "#2a78d6", "#184f95"])
+PERIODS = ["mean"] + [str(y) for y in YEARS]
+
+LAYERS = {
+    "surplus": {"label": "Rain left after evapotranspiration", "unit": "mm/year",
+                "source": "CHIRPS v2.0 − WaPOR v3 · 5 km grid", "diverging": True,
+                "stops": ["#b8302f", "#e34948", "#f0efec", "#2a78d6", "#184f95"],
+                "low_label": "Evapotranspiration exceeds rain", "high_label": "Rain exceeds evapotranspiration"},
+    "rain": {"label": "Rainfall", "unit": "mm/year", "source": "CHIRPS v2.0 · 5 km grid", "diverging": False,
+             "stops": ["#cde2fb", "#86b6ef", "#3987e5", "#1c5cab", "#0d366b"],
+             "low_label": "Less rain", "high_label": "More rain"},
+    "et": {"label": "Evapotranspiration", "unit": "mm/year", "source": "WaPOR v3 · 300 m grid", "diverging": False,
+           "stops": ["#fbe3d6", "#f4b08f", "#eb6834", "#b84a1c", "#7a2e0e"],
+           "low_label": "Less water returned to the air", "high_label": "More water returned to the air"},
+}
+
+
+def layer_path(layer: str, basin: str, period: str) -> Path:
+    if layer == "surplus":
+        return MAPS / (f"{basin}_surplus_mean_0p05.tif" if period == "mean" else f"{basin}_surplus_{period}.tif")
+    if layer == "rain":
+        return MAPS / f"{basin}_p_chirps2_mean_0p05.tif" if period == "mean" else RASTERS / "chirps_v2" / f"{basin}_{period}.tif"
+    return MAPS / f"{basin}_et_mean_300m.tif" if period == "mean" else RASTERS / "wapor_aeti" / f"{basin}_{period}.tif"
+
+
+def load_masked(path: Path, geom):
+    sub = load_subset(path)
+    data = np.where(inside_mask(geom, sub.data.shape, sub.transform), sub.data, np.nan)
+    rows, cols = np.where(np.isfinite(data))
+    r0, r1, c0, c1 = rows.min(), rows.max() + 1, cols.min(), cols.max() + 1
+    t = sub.transform
+    west, north = t.c + c0 * t.a, t.f + r0 * t.e
+    east, south = t.c + c1 * t.a, t.f + r1 * t.e
+    return data[r0:r1, c0:c1], [[south, west], [north, east]]
+
+
+def nice(v: float, step: float = 50.0, up: bool = True) -> float:
+    return float(np.ceil(v / step) * step if up else np.floor(v / step) * step)
 
 
 def main() -> None:
+    feats = json.loads((ROOT / "data/processed/basins.geojson").read_text())["features"]
+    basins = {f["properties"]["basin_id"]: shape(f["geometry"]) for f in feats}
+
+    grids = {(l, b, p): load_masked(layer_path(l, b, p), g) for l in LAYERS for b, g in basins.items() for p in PERIODS}
+
+    # One colour range per layer, shared by all years and both catchments
+    for l, meta in LAYERS.items():
+        vals = np.concatenate([grids[(l, b, p)][0][np.isfinite(grids[(l, b, p)][0])] for b in basins for p in PERIODS])
+        if meta["diverging"]:
+            s = nice(np.percentile(np.abs(vals), 99))
+            meta["vmin"], meta["vmax"] = -s, s
+        else:
+            meta["vmin"], meta["vmax"] = nice(np.percentile(vals, 2), up=False), nice(np.percentile(vals, 98))
+
+    out = DOCS / "overlays"
+    if out.exists():
+        shutil.rmtree(out)
+    out.mkdir(parents=True)
+    images = {b: {l: {} for l in LAYERS} for b in basins}
+    for (l, b, p), (data, bounds) in grids.items():
+        meta = LAYERS[l]
+        cmap = LinearSegmentedColormap.from_list(l, meta["stops"])
+        norm = np.clip((data - meta["vmin"]) / (meta["vmax"] - meta["vmin"]), 0, 1)
+        rgba = (cmap(np.nan_to_num(norm)) * 255).astype(np.uint8)
+        rgba[..., 3] = np.where(np.isfinite(data), 255, 0)
+        name = f"{b}_{l}_{p}.png"
+        Image.fromarray(rgba, "RGBA").save(out / name, optimize=True)
+        images[b][l][p] = {"file": f"overlays/{name}", "bounds": bounds,
+                           "cell_deg": round(abs(load_subset(layer_path(l, b, p)).transform.a), 5)}
+
     (DOCS / "data").mkdir(parents=True, exist_ok=True)
-    (DOCS / "maps").mkdir(exist_ok=True)
-    basins = gpd.read_file(ROOT / "data/processed/basins.geojson")
-
-    # One colour scale for every year and both catchments, symmetric around zero
-    grids = {(b, y): load_subset(ROOT / f"outputs/maps/{b}_surplus_{y}.tif") for b in BIDS for y in YEARS}
-    grids.update({(b, "mean"): load_subset(ROOT / f"outputs/maps/{b}_surplus_mean_0p05.tif") for b in BIDS})
-    vmax = float(np.nanpercentile(np.abs(np.concatenate([g.data[np.isfinite(g.data)] for g in grids.values()])), 99))
-    vmax = float(np.ceil(vmax / 50) * 50)
-
-    for (b, y), sub in grids.items():
-        t = sub.transform
-        ext = [t.c, t.c + t.a * sub.data.shape[1], t.f + t.e * sub.data.shape[0], t.f]
-        fig, ax = plt.subplots(figsize=(4.2, 4.2))
-        im = ax.imshow(sub.data, extent=ext, cmap=CMAP, norm=TwoSlopeNorm(0, -vmax, vmax), interpolation="nearest")
-        basins[basins.basin_id == b].boundary.plot(ax=ax, color="#0b0b0b", linewidth=0.8)
-        ax.set_axis_off()
-        cb = fig.colorbar(im, ax=ax, orientation="horizontal", fraction=0.05, pad=0.02)
-        cb.set_label("Rainfall − ET (mm/year), 0.05° grid", fontsize=8)
-        cb.ax.tick_params(labelsize=7)
-        fig.savefig(DOCS / "maps" / f"{b}_surplus_{y}.png", dpi=110, bbox_inches="tight", transparent=True)
-        plt.close(fig)
-
     annual = pd.read_csv(ROOT / "outputs/annual_balance.csv")
-    lt = pd.read_csv(ROOT / "outputs/long_term_chirps.csv")
+    long_term = pd.read_csv(ROOT / "outputs/long_term_chirps.csv")
     summary = json.loads((ROOT / "outputs/summary.json").read_text())
-    payload = {
+    app = {
         "annual": json.loads(annual.to_json(orient="records")),
-        "long_term": json.loads(lt.to_json(orient="records")),
+        "long_term": json.loads(long_term.to_json(orient="records")),
         "summary": summary,
-        "map_scale_mm": vmax,
+        "layers": LAYERS,
+        "images": images,
+        "gauge": {"name": "Bétérou river gauge", "lat": 9.19867, "lon": 2.26794},
     }
-    (DOCS / "data/app_data.json").write_text(json.dumps(payload, ensure_ascii=False))
-    shutil.copy(ROOT / "outputs/annual_balance.csv", DOCS / "data/annual_balance.csv")
-    shutil.copy(ROOT / "outputs/long_term_chirps.csv", DOCS / "data/long_term_chirps.csv")
-    shutil.copy(ROOT / "data/processed/basins.geojson", DOCS / "data/basins.geojson")
-    print("app data written; map colour scale ±", vmax, "mm/year")
+    (DOCS / "data/app_data.json").write_text(json.dumps(app, ensure_ascii=False, separators=(",", ":")))
+    for src in ["outputs/annual_balance.csv", "outputs/long_term_chirps.csv", "data/processed/basins.geojson"]:
+        shutil.copy(ROOT / src, DOCS / "data" / Path(src).name)
+    print("app data written;", {l: (m["vmin"], m["vmax"]) for l, m in LAYERS.items()}, f"{len(grids)} overlays")
 
 
 if __name__ == "__main__":
