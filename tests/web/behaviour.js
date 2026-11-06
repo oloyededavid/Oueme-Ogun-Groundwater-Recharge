@@ -2,7 +2,7 @@
 const { chromium } = require('playwright');
 const fs = require('fs');
 const SUM = JSON.parse(fs.readFileSync(require('path').join(__dirname, '../../outputs/summary.json'), 'utf8'));
-const C = SUM.closure_upper_oueme_2018_2024, URL = process.env.URL || 'http://127.0.0.1:8767/index.html';
+const C = SUM.closure_upper_oueme_2018_2024, URL = process.env.URL || 'http://127.0.0.1:8767/index.html', EX = new (require('url').URL)('explore.html', URL).href;
 const n = s => Number(String(s).replace(/,/g, '').replace('−', '-'));
 (async () => {
   const b = await chromium.launch(), fails = [], errs = [];
@@ -43,12 +43,29 @@ const n = s => Number(String(s).replace(/,/g, '').replace('−', '-'));
   await p.$eval('#fx-et', e => { e.value = '30'; e.dispatchEvent(new Event('input')); });
   ok('negative residual uses a minus sign', (await t('#fx-gap')).startsWith('−'));
   await p.click('[data-preset="reset"]');
-  // Explorer
+  // citation, navigation, story
+  await p.click('#copy-cite'); await p.waitForTimeout(250);
+  ok('citation copied', (await p.evaluate(() => navigator.clipboard.readText())).startsWith('Oloyede, D. O. (2026).') && !!(await p.$('.snack')));
+  for (const [s, title] of [['et', 'Evapotranspiration'], ['gap', 'Rainfall minus evapotranspiration'], ['rain', 'Rainfall,']]) {
+    await p.evaluate(s => { const el = document.querySelector(`.step[data-step="${s}"]`); scrollTo(0, el.getBoundingClientRect().top + scrollY - (innerHeight - el.offsetHeight) / 2); }, s); await p.waitForTimeout(900);
+    ok(`story step ${s} sets the map`, (await t('#sl-title')).startsWith(title) && (await p.$eval(`.step[data-step="${s}"]`, e => e.classList.contains('is-active'))));
+  }
+  ok('no table scroll stop on desktop', (await p.$$eval('.table-wrap[tabindex]', w => w.length)) === 0);
+  // restoring a shared link
+  await p.goto(`${EX}?zone=upper_oueme&layer=rain&year=2023&rain=chirps3`, { waitUntil: 'load' }); await p.waitForTimeout(2000);
+  ok('link restores explorer year', (await p.$eval('#ex-year [aria-pressed="true"]', e => e.dataset.year)) === '2023');
+  ok('link restores explorer product', (await p.$eval('#ex-prod [aria-pressed="true"]', e => e.dataset.xprod)) === 'chirps3');
+  await p.goto(`${URL}?product=chirps3`, { waitUntil: 'load' }); await p.waitForTimeout(2000);
+  ok('link restores figure product', (await p.$eval('#fig-storage [aria-pressed="true"]', e => e.dataset.prod)) === 'chirps3');
+  ok('study page links to the explorer', (await p.$eval('#explorer a.cta-card', e => e.getAttribute('href'))) === 'explore.html');
+  // Explorer page
+  await p.goto(EX, { waitUntil: 'load' }); await p.waitForTimeout(2200);
+  ok('explore page marks Explorer as current', (await p.$eval('.toc a[aria-current="page"]', e => e.textContent.trim())) === 'Explorer');
   await p.click('#ex-zone [data-zone="upper_ogun"]'); await p.click('#ex-layer [data-layer="et"]'); await p.click('#ex-year [data-year="2020"]'); await p.waitForTimeout(500);
   ok('explorer side shows only Upper Ogun', (await p.$$eval('#ex-side .basin h3', hs => hs.map(h => h.textContent).join())) === 'Upper Ogun');
   ok('explorer table has 8 rows', (await p.$$eval('#ex-table tbody tr', r => r.length)) === 8);
   ok('rainfall buttons disabled for ET', await p.$eval('#ex-prod button', e => e.disabled));
-  ok('query string written', (await p.evaluate(() => location.search)) === '?zone=upper_ogun&layer=et&year=2020&product=tamsat');
+  ok('query string written', (await p.evaluate(() => location.search)) === '?zone=upper_ogun&layer=et&year=2020');
   await p.focus('#ex-table tr[data-year="2021"] .yr'); await p.keyboard.press('Enter'); await p.waitForTimeout(200);
   ok('table year button keeps focus after re-render', await p.evaluate(() => document.activeElement.matches('#ex-table tr[data-year="2021"] .yr') && document.activeElement.getAttribute('aria-pressed') === 'true'));
   ok('year selector follows the table', (await p.$eval('#ex-year [data-year="2021"]', e => e.getAttribute('aria-pressed'))) === 'true');
@@ -59,19 +76,6 @@ const n = s => Number(String(s).replace(/,/g, '').replace('−', '-'));
   ok(`play advances the year (at ${yr})`, ['2019', '2020', '2021'].includes(yr));
   await p.click('#ex-play'); const held = await p.$eval('#ex-year [aria-pressed="true"]', e => e.dataset.year); await p.waitForTimeout(1500);
   ok(`pause holds the year (${held})`, (await p.$eval('#ex-year [aria-pressed="true"]', e => e.dataset.year)) === held && (await p.$eval('#ex-play', e => e.getAttribute('aria-label'))) === 'Play through the years');
-  // citation, navigation, story
-  await p.click('#copy-cite'); await p.waitForTimeout(250);
-  ok('citation copied', (await p.evaluate(() => navigator.clipboard.readText())).startsWith('Oloyede, D. O. (2026).') && !!(await p.$('.snack')));
-  for (const [s, title] of [['et', 'Evapotranspiration'], ['gap', 'Rainfall minus evapotranspiration'], ['rain', 'Rainfall,']]) {
-    await p.evaluate(s => { const el = document.querySelector(`.step[data-step="${s}"]`); scrollTo(0, el.getBoundingClientRect().top + scrollY - (innerHeight - el.offsetHeight) / 2); }, s); await p.waitForTimeout(900);
-    ok(`story step ${s} sets the map`, (await t('#sl-title')).startsWith(title) && (await p.$eval(`.step[data-step="${s}"]`, e => e.classList.contains('is-active'))));
-  }
-  ok('no table scroll stop on desktop', (await p.$$eval('.table-wrap[tabindex]', w => w.length)) === 0);
-  // restoring a shared link
-  await p.goto(`${URL}?zone=upper_oueme&layer=rain&year=2023&rain=chirps3&product=chirps3`, { waitUntil: 'load' }); await p.waitForTimeout(2000);
-  ok('link restores explorer year', (await p.$eval('#ex-year [aria-pressed="true"]', e => e.dataset.year)) === '2023');
-  ok('link restores explorer product', (await p.$eval('#ex-prod [aria-pressed="true"]', e => e.dataset.xprod)) === 'chirps3');
-  ok('link restores figure product', (await p.$eval('#fig-storage [aria-pressed="true"]', e => e.dataset.prod)) === 'chirps3');
   // phone
   const m = await b.newPage({ viewport: { width: 390, height: 844 } }); await m.route(/arcgisonline/, r => r.abort());
   m.on('pageerror', e => errs.push('phone: ' + e.message));
@@ -79,6 +83,10 @@ const n = s => Number(String(s).replace(/,/g, '').replace('−', '-'));
   ok('phone: wide tables become labelled scroll regions', await m.$eval('#cap-t1', c => { const w = c.parentElement.querySelector('.table-wrap'); return w.tabIndex === 0 && w.getAttribute('role') === 'region' && w.getAttribute('aria-labelledby') === 'cap-t1'; }));
   ok('phone: locator uses large labels', await m.$eval('#locator', e => e.classList.contains('is-small')));
   ok('phone: no sideways scroll', await m.evaluate(() => document.documentElement.scrollWidth === innerWidth));
+  const me = await b.newPage({ viewport: { width: 390, height: 844 } }); await me.route(/arcgisonline/, r => r.abort());
+  me.on('pageerror', e => errs.push('phone explore: ' + e.message));
+  await me.goto(EX, { waitUntil: 'load' }); await me.waitForTimeout(2000);
+  ok('phone explore: no sideways scroll', await me.evaluate(() => document.documentElement.scrollWidth === innerWidth));
   await m.evaluate(() => { const el = document.querySelector('.step[data-step="et"]'); scrollTo(0, el.getBoundingClientRect().top + scrollY - innerHeight * 0.6); }); await m.waitForTimeout(900);
   ok('phone: step starts while its card is in the lower half', (await m.$eval('#sl-title', e => e.textContent)).startsWith('Evapotranspiration'));
   console.log('FAILS', fails.length, JSON.stringify(fails), 'ERRORS', JSON.stringify(errs)); await b.close();

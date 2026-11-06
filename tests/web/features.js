@@ -1,5 +1,5 @@
 // Checks for the reader features: catchment selection, equation, datasets drawer, figure viewer and links,
-// feedback (email, nothing stored), reading progress and back to top. Set URL to the page to test.
+// feedback (FormSubmit, mocked; mailto fallback), reading progress and back to top. Set URL to the page to test.
 const { chromium } = require('playwright');
 (async () => { const b = await chromium.launch(), fails = [], errs = [];
   const ok = (n, c) => { if (!c) fails.push(n); console.log(c ? 'PASS' : 'FAIL', n); };
@@ -32,14 +32,17 @@ const { chromium } = require('playwright');
   // figure link
   await p.click('#fig-rain .tool[data-act="link"]'); await p.waitForTimeout(200);
   ok('figure link copied', (await p.evaluate(() => navigator.clipboard.readText())).endsWith('#fig-rain'));
-  // feedback: mailto, not stored
-  let mail = null; p.on('request', r => { if (r.url().startsWith('mailto:')) mail = r.url(); });
+  // feedback: sent by email through FormSubmit (mocked here), mailto fallback when it fails
+  let posted = null;
+  await p.route(/formsubmit\.co/, r => { posted = r.request().postDataJSON(); r.fulfill({ status: 200, contentType: 'application/json', body: '{"success":"true"}' }); });
   await p.click('.react[data-react="Useful"]'); await p.fill('#fb-text', 'Test note');
-  const href = await p.evaluate(() => new Promise(res => { const orig = Object.getOwnPropertyDescriptor(Location.prototype, 'href'); res(null); }));
-  await p.evaluate(() => { window.__mail = null; const f = document.getElementById('fb-form'); });
-  await p.route('**/*', r => r.continue());
-  const [popupUrl] = await Promise.all([p.waitForEvent('framenavigated', { timeout: 1500 }).then(f => f.url()).catch(() => null), p.click('#fb-form button[type="submit"]')]);
-  ok('feedback status says nothing is stored', (await t('#fb-status')).includes('keeps nothing'));
+  await p.click('#fb-form button[type="submit"]'); await p.waitForTimeout(500);
+  ok('feedback posts reaction and note', !!posted && posted.reaction === 'Useful' && posted.message === 'Test note');
+  ok('feedback confirms it was sent', (await t('#fb-status')).startsWith('Sent.'));
+  await p.unroute(/formsubmit\.co/);
+  await p.route(/formsubmit\.co/, r => r.fulfill({ status: 522, body: '' }));
+  await p.fill('#fb-text', 'Second note'); await p.click('#fb-form button[type="submit"]'); await p.waitForTimeout(600);
+  ok('feedback falls back to email app', (await t('#fb-status')).includes('email app'));
   ok('reaction is pressed', (await p.$eval('.react[data-react="Useful"]', e => e.getAttribute('aria-pressed'))) === 'true');
   // header, progress, back to top
   await p.evaluate(() => scrollTo(0, document.body.scrollHeight / 2)); await p.waitForTimeout(400);
