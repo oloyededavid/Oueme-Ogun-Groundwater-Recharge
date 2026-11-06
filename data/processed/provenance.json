@@ -1,0 +1,1051 @@
+{
+ "https://storage.googleapis.com/fao-gismgr-wapor-3-data/DATA/WAPOR-3/MAPSET/L1-AETI-A/WAPOR-3.L1-AETI-A.2018.tif": {
+  "accessed_utc": "2026-11-06T03:18:40Z",
+  "method": "windowed read (COG)",
+  "scale": 0.1
+ },
+ "https://storage.googleapis.com/fao-gismgr-wapor-3-data/DATA/WAPOR-3/MAPSET/L1-AETI-A/WAPOR-3.L1-AETI-A.2019.tif": {
+  "accessed_utc": "2026-11-06T03:18:40Z",
+  "method": "windowed read (COG)",
+  "scale": 0.1
+ },
+ "https://storage.googleapis.com/fao-gismgr-wapor-3-data/DATA/WAPOR-3/MAPSET/L1-AETI-A/WAPOR-3.L1-AETI-A.2020.tif": {
+  "accessed_utc": "2026-11-06T03:18:40Z",
+  "method": "windowed read (COG)",
+  "scale": 0.1
+ },
+ "https://storage.googleapis.com/fao-gismgr-wapor-3-data/DATA/WAPOR-3/MAPSET/L1-AETI-A/WAPOR-3.L1-AETI-A.2021.tif": {
+  "accessed_utc": "2026-11-06T03:18:40Z",
+  "method": "windowed read (COG)",
+  "scale": 0.1
+ },
+ "https://storage.googleapis.com/fao-gismgr-wapor-3-data/DATA/WAPOR-3/MAPSET/L1-AETI-A/WAPOR-3.L1-AETI-A.2022.tif": {
+  "accessed_utc": "2026-11-06T03:18:40Z",
+  "method": "windowed read (COG)",
+  "scale": 0.1
+ },
+ "https://storage.googleapis.com/fao-gismgr-wapor-3-data/DATA/WAPOR-3/MAPSET/L1-AETI-A/WAPOR-3.L1-AETI-A.2023.tif": {
+  "accessed_utc": "2026-11-06T03:18:40Z",
+  "method": "windowed read (COG)",
+  "scale": 0.1
+ },
+ "https://storage.googleapis.com/fao-gismgr-wapor-3-data/DATA/WAPOR-3/MAPSET/L1-AETI-A/WAPOR-3.L1-AETI-A.2024.tif": {
+  "accessed_utc": "2026-11-06T03:18:40Z",
+  "method": "windowed read (COG)",
+  "scale": 0.1
+ },
+ "https://storage.googleapis.com/fao-gismgr-wapor-3-data/DATA/WAPOR-3/MAPSET/L1-PCP-A/WAPOR-3.L1-PCP-A.2018.tif": {
+  "accessed_utc": "2026-11-06T03:18:40Z",
+  "method": "windowed read (COG)",
+  "scale": 0.1
+ },
+ "https://storage.googleapis.com/fao-gismgr-wapor-3-data/DATA/WAPOR-3/MAPSET/L1-PCP-A/WAPOR-3.L1-PCP-A.2019.tif": {
+  "accessed_utc": "2026-11-06T03:18:40Z",
+  "method": "windowed read (COG)",
+  "scale": 0.1
+ },
+ "https://storage.googleapis.com/fao-gismgr-wapor-3-data/DATA/WAPOR-3/MAPSET/L1-PCP-A/WAPOR-3.L1-PCP-A.2020.tif": {
+  "accessed_utc": "2026-11-06T03:18:40Z",
+  "method": "windowed read (COG)",
+  "scale": 0.1
+ },
+ "https://storage.googleapis.com/fao-gismgr-wapor-3-data/DATA/WAPOR-3/MAPSET/L1-PCP-A/WAPOR-3.L1-PCP-A.2021.tif": {
+  "accessed_utc": "2026-11-06T03:18:40Z",
+  "method": "windowed read (COG)",
+  "scale": 0.1
+ },
+ "https://storage.googleapis.com/fao-gismgr-wapor-3-data/DATA/WAPOR-3/MAPSET/L1-PCP-A/WAPOR-3.L1-PCP-A.2022.tif": {
+  "accessed_utc": "2026-11-06T03:18:40Z",
+  "method": "windowed read (COG)",
+  "scale": 0.1
+ },
+ "https://storage.googleapis.com/fao-gismgr-wapor-3-data/DATA/WAPOR-3/MAPSET/L1-PCP-A/WAPOR-3.L1-PCP-A.2023.tif": {
+  "accessed_utc": "2026-11-06T03:18:40Z",
+  "method": "windowed read (COG)",
+  "scale": 0.1
+ },
+ "https://storage.googleapis.com/fao-gismgr-wapor-3-data/DATA/WAPOR-3/MAPSET/L1-PCP-A/WAPOR-3.L1-PCP-A.2024.tif": {
+  "accessed_utc": "2026-11-06T03:18:40Z",
+  "method": "windowed read (COG)",
+  "scale": 0.1
+ },
+ "https://storage.googleapis.com/fao-gismgr-wapor-3-data/DATA/WAPOR-3/MAPSET/L1-RET-A/WAPOR-3.L1-RET-A.2018.tif": {
+  "accessed_utc": "2026-11-06T03:18:40Z",
+  "method": "windowed read (COG)",
+  "scale": 0.1
+ },
+ "https://storage.googleapis.com/fao-gismgr-wapor-3-data/DATA/WAPOR-3/MAPSET/L1-RET-A/WAPOR-3.L1-RET-A.2019.tif": {
+  "accessed_utc": "2026-11-06T03:18:40Z",
+  "method": "windowed read (COG)",
+  "scale": 0.1
+ },
+ "https://storage.googleapis.com/fao-gismgr-wapor-3-data/DATA/WAPOR-3/MAPSET/L1-RET-A/WAPOR-3.L1-RET-A.2020.tif": {
+  "accessed_utc": "2026-11-06T03:18:40Z",
+  "method": "windowed read (COG)",
+  "scale": 0.1
+ },
+ "https://storage.googleapis.com/fao-gismgr-wapor-3-data/DATA/WAPOR-3/MAPSET/L1-RET-A/WAPOR-3.L1-RET-A.2021.tif": {
+  "accessed_utc": "2026-11-06T03:18:40Z",
+  "method": "windowed read (COG)",
+  "scale": 0.1
+ },
+ "https://storage.googleapis.com/fao-gismgr-wapor-3-data/DATA/WAPOR-3/MAPSET/L1-RET-A/WAPOR-3.L1-RET-A.2022.tif": {
+  "accessed_utc": "2026-11-06T03:18:40Z",
+  "method": "windowed read (COG)",
+  "scale": 0.1
+ },
+ "https://storage.googleapis.com/fao-gismgr-wapor-3-data/DATA/WAPOR-3/MAPSET/L1-RET-A/WAPOR-3.L1-RET-A.2023.tif": {
+  "accessed_utc": "2026-11-06T03:18:40Z",
+  "method": "windowed read (COG)",
+  "scale": 0.1
+ },
+ "https://storage.googleapis.com/fao-gismgr-wapor-3-data/DATA/WAPOR-3/MAPSET/L1-RET-A/WAPOR-3.L1-RET-A.2024.tif": {
+  "accessed_utc": "2026-11-06T03:18:40Z",
+  "method": "windowed read (COG)",
+  "scale": 0.1
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.1981.tif": {
+  "accessed_utc": "2026-11-06T03:04:43Z",
+  "bytes": 57616550,
+  "sha256": "5993dca2448ff1881292c6d1671fc949a17c339f49080a27737c98e84f709623"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.1982.tif": {
+  "accessed_utc": "2026-11-06T03:05:02Z",
+  "bytes": 57616550,
+  "sha256": "77f75a32d1818e6229035ec510c8599d143a8c79da1e11ff4e831a3e7bfbe085"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.1983.tif": {
+  "accessed_utc": "2026-11-06T03:05:44Z",
+  "bytes": 57616550,
+  "sha256": "dea49ad07b6e198f62d89b8be34bd8c9ecb106b5ef8eefbd4512b1e00fe64b51"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.1984.tif": {
+  "accessed_utc": "2026-11-06T03:05:57Z",
+  "bytes": 57616550,
+  "sha256": "d3dff20d0a97ae3bed0b91b166075c7bf1e7e2cd115b4f3ac2cfc283a03806ce"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.1985.tif": {
+  "accessed_utc": "2026-11-06T03:06:09Z",
+  "bytes": 57616550,
+  "sha256": "d3f10b0ed0e2c82f17d1814ff89ac742201b1a61a9d13d78eb095ea1f480154d"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.1986.tif": {
+  "accessed_utc": "2026-11-06T03:06:20Z",
+  "bytes": 57616550,
+  "sha256": "627465f52c88e11513505d27251cbbe5484ecc539fd3102b3b04befaf020dbf3"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.1987.tif": {
+  "accessed_utc": "2026-11-06T03:06:34Z",
+  "bytes": 57616550,
+  "sha256": "e2e10c5f8162cf5ce090e178e7f07cb5c850b9a45a5b3e991609316c4882ed39"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.1988.tif": {
+  "accessed_utc": "2026-11-06T03:06:51Z",
+  "bytes": 57616550,
+  "sha256": "f6c244d2fdd76095d1303687b15526580228ddc2367d3ca6161cc2000386ab64"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.1989.tif": {
+  "accessed_utc": "2026-11-06T03:07:09Z",
+  "bytes": 57616550,
+  "sha256": "3c412cf2693ae5b08ffab540cd22a33e48fcdf5709da7e1d1366f462db132152"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.1990.tif": {
+  "accessed_utc": "2026-11-06T03:07:16Z",
+  "bytes": 57616550,
+  "sha256": "97b2de6c6df44b36d3b9ee59574d8a8f2cd5a0b1ad1815a0b22e51931ad85ce7"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.1991.tif": {
+  "accessed_utc": "2026-11-06T03:07:25Z",
+  "bytes": 57616550,
+  "sha256": "c81d0ad0d19599239241fb1f1488f4bb9f06d5c237f9a562462fc12ad7fe31ed"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.1992.tif": {
+  "accessed_utc": "2026-11-06T03:07:34Z",
+  "bytes": 57616550,
+  "sha256": "892b31fe3c2b83dd3cdae1dd4cc243297612501fa842401793558bfdfea3ce45"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.1993.tif": {
+  "accessed_utc": "2026-11-06T03:07:45Z",
+  "bytes": 57616550,
+  "sha256": "2a0ec8840fa498674771d173f024d8b405b0efcc813c020f720e0847a2f7a23a"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.1994.tif": {
+  "accessed_utc": "2026-11-06T03:07:55Z",
+  "bytes": 57616550,
+  "sha256": "1ea33b5da034cca390ed94bffa26b95b4f10c1f0dcd638f8c776261336460767"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.1995.tif": {
+  "accessed_utc": "2026-11-06T03:08:09Z",
+  "bytes": 57616550,
+  "sha256": "0f368ea7fb33bceb7df99f7ee1eafe463dfc2da7b0a1eb2fb13e73b9230ef0a1"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.1996.tif": {
+  "accessed_utc": "2026-11-06T03:08:33Z",
+  "bytes": 57616550,
+  "sha256": "e3d56591c5e8c07f964cf16dd5da59f9d15e8ac45a14f320ac7ad662e6cdaaf8"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.1997.tif": {
+  "accessed_utc": "2026-11-06T03:08:41Z",
+  "bytes": 57616550,
+  "sha256": "9b22f2fce05f0bb1191e5853f9dfdd39aacd55c41ecc2dec344c93a9fe9b6990"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.1998.tif": {
+  "accessed_utc": "2026-11-06T03:08:49Z",
+  "bytes": 57616550,
+  "sha256": "5475bc7f8edcdb4ed71ea1888e49eebe8154f28cce971f5b0aeeb2502ecc9234"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.1999.tif": {
+  "accessed_utc": "2026-11-06T03:08:56Z",
+  "bytes": 57616550,
+  "sha256": "f24e438dd5490a5ac8e9c0b8ec0220bdc201d84b0624de77b20d796cee64fbe0"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.2000.tif": {
+  "accessed_utc": "2026-11-06T03:09:08Z",
+  "bytes": 57616550,
+  "sha256": "873cf8351c082d3f1c01a07fed2aef531ff755fa1c3df4ba74d9104c778ee2bb"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.2001.tif": {
+  "accessed_utc": "2026-11-06T03:09:19Z",
+  "bytes": 57616550,
+  "sha256": "0ef1919cf056b6224b341a1044ce74e09d88fcf5fe60b8b69d2755ecf5bd3275"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.2002.tif": {
+  "accessed_utc": "2026-11-06T03:09:32Z",
+  "bytes": 57616550,
+  "sha256": "0e6f48a092dd78810ce2054f7a8b0b4f5256ad8e882dcd88bf408fa341ab0661"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.2003.tif": {
+  "accessed_utc": "2026-11-06T03:09:40Z",
+  "bytes": 57616550,
+  "sha256": "7cf08580add0edd01ebf9d8e03fe30bd050add9c1ccf83c18788a3ac847360a3"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.2004.tif": {
+  "accessed_utc": "2026-11-06T03:09:51Z",
+  "bytes": 57616550,
+  "sha256": "4c85c3b12079410b3c8ab17f276e9fdeedb61ca76c8d41e85c1b54856fd25036"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.2005.tif": {
+  "accessed_utc": "2026-11-06T03:10:01Z",
+  "bytes": 57616550,
+  "sha256": "a383ca523139b25ec0f3ad990a61e57ee6eb9282e493177fe9fef038dac2ecc2"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.2006.tif": {
+  "accessed_utc": "2026-11-06T03:10:13Z",
+  "bytes": 57616550,
+  "sha256": "78f41725479db0b71f2bc4e57351001845375e071e254e0baa18e08659a11137"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.2007.tif": {
+  "accessed_utc": "2026-11-06T03:10:35Z",
+  "bytes": 57616550,
+  "sha256": "808dafb07514196b8dafaad259e361707ec81365dd55c622a0122ea1a1ac6349"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.2008.tif": {
+  "accessed_utc": "2026-11-06T03:10:44Z",
+  "bytes": 57616550,
+  "sha256": "8d4529804f3eb53035a267922c186a876f8ff3e7b63a0782292607bf846063b5"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.2009.tif": {
+  "accessed_utc": "2026-11-06T03:10:56Z",
+  "bytes": 57616550,
+  "sha256": "b14cb30469a4be071f09915202b40d2a63f1b069ea6ec68c7065a7f4d48eba79"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.2010.tif": {
+  "accessed_utc": "2026-11-06T03:11:23Z",
+  "bytes": 57616550,
+  "sha256": "8ff84f24683b7ad3c94667e3e6ea3edff58a00925ef1e47c36231b226fbdc6e9"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.2011.tif": {
+  "accessed_utc": "2026-11-06T03:11:32Z",
+  "bytes": 57616550,
+  "sha256": "9e6374b3a501cddff6e15f531a7673415ca67243d93684a7003661cda8e112d7"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.2012.tif": {
+  "accessed_utc": "2026-11-06T03:11:45Z",
+  "bytes": 57616550,
+  "sha256": "5f92f835efb0472016d830c9f0c53fe92f5d02cc55ff3e98a5009aa7b7e7bb00"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.2013.tif": {
+  "accessed_utc": "2026-11-06T03:11:59Z",
+  "bytes": 57616550,
+  "sha256": "9213a02ecc88bb7120036b97fd2862195cae0625e60eeb3fa679784306914c86"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.2014.tif": {
+  "accessed_utc": "2026-11-06T03:12:09Z",
+  "bytes": 57616550,
+  "sha256": "8189a22093465615ab023a70262d248c5ebc3be128ff8c5db2108537246022c2"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.2015.tif": {
+  "accessed_utc": "2026-11-06T03:12:18Z",
+  "bytes": 57616586,
+  "sha256": "fadbaf33e873e867040e311357a106b5ef2322a853c85b67d93eefa22dbb8d69"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.2016.tif": {
+  "accessed_utc": "2026-11-06T03:12:33Z",
+  "bytes": 57616586,
+  "sha256": "410527254af77d187831568b3a161a1dc343a7f5bd8ca3c17753597fe0b5d03b"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.2017.tif": {
+  "accessed_utc": "2026-11-06T03:12:52Z",
+  "bytes": 57616588,
+  "sha256": "c2d241a6a94b40f33d02f49c6eda6eedcb3db4c4df0a87668b3152049314c25f"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.2018.tif": {
+  "accessed_utc": "2026-11-06T03:13:07Z",
+  "bytes": 57616544,
+  "sha256": "cb6b0b8e41e75ec235d10db179e012344db448fc411c147965090f66aec43764"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.2019.tif": {
+  "accessed_utc": "2026-11-06T03:13:18Z",
+  "bytes": 57616588,
+  "sha256": "71f40e6fde787ed57174cf0e32b2ac28f38617fe0d384d38447557a10e2bdddd"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.2020.tif": {
+  "accessed_utc": "2026-11-06T03:13:35Z",
+  "bytes": 57616544,
+  "sha256": "7ebad0a3758a57ba0f8bcee65aa2f2c6d4ca1e701bb16c19263dc10858184e38"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.2021.tif": {
+  "accessed_utc": "2026-11-06T03:13:52Z",
+  "bytes": 57616544,
+  "sha256": "d0f9c1982f66d4b5002c25f3f4fe90359f06df12e1f4755aaa0294a6fb1af69b"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.2022.tif": {
+  "accessed_utc": "2026-11-06T03:14:01Z",
+  "bytes": 57616544,
+  "sha256": "ce97bd0697f5862e168b24269ee3cfaa9cff81d7c3ffa2a3e5ddd22966900b14"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.2023.tif": {
+  "accessed_utc": "2026-11-06T03:14:09Z",
+  "bytes": 57612546,
+  "sha256": "7e0943e382993e3a6cbb6e1e1caaa8757a989c5852f932e94f93d9445a58f6b0"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v2.0/global_annual/tifs/chirps-v2.0.2024.tif": {
+  "accessed_utc": "2026-11-06T03:14:39Z",
+  "bytes": 57612546,
+  "sha256": "c6dd23b746c847e9069d5b351be5f88267d6d4bb77d8b1d63c0e8ba598aadea9"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2018/01/rfe2018_01.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:14:44Z",
+  "bytes": 4404068,
+  "sha256": "83ca6c4623b148a0ab25b60c73e6f6438ee30674c4af8b49ebee596d483e8f68",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2018/02/rfe2018_02.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:14:48Z",
+  "bytes": 5648384,
+  "sha256": "d358685c49ffb3288d5c4793e61c167a921b9b5129dc59d20f0fd41f8fc7bb64",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2018/03/rfe2018_03.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:14:52Z",
+  "bytes": 5502178,
+  "sha256": "45d595dac050cec9d0630d441bfa870f08ef37a4b785154c524d14e804a3c0db",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2018/04/rfe2018_04.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:14:55Z",
+  "bytes": 5714442,
+  "sha256": "8f241b3e2aebc54fdbd1c7c9dc0c1fc03eaaeecd386996b41826873846d9f7ad",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2018/05/rfe2018_05.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:14:58Z",
+  "bytes": 5100286,
+  "sha256": "e98fbb4a2ab15d9a00810ba270df8337ea8449f39af07e674bd647fe1c316899",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2018/06/rfe2018_06.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:15:00Z",
+  "bytes": 3854792,
+  "sha256": "2fe51f7a4988c37360233cfb7542f5c6f746edebe3850f537b5f515e7c3d47b3",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2018/07/rfe2018_07.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:15:02Z",
+  "bytes": 3695420,
+  "sha256": "80b40a0f3ca939d7320099f40783f23ac72a94937adc79ed0a9a2dfe8852476c",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2018/08/rfe2018_08.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:15:06Z",
+  "bytes": 4771462,
+  "sha256": "97ade7d8048e3d2ab0931cba4e8875c2b4a32700824fedbff92e9637c2c353c3",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2018/09/rfe2018_09.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:15:08Z",
+  "bytes": 5376296,
+  "sha256": "f63a8c506e8a88ef8fb449dea74fd0ef4ce54bbe40144f70234f733314179ab7",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2018/10/rfe2018_10.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:15:12Z",
+  "bytes": 6194910,
+  "sha256": "c825d8a142156ea0630b3f69697e7968392fae4a81fc1e55d153c3c7c7a707ac",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2018/11/rfe2018_11.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:15:15Z",
+  "bytes": 5997808,
+  "sha256": "2519cbff8fce6d1941ddff3b2496120d2c7d70ed55c365e0001c72809daf124a",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2018/12/rfe2018_12.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:15:18Z",
+  "bytes": 4931538,
+  "sha256": "ab8ff832eeaef2e22fbe8b91326ccea5a2b101da2f63ede8989acae6971e1b1f",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2019/01/rfe2019_01.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:15:20Z",
+  "bytes": 5122294,
+  "sha256": "916dc66962d459a2eeb61634b922ae2c92485deab9ed1a8a7979952d099ad24c",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2019/02/rfe2019_02.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:15:22Z",
+  "bytes": 4908868,
+  "sha256": "6fc35612263aa458c1272b292da86b0071e74f8369e2057340be2d2f500a15bf",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2019/03/rfe2019_03.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:15:25Z",
+  "bytes": 5410452,
+  "sha256": "dd9b5345e92bd614e09e1977d1893da12d38f52afbffc758522611c8d0f06474",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2019/04/rfe2019_04.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:15:27Z",
+  "bytes": 5757616,
+  "sha256": "ae33c60b25db309b2414de21a4f51725b588c975efbeba7e36c8ade5c011e992",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2019/05/rfe2019_05.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:15:29Z",
+  "bytes": 4909346,
+  "sha256": "ddfae025320a425b9e9727fbf7d46b0a7c9e1421c26fc8ea03bba1b497a99465",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2019/06/rfe2019_06.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:15:32Z",
+  "bytes": 4027352,
+  "sha256": "1530ed760012dd4c72a81bcf734eab5aa8df7137b29dfaedf545e9267f9e4b6a",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2019/07/rfe2019_07.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:15:34Z",
+  "bytes": 3829326,
+  "sha256": "aaadc3580ede7677ab9bab6cf90b93662148bf65a871bf92dd5ada1dc532443f",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2019/08/rfe2019_08.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:15:36Z",
+  "bytes": 4536386,
+  "sha256": "5082df12ed4658cab74f7a68956efbbec752a7daac1425d2fade0cd172d4a34d",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2019/09/rfe2019_09.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:15:39Z",
+  "bytes": 4720302,
+  "sha256": "79fd58afd9a7e8116bc0f25f6a9759c094534a67bddebb1d8f670cd259e4124b",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2019/10/rfe2019_10.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:15:41Z",
+  "bytes": 5945050,
+  "sha256": "c24be0b8c50e21242adba80e83e9b9134ad38b35ba4d5e2396ce30ff8cc28521",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2019/11/rfe2019_11.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:15:43Z",
+  "bytes": 5807844,
+  "sha256": "37b37e7a1c845d0e4f12e61ad53a8e80d97f4f31697d8f75362f3e242d8fa112",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2019/12/rfe2019_12.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:15:46Z",
+  "bytes": 5086946,
+  "sha256": "a87e2521920e40b8afe1fe705d3c685e47e49c2122c5062cae0273f906250a9d",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2020/01/rfe2020_01.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:15:48Z",
+  "bytes": 4649484,
+  "sha256": "a14cc714c84071581d050e072a5ed053b91622919a3ccfd3b613548bd046d0b4",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2020/02/rfe2020_02.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:15:50Z",
+  "bytes": 4624756,
+  "sha256": "ac30813a63442f427b548b390b91c38a05a7a34f99cc353d7a1d7d4d031eeee9",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2020/03/rfe2020_03.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:15:53Z",
+  "bytes": 5641228,
+  "sha256": "d217e5d440b4fe9cb1f7e345352fd07e1e012651d5983e92d3b135d8ac6fb534",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2020/04/rfe2020_04.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:15:55Z",
+  "bytes": 5733506,
+  "sha256": "d53e95d9d53de1532f2109603d2b2cc886414f48e9758c5543bcfd2c060f8c61",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2020/05/rfe2020_05.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:15:57Z",
+  "bytes": 4798246,
+  "sha256": "a5c5437faa8d7b56e1c0d6a4624471aaf3ee2627911c6083758c973c0e66e988",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2020/06/rfe2020_06.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:00Z",
+  "bytes": 3839874,
+  "sha256": "4a3f15dfcee015fead57566a6cf56042ef8d82132e0ed05abdc2800f363f9336",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2020/07/rfe2020_07.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:02Z",
+  "bytes": 4002798,
+  "sha256": "107f2eae3aa4ee3298906f1e636b850a8c6705aaccf28781018efe2b35cf91b1",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2020/08/rfe2020_08.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:04Z",
+  "bytes": 4598748,
+  "sha256": "63d7ebff2421cd5d199a6cd5cd583c58b5cd8eda0fb73bb3e3ec44b3cd410470",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2020/09/rfe2020_09.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:06Z",
+  "bytes": 4774022,
+  "sha256": "d96a325b08b9678b5db24e0c53f4da7047d031d8d6c9465c31fc073bbea1eb20",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2020/10/rfe2020_10.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:09Z",
+  "bytes": 5183208,
+  "sha256": "95eb07fea7854a78d35e267ff7840dcff98f39128c89503c5c479fccc8f0be56",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2020/11/rfe2020_11.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:11Z",
+  "bytes": 5475060,
+  "sha256": "f74c435e4788e67a703db1ad1575ff7a15246c8071ffaa5611d9bb069be420e4",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2020/12/rfe2020_12.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:13Z",
+  "bytes": 4877416,
+  "sha256": "4e135c6c2ebfbc6cb4361d1620d49e433637f47f2c857b75c9817182b9780eca",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2021/01/rfe2021_01.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:16Z",
+  "bytes": 4804802,
+  "sha256": "c57d13713e95cb8a41774b51429ba3d4c74f589f2bbd80cd7156cc594956fc29",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2021/02/rfe2021_02.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:18Z",
+  "bytes": 4853724,
+  "sha256": "e878fdba33af4f7a7ae799f33b222502cca606e88dcbb3cd33d7637e9c29fb68",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2021/03/rfe2021_03.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:20Z",
+  "bytes": 4940270,
+  "sha256": "0bbfff524ca3de014317e5167c08bc71a3303ce090439ac0d92471d1014b5fc3",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2021/04/rfe2021_04.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:22Z",
+  "bytes": 5357976,
+  "sha256": "2254dfc321249569aa6cc38be71f3489f53c9a1f97a04043a510976ee73239e0",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2021/05/rfe2021_05.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:25Z",
+  "bytes": 5029808,
+  "sha256": "eb9bdc461d8afc86ea7709416ca73f01e52caa7ea895ece7e846809b721dde73",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2021/06/rfe2021_06.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:27Z",
+  "bytes": 3795992,
+  "sha256": "e4972b19948f56499466161982ac8688281a0d91eeb990733c943269b3954c35",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2021/07/rfe2021_07.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:29Z",
+  "bytes": 3785988,
+  "sha256": "8865ed53922d576b1555948ea6f690a14cc01af5d5d4fd66ae954a43067c5b3d",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2021/08/rfe2021_08.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:32Z",
+  "bytes": 4182370,
+  "sha256": "17d6265a8795612c0d67a144713543e44962833fc828a690562411d3fd024879",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2021/09/rfe2021_09.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:34Z",
+  "bytes": 4456256,
+  "sha256": "7942c8d799a9b44f391ce7c3c564789ef5530b4e0a97a97489c3099009514cd6",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2021/10/rfe2021_10.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:37Z",
+  "bytes": 5343142,
+  "sha256": "77d15f50ed48e77ae958415e282657c0b3fa8f80778174243e2ba9b8a39418ea",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2021/11/rfe2021_11.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:40Z",
+  "bytes": 5482264,
+  "sha256": "dca535b2feedcc8c03cbc4903f12aff1cf8c5307528953ebf3edb2f60f1556f2",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2021/12/rfe2021_12.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:42Z",
+  "bytes": 5352772,
+  "sha256": "5b9955177d3308222d5b9aa549ee2106a216b94e10bba3369df119f50369a9a0",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2022/01/rfe2022_01.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:44Z",
+  "bytes": 4815146,
+  "sha256": "124dddd39b5630b47e9ed10b9296822c969f1b852317c3b7d962030920554b1a",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2022/02/rfe2022_02.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:46Z",
+  "bytes": 4430892,
+  "sha256": "b7f93d5f0e6cdf1a4b1bc4aea32d934ec5631c6de279faed5e5ca40f3b400671",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2022/03/rfe2022_03.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:49Z",
+  "bytes": 5161918,
+  "sha256": "c67ad59e4e75254df0f23e4e9f5fdcb88c0cfa626b5563c33a88c14ed6bf7217",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2022/04/rfe2022_04.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:51Z",
+  "bytes": 5625322,
+  "sha256": "efe30aee8f26a77aa610589a70851530462289ba61005a92bb548591222410d2",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2022/05/rfe2022_05.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:53Z",
+  "bytes": 4324858,
+  "sha256": "9597a2cfc0a42b7015453148ed61170449d5a0d6574aefc368e14e39b4035b52",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2022/06/rfe2022_06.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:56Z",
+  "bytes": 4119452,
+  "sha256": "450c845cfa7dfbbcaddccfbfcbfd68e2cfe3b7dd62684a71de5c4d6d623c4eba",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2022/07/rfe2022_07.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:16:58Z",
+  "bytes": 3868962,
+  "sha256": "e39c006b4c3b322652d8399689105bf5ccb474eaac64376b622b3edd3b81af40",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2022/08/rfe2022_08.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:00Z",
+  "bytes": 4601680,
+  "sha256": "23368ac8d0a565fd178f3c049db272299a64a3555022e067f889f1e1e9c954b9",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2022/09/rfe2022_09.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:02Z",
+  "bytes": 4547278,
+  "sha256": "44de61ea1ca13544797b76c0bdd4348f15136b060fa14bf4348fdedaf76b3610",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2022/10/rfe2022_10.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:05Z",
+  "bytes": 5392770,
+  "sha256": "2aa8d66f7f4856a50a85e59e3dc54ab62118a2bd8934b6d333b32e8e253c6623",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2022/11/rfe2022_11.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:07Z",
+  "bytes": 5645030,
+  "sha256": "0786cea28c3b33bd585b28205c63c08948e1b46d3d237c739adf99e4487e8e16",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2022/12/rfe2022_12.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:10Z",
+  "bytes": 5053890,
+  "sha256": "9e1f06ada3ddfff7b75276b4dad0924305c9842d467c6d3cdd68824a251b3533",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2023/01/rfe2023_01.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:12Z",
+  "bytes": 4338044,
+  "sha256": "566d020597f088f63a257fa6761fa5d41ca76b9749eeaf648d459720165d16a0",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2023/02/rfe2023_02.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:14Z",
+  "bytes": 4709304,
+  "sha256": "7bc2e80b717380ed0ddb85ec7f11e7834a7022ec8fca71818dae6a4dd2cd24a8",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2023/03/rfe2023_03.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:16Z",
+  "bytes": 6038964,
+  "sha256": "86882d620804244e0c8c3ec34b4d07b94f4bb9bc3582d6852d89082ee67920e2",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2023/04/rfe2023_04.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:19Z",
+  "bytes": 5871490,
+  "sha256": "0187e5a37a6a84a1fb6a72a8f8ab972aad1c82a4a06827983fa3a1b91ee722a9",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2023/05/rfe2023_05.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:21Z",
+  "bytes": 5058458,
+  "sha256": "ed85b624cbeb4be49f22bc56ec1952f8595ff86a85d1e03acbe2d2834cef3bbc",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2023/06/rfe2023_06.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:23Z",
+  "bytes": 4674238,
+  "sha256": "2efb62b7ee7013825be12f9ac71f66d4cd756e2ba8ffe34bde606d981f668f03",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2023/07/rfe2023_07.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:26Z",
+  "bytes": 3692920,
+  "sha256": "6ae21fdc11f0642dfec90d2a1efafd3a588d0cfd36d14e1a123e2abf582111d3",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2023/08/rfe2023_08.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:28Z",
+  "bytes": 4616464,
+  "sha256": "9b348ed6e2915c4f14d073c2bd93726b0f80be4cae24f7f89a803fc81190c8c8",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2023/09/rfe2023_09.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:30Z",
+  "bytes": 4956176,
+  "sha256": "b59b58d1555a9495b375aa60efd514a25f9121eb6a94b5d61056c9fbae8c7c87",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2023/10/rfe2023_10.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:33Z",
+  "bytes": 5828558,
+  "sha256": "e6013ff79c6647cfe046902a7fb39044c59bb54f7eaeed908a0c1dbe27970b68",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2023/11/rfe2023_11.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:35Z",
+  "bytes": 6016342,
+  "sha256": "94d014c2ac44505161ed10aad2d9f3ff6549f98b2387b86bf52011e10723f3b9",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2023/12/rfe2023_12.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:37Z",
+  "bytes": 5172820,
+  "sha256": "e93ac0804447c6b2a24eecd0ab874f2c404a28541fd8ff4c6dd4a681719a0eae",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2024/01/rfe2024_01.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:40Z",
+  "bytes": 4857890,
+  "sha256": "a6796091dc8221fa9a1fe032da349fc51fe6a2eade02a2f9e3d96cfe295ef688",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2024/02/rfe2024_02.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:42Z",
+  "bytes": 4952922,
+  "sha256": "538c400f8501887e56395c2e5609171d21c128320d9d53f01f390e4d965cbb4d",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2024/03/rfe2024_03.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:45Z",
+  "bytes": 5777952,
+  "sha256": "bbc2b773ff8293fd72f48a643c8abf384b0e0bacdf25522fa994d202ae5a25c9",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2024/04/rfe2024_04.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:47Z",
+  "bytes": 5787574,
+  "sha256": "0a0c9c23b7a6c38e742cff7bd74f5216b79b88197600fc5358dc273f55d86dc3",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2024/05/rfe2024_05.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:49Z",
+  "bytes": 4448248,
+  "sha256": "6b0805c138ef47927ad0a5658461025d6c83867582f4b0f21b32c3e9090df344",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2024/06/rfe2024_06.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:51Z",
+  "bytes": 3778866,
+  "sha256": "d714338998024b1c516d07fac1704617f3b65d4fb0651902bec773b344575ee4",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2024/07/rfe2024_07.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:54Z",
+  "bytes": 3981372,
+  "sha256": "115336f5eb2ff7595a34b6fc7165d4d076a7591532285391bd6779281ed8a259",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2024/08/rfe2024_08.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:56Z",
+  "bytes": 4791194,
+  "sha256": "6df9e25a19ceccf8aeea5cceb054da40787625a1dda1057ea93622e73897abf4",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2024/09/rfe2024_09.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:17:58Z",
+  "bytes": 5208276,
+  "sha256": "b4b0c7bdb0a5e60d830c073945cc0f306b4a5a5db496e3c8b3bf300407057432",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2024/10/rfe2024_10.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:18:01Z",
+  "bytes": 5406990,
+  "sha256": "f7e40dae4c602514f969798f2f4ee4b0e000d0b18d1273a4325163e3a9dc88e1",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2024/11/rfe2024_11.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:18:03Z",
+  "bytes": 5308144,
+  "sha256": "fcbd393d76f6d0fb802aafb4a0132f300d2d8a93681825804f133c1ec9c894d1",
+  "variable": "rfe_filled"
+ },
+ "https://gws-access.jasmin.ac.uk/public/tamsat/rfe/data/v3.1/monthly/2024/12/rfe2024_12.v3.1.nc": {
+  "accessed_utc": "2026-11-06T03:18:05Z",
+  "bytes": 4760440,
+  "sha256": "383d895113d27e1a1ec2c42a44c5853ddda85367afa9212677b5ec51854d1a3b",
+  "variable": "rfe_filled"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.1981.tif": {
+  "accessed_utc": "2026-11-06T03:18:42Z",
+  "bytes": 5927950,
+  "sha256": "ffd356133f896be7114ec8d756b695d04b9c9e08180ac90d24e146b6a50e913f"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.1982.tif": {
+  "accessed_utc": "2026-11-06T03:18:47Z",
+  "bytes": 5914988,
+  "sha256": "33aed9720c8a6a5d228446dbc36aab9b7ed6be4212e9098c74c09306bd2461fa"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.1983.tif": {
+  "accessed_utc": "2026-11-06T03:18:52Z",
+  "bytes": 5943328,
+  "sha256": "dc753f64cc3ddf3be3f5e2021c1d8a4cdfc27fc6e36d10fd0e7fe094b901108e"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.1984.tif": {
+  "accessed_utc": "2026-11-06T03:18:56Z",
+  "bytes": 5971236,
+  "sha256": "d16b3577f5312e1f285256bc66d47525668f59f341ba28f0f39bb6afb6ce6b1a"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.1985.tif": {
+  "accessed_utc": "2026-11-06T03:19:00Z",
+  "bytes": 5931126,
+  "sha256": "873e0322f72e22f927791ad13207086715497b15db53220598d72c02ea439640"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.1986.tif": {
+  "accessed_utc": "2026-11-06T03:19:04Z",
+  "bytes": 5943860,
+  "sha256": "5872da2265121dc628c421154dcf4023ebf20bac5f7d78a9ef0c9b392894be5c"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.1987.tif": {
+  "accessed_utc": "2026-11-06T03:19:08Z",
+  "bytes": 5971990,
+  "sha256": "5879df532c29b08f19d78764592f7be2fbea54b655e8f1621ba1fb5080e795aa"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.1988.tif": {
+  "accessed_utc": "2026-11-06T03:19:13Z",
+  "bytes": 5896560,
+  "sha256": "fb0e70a82c29e350d020c613510af2e8608a981d3155faa2a61f0561905775dc"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.1989.tif": {
+  "accessed_utc": "2026-11-06T03:19:22Z",
+  "bytes": 5971066,
+  "sha256": "9015cabae309f22a523a62b833af8ac8fd88b4eb618131ae2f26305ca8306550"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.1990.tif": {
+  "accessed_utc": "2026-11-06T03:19:27Z",
+  "bytes": 5941590,
+  "sha256": "dcbd016545878b330a4a657c76ade1ea49e91b1c47b0fabe475a5b60b7c20b16"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.1991.tif": {
+  "accessed_utc": "2026-11-06T03:19:33Z",
+  "bytes": 5942520,
+  "sha256": "8cecd58a7874f364a18dfdb06fb6147fa17dd77d4c9e8698d5f78daa686d50ae"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.1992.tif": {
+  "accessed_utc": "2026-11-06T03:19:42Z",
+  "bytes": 5940206,
+  "sha256": "5da9b1234348d1c3b9907102c765354712bc9a129f6596e24c5e264f710d9485"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.1993.tif": {
+  "accessed_utc": "2026-11-06T03:19:47Z",
+  "bytes": 5949084,
+  "sha256": "ab53cef17b9f0a1c82b46c0a215cbb4b030fc404bb346a9bd0222d1660fb2e0e"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.1994.tif": {
+  "accessed_utc": "2026-11-06T03:19:52Z",
+  "bytes": 5937236,
+  "sha256": "eb354d29084c1cb8b193c987b0892007604dc37bd91d195203172366e548c413"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.1995.tif": {
+  "accessed_utc": "2026-11-06T03:19:59Z",
+  "bytes": 5944982,
+  "sha256": "6249771e6c6ecf874452d4615d30e5be968f0a7958792347d6d29c202623da16"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.1996.tif": {
+  "accessed_utc": "2026-11-06T03:20:05Z",
+  "bytes": 5961552,
+  "sha256": "477ec10cd8324c5b2c3bb52159d71a7a5b5f564566a0a3e20e1ee6186ac0e8e6"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.1997.tif": {
+  "accessed_utc": "2026-11-06T03:20:10Z",
+  "bytes": 5922016,
+  "sha256": "9be997436b96a7052ccea127407fc8e0e3e516bb3e50a235037e2d5dd0f9df7d"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.1998.tif": {
+  "accessed_utc": "2026-11-06T03:20:19Z",
+  "bytes": 5928280,
+  "sha256": "40b8472626338efd4de2821c25f7f0e9affa20aa762312936ec7506551bc6a0d"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.1999.tif": {
+  "accessed_utc": "2026-11-06T03:20:24Z",
+  "bytes": 5930944,
+  "sha256": "4ecdd3befe8eae5cc00403e39ac60193ef83a1968d65aea4b103185db27ac57a"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.2000.tif": {
+  "accessed_utc": "2026-11-06T03:20:30Z",
+  "bytes": 5949778,
+  "sha256": "b95d553aadd04b4fb1750d12d417f910a57d2091671da56eac4566f35a300f9d"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.2001.tif": {
+  "accessed_utc": "2026-11-06T03:20:43Z",
+  "bytes": 5938754,
+  "sha256": "46dacc6408cb92e20f6e84b2faaaab0c9d4aa6f582ec0e5358de321ad846909a"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.2002.tif": {
+  "accessed_utc": "2026-11-06T03:20:48Z",
+  "bytes": 5929098,
+  "sha256": "c7f29b693fd50f53dd90cd8f14963528ac0467f3278677b843f6a5575e930c8b"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.2003.tif": {
+  "accessed_utc": "2026-11-06T03:20:53Z",
+  "bytes": 5925590,
+  "sha256": "a44863e839cfa3e8961c813b9a1e18de9fc90b108ad8d92f0649366062ba90cd"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.2004.tif": {
+  "accessed_utc": "2026-11-06T03:20:57Z",
+  "bytes": 5911426,
+  "sha256": "8ee0879180c912506defb70bfb06d724c2a1e28e0d69f607fe47b22cc292512d"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.2005.tif": {
+  "accessed_utc": "2026-11-06T03:21:01Z",
+  "bytes": 5925028,
+  "sha256": "65f39769f39b693ebaf98ea38be2052b4c07119c56709b4687b1dc2599385f23"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.2006.tif": {
+  "accessed_utc": "2026-11-06T03:21:05Z",
+  "bytes": 5890110,
+  "sha256": "33fa92e412074d122aee322e7c84022e0129f61d3fb8a099520274e33e2ec4fe"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.2007.tif": {
+  "accessed_utc": "2026-11-06T03:21:19Z",
+  "bytes": 5917106,
+  "sha256": "af3a401146a2a5a3abb7a49bcc1c5be79a791111f8ee18c4620fc5e63b0d1f39"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.2008.tif": {
+  "accessed_utc": "2026-11-06T03:21:28Z",
+  "bytes": 5916474,
+  "sha256": "f0572213e8e2bcf340519b30bd9bf2d0e575a67f5051f6cb12dcc5a3b7e5fe47"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.2009.tif": {
+  "accessed_utc": "2026-11-06T03:21:33Z",
+  "bytes": 5905278,
+  "sha256": "9072c63f07e5a153777d55ddfc325fc59150199e219189b26b572f7f96a52e84"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.2010.tif": {
+  "accessed_utc": "2026-11-06T03:21:38Z",
+  "bytes": 5908198,
+  "sha256": "14e6cc7cdb30fdf7c3300f1263a151a4d3d4784ef82b487aa6b0a75170c7f0fd"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.2011.tif": {
+  "accessed_utc": "2026-11-06T03:21:42Z",
+  "bytes": 5918530,
+  "sha256": "753e0caf7282657d54e8e96eb4ebb7002cac65083ed19d273e7265ad99a47f70"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.2012.tif": {
+  "accessed_utc": "2026-11-06T03:21:47Z",
+  "bytes": 5908752,
+  "sha256": "bd8e96da4a87cb5f566fb55f4389edb0007aebf28e3944102f3e4ef97912e423"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.2013.tif": {
+  "accessed_utc": "2026-11-06T03:21:52Z",
+  "bytes": 5923758,
+  "sha256": "1856835fc46ef82d2b4f6758507a24462a56d5eac0814225de031d04cf8e315a"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.2014.tif": {
+  "accessed_utc": "2026-11-06T03:21:57Z",
+  "bytes": 5917818,
+  "sha256": "5dbec73a8531b4a3b82ace19774cb11b5df78ba34fe38530246fbb69bbb91e3d"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.2015.tif": {
+  "accessed_utc": "2026-11-06T03:22:03Z",
+  "bytes": 5927298,
+  "sha256": "c61da2d62ca6b07122fff98e0d673bfa634144454b7c810a73d23c9c6dafe6cf"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.2016.tif": {
+  "accessed_utc": "2026-11-06T03:22:09Z",
+  "bytes": 5914816,
+  "sha256": "643714353c37cb9929f3480c8f2b714541e68478546cdb7e62e511a676b6fefe"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.2017.tif": {
+  "accessed_utc": "2026-11-06T03:22:30Z",
+  "bytes": 5908222,
+  "sha256": "9a00af6b3d1ec3b28cebb10f502e8ec61a80781ea6b49eff71075b02530fb543"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.2018.tif": {
+  "accessed_utc": "2026-11-06T03:22:42Z",
+  "bytes": 5908932,
+  "sha256": "9f3892c86641641347c6f8f92949281813d5c446580e64083cec22bc42ec1513"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.2019.tif": {
+  "accessed_utc": "2026-11-06T03:22:46Z",
+  "bytes": 5912836,
+  "sha256": "f037213aef5b9b3cddecaaa92c187c15c697f616c02845562291069a69ae0d28"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.2020.tif": {
+  "accessed_utc": "2026-11-06T03:22:52Z",
+  "bytes": 5921298,
+  "sha256": "4a6aec2154f521d999adab248383dd511fbe288801e5ff7bdb80df9cf437562c"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.2021.tif": {
+  "accessed_utc": "2026-11-06T03:23:00Z",
+  "bytes": 5932244,
+  "sha256": "9106f1b056e311d5436631095b0680fa5f68813ade8222452b742f83626a15be"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.2022.tif": {
+  "accessed_utc": "2026-11-06T03:23:07Z",
+  "bytes": 5951032,
+  "sha256": "6a4dab5c402a576dc17b6f2effd78fe7adf11e41e0fdae3eaa7cb17d0fb0eeab"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.2023.tif": {
+  "accessed_utc": "2026-11-06T03:23:11Z",
+  "bytes": 5927334,
+  "sha256": "96ffecc7ff17d30c219800716ad87b482baad0b121d38022554d9e8b57a59df6"
+ },
+ "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/africa/tifs/chirps-v3.0.2024.tif": {
+  "accessed_utc": "2026-11-06T03:23:16Z",
+  "bytes": 5912138,
+  "sha256": "b607790b19bdf21b6108fd85174d458d95008190b60f83dd52527c533c1908e1"
+ }
+}
