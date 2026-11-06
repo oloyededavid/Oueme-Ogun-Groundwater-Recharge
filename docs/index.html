@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ouémé–Ogun Recharge Explorer</title>
+<meta name="description" content="Satellite water balance (CHIRPS, TAMSAT, WaPOR) for two crystalline-basement catchments, Upper Ouémé (Benin) and Upper Ogun (Nigeria), 2018–2024.">
+<style>
+:root {
+  color-scheme: light;
+  --surface-0: #f5f4f1; --surface-1: #fcfcfb; --border: #e0ded8;
+  --text-primary: #0b0b0b; --text-secondary: #52514e; --text-muted: #77756f;
+  --series-1: #2a78d6; --series-2: #eb6834; --series-3: #1baf7a;
+  --neutral: #c3c2b7; --grid: #e6e5e1; --accent-bg: #eef4fc; --series-1-tint: #9ec5f4;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --surface-0: #121211; --surface-1: #1a1a19; --border: #33332f;
+    --text-primary: #f0efec; --text-secondary: #c3c2b7; --text-muted: #9a988f;
+    --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70;
+    --neutral: #5d5c56; --grid: #2b2b28; --accent-bg: #1c2633; --series-1-tint: #184f95;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface-0: #121211; --surface-1: #1a1a19; --border: #33332f;
+  --text-primary: #f0efec; --text-secondary: #c3c2b7; --text-muted: #9a988f;
+  --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70;
+  --neutral: #5d5c56; --grid: #2b2b28; --accent-bg: #1c2633; --series-1-tint: #184f95;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--surface-0); color: var(--text-primary);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+header, main, footer { max-width: 1180px; margin: 0 auto; padding: 0 16px; }
+header { padding-top: 24px; }
+h1 { font-size: 1.5rem; margin: 0 0 4px; }
+h2 { font-size: 1.05rem; margin: 0 0 8px; }
+p { margin: 0 0 10px; }
+.lede { color: var(--text-secondary); max-width: 820px; }
+.controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 16px 0; }
+.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: var(--surface-1); color: var(--text-primary); padding: 8px 14px; cursor: pointer; font: inherit; }
+.seg button[aria-pressed="true"] { background: var(--series-1); color: #fff; }
+select { font: inherit; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary); }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; min-width: 0; }
+.card img { width: 100%; max-width: 460px; display: block; margin: 0 auto; background: #fcfcfb; border-radius: 8px; }
+.kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.kpi { background: var(--surface-0); border-radius: 8px; padding: 10px; }
+.kpi .v { font-size: 1.25rem; font-weight: 700; }
+.kpi .l { color: var(--text-secondary); font-size: 0.82rem; }
+.note { color: var(--text-muted); font-size: 0.85rem; }
+.chart { position: relative; height: 300px; }
+.tabs { display: flex; gap: 4px; flex-wrap: wrap; margin: 20px 0 0; }
+.tabs button { border: 1px solid var(--border); border-bottom: 0; background: var(--surface-0); color: var(--text-secondary);
+  padding: 8px 14px; border-radius: 8px 8px 0 0; cursor: pointer; font: inherit; }
+.tabs button[aria-selected="true"] { background: var(--surface-1); color: var(--text-primary); font-weight: 600; }
+.panel { border-top-left-radius: 0; }
+.panel[hidden] { display: none; }
+table { border-collapse: collapse; width: 100%; font-size: 0.85rem; }
+th, td { border-bottom: 1px solid var(--border); padding: 6px 8px; text-align: right; white-space: nowrap; }
+th { white-space: normal; vertical-align: bottom; }
+th:first-child, td:first-child { text-align: left; }
+.table-wrap { overflow-x: auto; }
+.callout { background: var(--accent-bg); border-radius: 8px; padding: 12px; }
+a { color: var(--series-1); }
+ul { margin: 0 0 10px 18px; padding: 0; }
+footer { color: var(--text-muted); font-size: 0.82rem; padding-bottom: 32px; }
+@media (max-width: 820px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Ouémé–Ogun Recharge Explorer</h1>
+  <p class="lede">How much rainfall is left over after evapotranspiration in two crystalline-basement catchments, and what does that say, and not say, about groundwater recharge? Satellite rainfall (CHIRPS, TAMSAT) and evapotranspiration (WaPOR v3), 2018–2024, checked against observed river flow at Bétérou.</p>
+</header>
+<main>
+  <div class="controls" role="group" aria-label="Choose catchment and year">
+    <div class="seg" id="basinSeg">
+      <button data-basin="upper_oueme" aria-pressed="true">Upper Ouémé (Benin)</button>
+      <button data-basin="upper_ogun" aria-pressed="false">Upper Ogun (Nigeria)</button>
+    </div>
+    <label>Year <select id="yearSel"></select></label>
+  </div>
+
+  <div class="grid">
+    <section class="card" aria-labelledby="mapTitle">
+      <h2 id="mapTitle">Rainfall − evapotranspiration</h2>
+      <img id="mapImg" alt="Map of rainfall minus evapotranspiration for the selected catchment and year">
+      <p class="note">Blue: rainfall exceeds ET. Red: ET exceeds rainfall (water drawn from storage, rivers or groundwater, or error in the products). Shown on the 5 km CHIRPS grid, the coarsest input; nothing finer is implied.</p>
+    </section>
+    <section class="card" aria-labelledby="kpiTitle">
+      <h2 id="kpiTitle">Key numbers</h2>
+      <div class="kpis" id="kpis"></div>
+      <p class="note" id="kpiNote"></p>
+    </section>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="results">Results</button>
+    <button role="tab" aria-selected="false" data-tab="reliability">Reliability</button>
+    <button role="tab" aria-selected="false" data-tab="methods">Data &amp; methods</button>
+    <button role="tab" aria-selected="false" data-tab="download">Download</button>
+  </div>
+
+  <section class="card panel" id="tab-results" role="tabpanel">
+    <div class="grid">
+      <div><h2>Annual rainfall: three estimates</h2><div class="chart"><canvas id="cBalance"></canvas></div></div>
+      <div><h2>Annual evapotranspiration (WaPOR v3)</h2><div class="chart"><canvas id="cEt"></canvas></div></div>
+    </div>
+    <h2 style="margin-top:16px">Rainfall − ET versus expected river flow</h2>
+    <div class="chart"><canvas id="cClosure"></canvas></div>
+    <p class="note" id="closureNote"></p>
+    <h2 style="margin-top:16px">Upper Ouémé: closure error against published recharge</h2>
+    <div class="chart" style="height:230px"><canvas id="cRef"></canvas></div>
+    <p class="note" id="refNote"></p>
+    <h2 style="margin-top:16px">Were 2018–2024 wet or dry? CHIRPS v2.0 and v3.0, 1981–2024</h2>
+    <div class="chart"><canvas id="cLong"></canvas></div>
+    <p class="note">Dashed line: upper tercile, dotted line: lower tercile of 1991–2020 (CHIRPS v2.0); darker bars are 2018–2024. Years below the lower tercile are classed "dry", above the upper tercile "wet". The classes are computed separately for each CHIRPS version against its own 1991–2020 record.</p>
+    <h2 style="margin-top:16px">Table</h2>
+    <div class="table-wrap"><table id="tbl"></table></div>
+  </section>
+
+  <section class="card panel" id="tab-reliability" role="tabpanel" hidden>
+    <h2>How reliable is this?</h2>
+    <div class="callout" id="relSummary"></div>
+    <ul>
+      <li><strong>Rainfall products disagree.</strong> WaPOR v3's precipitation layer is CHIRPS v3.0 (identical values), which is <span id="v3diff"></span> than CHIRPS v2.0. All three estimates are shown rather than picking one.</li>
+      <li><strong>Net, not gross, recharge.</strong> Satellite ET already includes water that plants and valley bottoms draw from groundwater, so rainfall − ET − quick flow is recharge <em>minus</em> groundwater evaporation. Wells measure gross recharge. The two should differ.</li>
+      <li><strong>ET uncertainty is large.</strong> WaPOR v2 errors across Africa were about 29–31% (Blatchford et al., 2020); v3 has not been evaluated in these catchments. <span id="etSens"></span></li>
+      <li><strong>No observed river flow for 2018–2024 was available.</strong> The expected flow uses the observed Bétérou runoff ratios for 1971–1987 and 1988–2010, assuming the ratio has not changed. No flow data were found for the Upper Ogun; its band is an assumption.</li>
+      <li><strong>Validation against wells is pending.</strong> AMMA-CATCH groundwater-level data (registration required) are needed for the water-table fluctuation comparison; the code is ready (<code>scripts/04_validate_wtf.py</code>).</li>
+      <li><strong>Scale.</strong> Catchment means over ~10,000 km² hide local differences; maps are at 5 km.</li>
+    </ul>
+  </section>
+
+  <section class="card panel" id="tab-methods" role="tabpanel" hidden>
+    <h2>Data</h2>
+    <ul>
+      <li>Rainfall: CHIRPS v2.0 and v3.0 annual totals (Climate Hazards Center, 0.05°, 1981–2024) and TAMSAT v3.1 monthly totals (University of Reading, 0.0375°, gap-filled estimate). WaPOR v3's own precipitation layer equals CHIRPS v3.0.</li>
+      <li>Evapotranspiration: FAO WaPOR v3 Level 1 actual ET and interception (300 m), and reference ET (~30 km), 2018–2024. CC BY 4.0.</li>
+      <li>Catchments: HydroBASINS v1c level 9. Upper Ouémé outlet at Bétérou (unit 1090852360); Upper Ogun above the Oyan confluence (unit 1090928900).</li>
+      <li>Observed river flow at Bétérou: 47.5 m³/s (1971–1987) and 54.5 m³/s (1988–2010), Proc. IAHS 383, 163–169 (2020).</li>
+    </ul>
+    <h2>Method</h2>
+    <ol>
+      <li>Area-weighted catchment means of each layer for each year.</li>
+      <li>Surplus = rainfall − ET, for each of the three rainfall estimates.</li>
+      <li>Closure check (Upper Ouémé): over several years, surplus − expected river flow should be near zero. Expected flow = observed Bétérou runoff ratio × rainfall; the higher of the two observed ratios is used, which gives the smaller residual.</li>
+      <li>Because the residual is far from zero: how much ET would have to rise, rainfall fall, or the runoff ratio change to close it, and how far the water table would have had to rise if the residual were stored underground (specific yield 0.2–1.5%, Lachassagne et al., 2021).</li>
+      <li>Comparison with published recharge from groundwater levels in Benin crystalline rock: about 4% of rainfall from 19–25-year records in weathered crystalline rock (Kotchoni et al., 2019), and 5–24% from two years of water-table data in the Donga sub-basin of the Upper Ouémé (Kamagaté et al., 2007). These give scale; they are not a validation.</li>
+    </ol>
+    <p id="repoLink">Code, tests and full documentation are in the project's GitHub repository (README).</p>
+  </section>
+
+  <section class="card panel" id="tab-download" role="tabpanel" hidden>
+    <h2>Download</h2>
+    <ul>
+      <li><a href="data/annual_balance.csv" download>annual_balance.csv</a>: catchment means per year, 2018–2024</li>
+      <li><a href="data/long_term_chirps.csv" download>long_term_chirps.csv</a>: CHIRPS annual rainfall, 1981–2024</li>
+      <li><a href="data/basins.geojson" download>basins.geojson</a>: catchment boundaries</li>
+    </ul>
+    <p class="note">Derived data: CC BY 4.0. Source datasets keep their own terms (see LICENSE-DATA.md in the repository).</p>
+  </section>
+</main>
+<footer><p>David Oloyede · Data: FAO WaPOR v3, CHIRPS v2.0, TAMSAT v3.1, HydroBASINS · Charts: Chart.js (MIT)</p></footer>
+
+<script src="vendor/chartjs-4.4.1/chart.umd.min.js"></script>
+<script>
+(async function () {
+  const D = await (await fetch("data/app_data.json")).json();
+  const NAMES = { upper_oueme: "Upper Ouémé (Benin)", upper_ogun: "Upper Ogun (Nigeria)" };
+  const PROD = [["chirps2", "CHIRPS v2.0", "--series-1", "circle"], ["chirps3", "CHIRPS v3.0", "--series-2", "rectRot"], ["tamsat", "TAMSAT v3.1", "--series-3", "rect"]];
+  const state = { basin: "upper_oueme", year: "mean" };
+  const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const fmt = (v, d = 0) => (v == null || isNaN(v)) ? "–" : Number(v).toLocaleString("en-GB", { maximumFractionDigits: d, minimumFractionDigits: d });
+  const rows = b => D.annual.filter(r => r.basin_id === b);
+  const ratio = D.summary.beterou_observed_runoff.ratio_range;
+  const rf = D.summary.published_recharge_fraction, cl = D.summary.closure_upper_oueme_2018_2024;
+  const charts = {};
+  const mean = (arr, k) => { const v = arr.map(r => r[k]).filter(x => x != null); return v.reduce((a, b) => a + b, 0) / v.length; };
+
+  Chart.defaults.animation = false;
+  const ysel = document.getElementById("yearSel");
+  ysel.innerHTML = `<option value="mean">2018–2024 mean</option>` +
+    [...new Set(D.annual.map(r => r.year))].map(y => `<option value="${y}">${y}</option>`).join("");
+
+  function current() {
+    const rs = rows(state.basin);
+    if (state.year !== "mean") return rs.find(r => String(r.year) === String(state.year));
+    const o = {};
+    Object.keys(rs[0]).forEach(k => { if (typeof rs[0][k] === "number") o[k] = mean(rs, k); });
+    return o;
+  }
+
+  function renderKpis() {
+    const r = current(), oue = state.basin === "upper_oueme";
+    const rng = pre => { const v = PROD.map(p => r[`${pre}_${p[0]}_mm`]); return `${fmt(Math.min(...v))} to ${fmt(Math.max(...v))}`; };
+    const items = PROD.map(p => [`Rainfall, ${p[1]}`, fmt(r[`p_${p[0]}_mm`])]).concat([
+      ["Evapotranspiration, WaPOR v3", fmt(r.et_wapor_mm)],
+      ["Rainfall − ET (range of the three)", rng("surplus")],
+      oue ? [`Expected river flow (${fmt(ratio[1], 3)} × CHIRPS v2.0 rainfall)`, fmt(r.q_expected_chirps2_mm)]
+          : ["Spread of the three rainfall estimates", fmt(r.p_spread_mm)],
+      oue ? ["Closure residual (range of the three)", rng("closure_residual")]
+          : ["ET / reference ET (ratio)", fmt(r.et_over_ret, 2)],
+      [`Published recharge, Benin basement (${fmt(100 * rf.kotchoni2019[0])}–${fmt(100 * rf.kamagate2007[1])}% of rainfall)`,
+        `${fmt(rf.kotchoni2019[0] * r.p_min_mm)} to ${fmt(rf.kamagate2007[1] * r.p_max_mm)}`],
+    ]);
+    document.getElementById("kpis").innerHTML = items.map(([l, v]) =>
+      `<div class="kpi"><div class="v">${v}</div><div class="l">${l}${l.includes("(ratio)") ? "" : " · mm/year"}</div></div>`).join("");
+    const rs = rows(state.basin);
+    document.getElementById("kpiNote").textContent = state.year === "mean"
+      ? `Rainfall class vs 1991–2020, CHIRPS v2.0: ${rs.map(x => `${x.year} ${x.rain_class_chirps2}`).join(", ")}. CHIRPS v3.0: ${rs.map(x => `${x.year} ${x.rain_class_chirps3}`).join(", ")}.`
+      : `Rainfall class vs 1991–2020: ${r.rain_class_chirps2} by CHIRPS v2.0 (${fmt(r.rain_anomaly_sd_chirps2, 2)} SD), ${r.rain_class_chirps3} by CHIRPS v3.0 (${fmt(r.rain_anomaly_sd_chirps3, 2)} SD).`;
+    document.getElementById("mapImg").src = `maps/${state.basin}_surplus_${state.year}.png`;
+    document.getElementById("mapTitle").textContent = `CHIRPS v2.0 − ET, ${NAMES[state.basin]}, ${state.year === "mean" ? "2018–2024 mean" : state.year}`;
+  }
+
+  function opts(yTitle, unit = "mm/year") {
+    return { responsive: true, maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
+      plugins: { legend: { labels: { color: css("--text-secondary"), boxWidth: 12, usePointStyle: true } },
+        tooltip: { callbacks: { label: c => `${c.dataset.label}: ${Array.isArray(c.raw) ? fmt(c.raw[0]) + "–" + fmt(c.raw[1]) : fmt(c.parsed.y)} ${unit}` } } },
+      scales: { x: { ticks: { color: css("--text-secondary") }, grid: { display: false } },
+        y: { title: { display: true, text: yTitle, color: css("--text-secondary") }, ticks: { color: css("--text-secondary") }, grid: { color: css("--grid") } } } };
+  }
+
+  function renderCharts() {
+    Object.values(charts).forEach(c => c.destroy());
+    const rs = rows(state.basin), years = rs.map(r => r.year), oue = state.basin === "upper_oueme";
+    charts.b = new Chart(document.getElementById("cBalance"), { type: "bar", options: opts("mm/year"), data: { labels: years,
+      datasets: PROD.map(p => ({ label: p[1], data: rs.map(r => r[`p_${p[0]}_mm`]), backgroundColor: css(p[2]), borderRadius: 4, pointStyle: "rect" })) } });
+    const etOpts = opts("mm/year"); etOpts.plugins.legend = { display: false };
+    charts.e = new Chart(document.getElementById("cEt"), { type: "bar", options: etOpts, data: { labels: years,
+      datasets: [{ label: "WaPOR v3 ET", data: rs.map(r => r.et_wapor_mm), backgroundColor: css("--text-secondary"), borderRadius: 4, barPercentage: 0.5 }] } });
+
+    // Bands are drawn at their true width (often only a few mm) with a midline so they stay visible.
+    const pm = rs.map(r => (r.p_chirps2_mm + r.p_chirps3_mm + r.p_tamsat_mm) / 3);
+    const band = (lo, hi, label, colorVar, dash) => [
+      { type: "line", isBand: true, label: `${label} low`, data: lo, borderWidth: 0, pointRadius: 0, stepped: "middle", fill: false },
+      { type: "line", isBand: true, label: `${label} high`, data: hi, borderWidth: 0, pointRadius: 0, stepped: "middle", fill: "-1", backgroundColor: css("--neutral") },
+      { type: "line", label, data: lo.map((v, i) => (v + hi[i]) / 2), borderColor: css(colorVar), borderWidth: 3, borderDash: dash, pointRadius: 0,
+        stepped: "middle", pointStyle: "line", lo, hi } ];
+    const cOpts = opts("mm/year");
+    cOpts.scales.y.beginAtZero = true;
+    cOpts.scales.x.offset = true;
+    cOpts.plugins.legend.labels.filter = (item, data) => !data.datasets[item.datasetIndex].isBand;
+    cOpts.plugins.tooltip.filter = c => !c.dataset.isBand;
+    cOpts.plugins.tooltip.callbacks.label = c => c.dataset.lo
+      ? `${c.dataset.label}: ${fmt(c.dataset.lo[c.dataIndex])}–${fmt(c.dataset.hi[c.dataIndex])} mm/year`
+      : `${c.dataset.label}: ${fmt(c.parsed.y)} mm/year`;
+    charts.c = new Chart(document.getElementById("cClosure"), { type: "line", options: cOpts, data: { labels: years, datasets:
+      band(pm.map(v => ratio[0] * v), pm.map(v => ratio[1] * v),
+           oue ? "Expected river flow (observed Bétérou runoff ratios)" : "Same ratios applied (assumption: no flow data)", "--text-secondary", [])
+      .concat(PROD.map(p => ({ label: `Rainfall − ET, ${p[1]}`, data: rs.map(r => r[`surplus_${p[0]}_mm`]), borderColor: css(p[2]), backgroundColor: css(p[2]),
+        showLine: false, pointRadius: 6, pointHoverRadius: 8, pointStyle: p[3] }))) } });
+    const m = k => mean(rs, k);
+    document.getElementById("closureNote").textContent = oue
+      ? `2018–2024 mean rainfall − ET: ${fmt(m("surplus_chirps2_mm"))} (CHIRPS v2.0), ${fmt(m("surplus_chirps3_mm"))} (CHIRPS v3.0) and ${fmt(m("surplus_tamsat_mm"))} mm/year (TAMSAT), against expected river flow of about ${fmt(m("q_expected_chirps2_mm"))} mm/year. Over several years rainfall − ET should be close to river flow; the closure residual is ${fmt(m("closure_residual_chirps2_mm"))}, ${fmt(m("closure_residual_chirps3_mm"))} and ${fmt(m("closure_residual_tamsat_mm"))} mm/year respectively.`
+      : `No river-flow data were available for the Upper Ogun, so its balance cannot be checked; the gray line only shows what flow would be at the Bétérou runoff ratios (an assumption).`;
+
+    const rOpts = opts("", "% of rainfall");
+    rOpts.indexAxis = "y";
+    rOpts.interaction = { mode: "nearest", intersect: true };
+    rOpts.scales = {
+      x: { min: 0, max: 25, title: { display: true, text: "% of annual rainfall", color: css("--text-secondary") }, ticks: { color: css("--text-secondary") }, grid: { color: css("--grid") } },
+      y: { ticks: { color: css("--text-secondary") }, grid: { display: false } } };
+    rOpts.plugins.tooltip.callbacks.label = c => `${c.dataset.label}: ${Array.isArray(c.raw) ? fmt(c.raw[0]) + "–" + fmt(c.raw[1]) : fmt(c.raw, 1)}% of rainfall`;
+    charts.r = new Chart(document.getElementById("cRef"), { type: "bar", options: rOpts, data: {
+      labels: ["Closure residual, 2018–2024", "Kamagaté et al. (2007)", "Kotchoni et al. (2019)"], datasets: [
+        { label: "Published range", data: [null, [100 * rf.kamagate2007[0], 100 * rf.kamagate2007[1]], null], backgroundColor: css("--neutral"), barPercentage: 0.5, borderRadius: 4, pointStyle: "rect" },
+        { type: "line", indexAxis: "y", label: "Published value", data: [null, null, 100 * rf.kotchoni2019[0]], showLine: false, pointRadius: 7, pointStyle: "rect",
+          borderColor: css("--text-secondary"), backgroundColor: css("--text-secondary") } ].concat(
+        PROD.map(p => ({ type: "line", indexAxis: "y", label: `Residual, ${p[1]}`, data: [cl[p[0]].residual_pct_of_rainfall, null, null], showLine: false,
+          pointRadius: 7, pointHoverRadius: 9, pointStyle: p[3], borderColor: css(p[2]), backgroundColor: css(p[2]) }))) } });
+    document.getElementById("refNote").textContent =
+      `Closure residual as a share of rainfall: ${PROD.map(p => `${fmt(cl[p[0]].residual_pct_of_rainfall, 1)}% (${p[1]})`).join(", ")}. ` +
+      `Published recharge: about ${fmt(100 * rf.kotchoni2019[0])}% from 19–25-year groundwater-level records of a weathered-crystalline aquifer in Benin (Kotchoni et al., 2019), and ${fmt(100 * rf.kamagate2007[0])}–${fmt(100 * rf.kamagate2007[1])}% from two years of water-table monitoring in the 586 km² Donga sub-basin of the Upper Ouémé (Kamagaté et al., 2007). The error of the balance is as large as the recharge it would need to measure.`;
+
+    const lt = D.long_term.filter(r => r.basin_id === state.basin), terc = D.summary.basins[state.basin].baseline_terciles_chirps2_mm;
+    charts.l = new Chart(document.getElementById("cLong"), { type: "bar", options: opts("mm/year"), data: { labels: lt.map(r => r.year), datasets: [
+      { label: "CHIRPS v2.0 (2018–2024 darker)", data: lt.map(r => r.p_chirps2_mm), backgroundColor: lt.map(r => r.year >= 2018 ? css("--series-1") : css("--series-1-tint")), borderRadius: 3, pointStyle: "rect" },
+      { type: "line", label: "CHIRPS v3.0", data: lt.map(r => r.p_chirps3_mm), borderColor: css("--series-2"), backgroundColor: css("--series-2"), pointRadius: 2, borderWidth: 2, pointStyle: "rectRot" },
+      { type: "line", label: `Upper tercile 1991–2020 (v2.0): ${fmt(terc[1])}`, data: lt.map(() => terc[1]), borderColor: css("--text-secondary"), borderDash: [6, 4], pointRadius: 0, borderWidth: 1.5, pointStyle: "line" },
+      { type: "line", label: `Lower tercile 1991–2020 (v2.0): ${fmt(terc[0])}`, data: lt.map(() => terc[0]), borderColor: css("--text-secondary"), borderDash: [2, 3], pointRadius: 0, borderWidth: 1.5, pointStyle: "line" } ] } });
+  }
+
+  function renderTable() {
+    const cols = [["year", "Year"], ["p_chirps2_mm", "Rain CHIRPS v2"], ["p_chirps3_mm", "Rain CHIRPS v3"], ["p_tamsat_mm", "Rain TAMSAT"], ["et_wapor_mm", "ET WaPOR"],
+      ["surplus_chirps2_mm", "Rain−ET (v2)"], ["surplus_chirps3_mm", "Rain−ET (v3)"], ["surplus_tamsat_mm", "Rain−ET (TAMSAT)"], ["rain_class_chirps2", "Class (v2)"], ["rain_class_chirps3", "Class (v3)"]];
+    if (state.basin === "upper_oueme") cols.push(["q_expected_chirps2_mm", "Expected flow (v2)"], ["closure_residual_chirps2_mm", "Closure residual (v2)"]);
+    const cell = (k, v) => (k === "year" || typeof v === "string") ? v : fmt(v);
+    document.getElementById("tbl").innerHTML = `<caption class="note" style="text-align:left">${NAMES[state.basin]}, mm/year</caption><thead><tr>${cols.map(c => `<th>${c[1]}</th>`).join("")}</tr></thead><tbody>` +
+      rows(state.basin).map(r => `<tr>${cols.map(([k]) => `<td>${cell(k, r[k])}</td>`).join("")}</tr>`).join("") + "</tbody>";
+  }
+
+  function renderReliability() {
+    const o = rows("upper_oueme"), g = rows("upper_ogun");
+    const sp = a => a.map(r => r.p_spread_mm);
+    document.getElementById("relSummary").innerHTML =
+      `The three rainfall estimates differ by ${fmt(Math.min(...sp(o)))}–${fmt(Math.max(...sp(o)))} mm/year in the Upper Ouémé and ${fmt(Math.min(...sp(g)))}–${fmt(Math.max(...sp(g)))} mm/year in the Upper Ogun (largest minus smallest, per year). ` +
+      `In the Upper Ouémé the 2018–2024 closure residual ranges from ${fmt(Math.min(...PROD.map(p => mean(o, `closure_residual_${p[0]}_mm`))))} to ${fmt(Math.max(...PROD.map(p => mean(o, `closure_residual_${p[0]}_mm`))))} mm/year across the three products, against expected river flow of about ${fmt(mean(o, "q_expected_chirps2_mm"))} mm/year. ` +
+      `Stored underground, that much water would have raised the water table by at least ${fmt(Math.min(...PROD.map(p => cl[p[0]].water_table_rise_if_stored_m[0])))} m over 2018–2024 (specific yield ${fmt(100 * cl.chirps2.sy_range[1], 1)}%), which is not plausible. So the residual is mostly error in the rainfall, ET or river-flow terms. At ${fmt(Math.min(...PROD.map(p => cl[p[0]].residual_pct_of_rainfall)))}–${fmt(Math.max(...PROD.map(p => cl[p[0]].residual_pct_of_rainfall)))}% of rainfall it is as large as published recharge for Benin basement (${fmt(100 * rf.kotchoni2019[0])}% and ${fmt(100 * rf.kamagate2007[0])}–${fmt(100 * rf.kamagate2007[1])}%), so the balance cannot resolve recharge here.`;
+    const dv = D.summary.qa;
+    document.getElementById("v3diff").textContent =
+      `on average ${fmt(dv.upper_oueme_chirps3_minus_chirps2_mm.mean)} mm/year higher in the Upper Ouémé and ${fmt(dv.upper_ogun_chirps3_minus_chirps2_mm.mean)} mm/year higher in the Upper Ogun (up to ${fmt(dv.upper_ogun_chirps3_minus_chirps2_mm.max)} mm/year)`;
+    document.getElementById("etSens").textContent =
+      `A 10% change in ET moves the 2018–2024 mean surplus by ${fmt(0.1 * mean(o, "et_wapor_mm"))} mm/year in the Upper Ouémé and ${fmt(0.1 * mean(g, "et_wapor_mm"))} mm/year in the Upper Ogun.`;
+  }
+
+  function renderAll() { renderKpis(); renderCharts(); renderTable(); renderReliability(); }
+
+  document.querySelectorAll("#basinSeg button").forEach(b => b.addEventListener("click", () => {
+    state.basin = b.dataset.basin;
+    document.querySelectorAll("#basinSeg button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    renderAll();
+  }));
+  ysel.addEventListener("change", () => { state.year = ysel.value; renderKpis(); });
+  document.querySelectorAll(".tabs button").forEach(t => t.addEventListener("click", () => {
+    document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", String(x === t)));
+    document.querySelectorAll(".panel").forEach(p => p.hidden = p.id !== `tab-${t.dataset.tab}`);
+    if (t.dataset.tab === "results") Object.values(charts).forEach(c => c.resize());
+  }));
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", renderCharts);
+  if (location.hostname.endsWith(".github.io")) {
+    const user = location.hostname.split(".")[0], name = location.pathname.split("/").filter(Boolean)[0];
+    if (name) document.getElementById("repoLink").innerHTML =
+      `Code, tests and full documentation: <a href="https://github.com/${user}/${name}">github.com/${user}/${name}</a> (README).`;
+  }
+  renderAll();
+})();
+</script>
+</body>
+</html>
