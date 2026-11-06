@@ -1,0 +1,46 @@
+/* Print layout for the PDF report (scripts/07_build_report.js). Applied on top of assets/style.css. */
+@page { size: A4; }
+body.report { font-size: 10pt; line-height: 1.5; color: #111; background: #fff; }
+.report main { display: block; max-width: none; margin: 0; padding: 0; }
+.report main > * { max-width: none; }
+
+/* title page */
+.report header.title { padding: 30mm 0 0; border: 0; margin: 0; break-after: page; }
+.report h1 { font-size: 23pt; line-height: 1.15; max-width: 15cm; }
+.report .subtitle { font-size: 13pt; margin-top: 4mm; }
+.report .author { margin-top: 10mm; font-size: 10.5pt; }
+.report .info { margin-top: 8mm; font-size: 9.5pt; }
+.report .info div { grid-template-columns: 30mm minmax(0, 1fr); padding: 1.6mm 0; }
+.report .report-note { margin-top: 12mm; font-size: 9pt; color: #6b6b6b; max-width: 14cm; }
+
+/* text */
+.report h2 { font-size: 14pt; margin: 9mm 0 3mm; break-after: avoid; }
+.report h3 { font-size: 11pt; margin: 6mm 0 2mm; break-after: avoid; }
+.report p, .report li { orphans: 3; widows: 3; }
+.report .abstract h2 { margin-top: 0; }
+.report .cite { white-space: normal; }
+.report a { text-decoration: none; }
+.report .eq { font-size: 10.5pt; }
+
+/* figures and tables */
+.report figure { margin: 5mm 0 7mm; break-inside: avoid; }
+.report figcaption { font-size: 8.5pt; line-height: 1.45; }
+.report figure img { width: 100%; height: auto; display: block; }
+.report #fig-1 svg { width: 13cm; margin: 0 auto; }
+.report .chart-pair { gap: 2mm 8mm; }
+.report .ch-legend { font-size: 8.5pt; }
+.report #ratiochart svg { width: 15cm; }
+.report .interactive { display: block; border-top: 1px solid #111; padding-top: 3mm; }
+.report .interactive .readout .big { font-size: 22pt; }
+.report #fig-storage svg { width: 12cm; margin-top: 2mm; }
+.report .flow li { font-size: 8.5pt; padding-top: 3mm; padding-bottom: 3mm; }
+.report .flow b { font-size: 9pt; }
+.report .tablefig { break-inside: avoid; }
+.report table { font-size: 8.5pt; }
+.report th { font-size: 8pt; }
+.report td, .report th { padding-top: 1.2mm; padding-bottom: 1.2mm; }
+.report .table-wrap { overflow: visible; background: none; }
+.report .scale-row { min-height: 10mm; }
+.report .scale-name { font-size: 8.5pt; }
+.report .refs { font-size: 8.5pt; }
+.report #references { break-before: page; }
