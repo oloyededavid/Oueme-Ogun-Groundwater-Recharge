@@ -11,7 +11,6 @@
     <meta name="citation_author" content="Oloyede, David Oluwayinka">
     <meta name="citation_publication_date" content="2026/11/06">
     <meta name="citation_public_url" content="https://oloyededavid.github.io/Oueme-Ogun-Groundwater-Recharge/">
-    <meta name="citation_pdf_url" content="https://oloyededavid.github.io/Oueme-Ogun-Groundwater-Recharge/report/oueme-ogun-water-balance.pdf">
     <meta property="og:type" content="article">
     <meta property="og:title" content="Testing a satellite water balance for groundwater recharge in tropical basement catchments">
     <meta property="og:description" content="Upper Ouémé (Benin) and Upper Ogun (Nigeria), 2018–2024. With the runoff ratio observed in 1988–2010, the balance at Bétérou does not close, and the residual is as large as published recharge.">
@@ -20,6 +19,7 @@
     <link rel="preconnect" href="https://api.fontshare.com">
     <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
     <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&amp;display=swap">
+    <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=zodiak@500,700&amp;display=swap">
     <link rel="stylesheet" href="vendor/leaflet-1.9.4/leaflet.css">
     <link rel="stylesheet" href="assets/style.css">
 </head>
@@ -35,31 +35,33 @@
             <a href="#data-method">Method</a>
             <a href="#results">Results</a>
             <a href="#discussion">Meaning</a>
-            <a href="#explorer">Explorer</a>
+            <a href="explore.html" class="toc-ex">Explorer</a>
         </nav>
-        <div class="site-links">
-            <a href="report/oueme-ogun-water-balance.pdf">PDF</a>
-            <a href="https://github.com/oloyededavid/Oueme-Ogun-Groundwater-Recharge">Code</a>
-            <a href="#cite">Cite</a>
-        </div>
     </div>
     <div class="progress" aria-hidden="true"><span id="progress"></span></div>
 </header>
 
 <main class="article" id="top">
     <header class="title">
-        <p class="kicker">Research note · Version 0.3 · <time datetime="2026-11-06">6 November 2026</time></p>
         <h1>Testing a satellite water balance for groundwater recharge in tropical basement catchments</h1>
         <p class="subtitle">Upper Ouémé, Benin, and Upper Ogun, Nigeria, 2018–2024</p>
-        <p class="author"><strong>David Oluwayinka Oloyede</strong><span>B.Tech, Remote Sensing and GIS, Federal University of Technology, Akure</span></p>
     </header>
 
     <section id="abstract" data-reveal class="abstract" aria-labelledby="h-abstract">
         <h2 id="h-abstract">Summary</h2>
-        <p class="lede">Can free satellite data tell us how much rain recharges groundwater where no wells are monitored? In the Upper Ouémé, where the answer can be checked against river flow, the numbers do not add up: <span class="num" data-v="gapRange">—</span> mm of water a year is unaccounted for.</p>
-        <p>Rainfall (CHIRPS v2.0, CHIRPS v3.0, TAMSAT v3.1) minus evapotranspiration (FAO WaPOR v3) minus river flow should be close to zero over several years. With river flow estimated from the runoff ratio measured at Bétérou in 1988–2010, it leaves <span class="num" data-v="gapPctRange">—</span>% of rainfall in every year of 2018–2024 and with every product.</p>
-        <p>That water cannot be stored underground; it would need the water table to rise at least <span class="num" data-v="riseMin">—</span> m. A higher runoff ratio, of <span class="num" data-v="needRatioRange">—</span>, would close the gap, but no recent flow record exists to test it.</p>
-        <p>The gap is as large as recharge measured in wells in Benin (about 4% and 5–24% of rainfall), so without recent river and well records a satellite balance cannot measure recharge here. The Upper Ogun in Nigeria, with no flow record at all, can be described but not tested.</p>
+        <p class="lede">Can free satellite data tell us how much rain recharges groundwater where no wells are monitored? In the Upper Ouémé, where the answer can be checked against river flow, the numbers do not add up: <span class="num hl" data-v="gapRange">—</span> mm of water a year is unaccounted for.</p>
+        <div class="rain100" id="rain100">
+            <p class="rain100-head">Of every 100 mm of rain on the Upper Ouémé, 2018–2024</p>
+            <div class="rain100-bar" id="rain100-bar" aria-hidden="true"></div>
+            <ul class="rain100-key" id="rain100-key"></ul>
+            <p class="rain100-note">Rainfall CHIRPS v2.0, evapotranspiration FAO WaPOR v3, river flow estimated from the 1988–2010 runoff ratio at Bétérou.</p>
+        </div>
+        <ol class="findings">
+            <li><b class="hl">At least <span data-v="riseMin">—</span> m</b><span class="f-text">The water table would have to rise this much to store the missing water. It is not stored underground.</span></li>
+            <li><b class="hl">A ratio of <span data-v="needRatioRange">—</span></b><span class="f-text">If the river carried this share of the rain instead of <span data-v="ratio">—</span>, the gap would close. No recent flow record exists to check.</span></li>
+            <li><b class="hl"><span data-v="gapPctRange">—</span>% of rainfall</b><span class="f-text">The gap is as large as recharge measured in Benin's wells (4% and 5–24%), so the method cannot measure recharge here.</span></li>
+        </ol>
+        <p class="small">The Upper Ogun in Nigeria has no flow record, so it can be described but not tested.</p>
     </section>
 
     <section id="introduction" data-reveal aria-labelledby="h-intro">
@@ -278,43 +280,21 @@
         <p>With the data available, a satellite water balance does not close at Bétérou, and its error is as large as groundwater recharge. It shows where rain exceeds evapotranspiration, not how much reaches the aquifer. Three records would settle it: river flow at Bétérou for 2018–2024, the AMMA-CATCH well levels in the Upper Ouémé <span class="cite">(Galle et al., 2018)</span>, for which the analysis code is ready, and ground measurements of evapotranspiration <span class="cite">(Mamadou et al., 2016)</span>.</p>
     </section>
 
-    <section id="explorer" aria-labelledby="h-explorer">
-        <h2 id="h-explorer">Data explorer</h2>
-        <p>Every 5 km cell of both catchments, by year, layer and rainfall product. Hover a cell for its value; select a catchment for its totals. mm per year, 2018–2024.</p>
+    <section id="explorer" class="explore-cta" data-reveal aria-labelledby="h-explorer">
+        <a class="cta-card" href="explore.html">
+            <img src="assets/explorer-preview.png" alt="The explorer: a map of the 5 km cells of both catchments with controls for catchment, layer, rainfall product and year" width="1200" height="700" loading="lazy">
+            <span class="cta-text">
+                <span class="cta-kicker">Interactive explorer</span>
+                <span class="cta-title" id="h-explorer">Explore every 5 km cell, year by year</span>
+                <span class="cta-body">Switch catchment, layer and rainfall product, play through 2018–2024, hover any cell for its value, and share the view as a link.</span>
+                <span class="cta-go">Open the explorer →</span>
+            </span>
+        </a>
     </section>
-    <div class="wide">
-        <div class="explorer-bar" role="group" aria-label="Explorer controls">
-            <div class="field"><span class="field-label" id="exl-zone">Catchment</span><div class="seg" id="ex-zone" role="group" aria-labelledby="exl-zone"></div></div>
-            <div class="field"><span class="field-label" id="exl-layer">Layer</span><div class="seg" id="ex-layer" role="group" aria-labelledby="exl-layer"></div></div>
-            <div class="field"><span class="field-label" id="exl-prod">Rainfall</span><div class="seg" id="ex-prod" role="group" aria-labelledby="exl-prod"></div></div>
-            <div class="field"><span class="field-label" id="exl-year">Year</span><div class="field-row"><button type="button" class="play" id="ex-play" aria-label="Play through the years"></button><div class="seg" id="ex-year" role="group" aria-labelledby="exl-year"></div></div></div>
-        </div>
-        <div class="explorer">
-            <div class="explorer-map">
-                <div class="map" id="explore-map" role="group" aria-label="Interactive map of the water-balance terms on the 5 km grid"></div>
-                <div class="legend" id="ex-legend">
-                    <div class="t" id="el-title">—</div>
-                    <div class="s" id="el-source">—</div>
-                    <div class="ramp" id="el-ramp"></div>
-                    <div class="ramp-ticks"><span id="el-min">—</span><span id="el-mid">—</span><span id="el-max">—</span></div>
-                </div>
-            </div>
-            <div class="side" id="ex-side" aria-live="polite"></div>
-        </div>
-        <figure class="tablefig">
-            <figcaption id="cap-t4"><b>Table 4.</b> Annual catchment values, mm per year, for the rainfall product selected above, with <var>Q</var> estimated as in Eq. 1. Class: wet, normal or dry against the terciles of 1991–2020 (CHIRPS v2.0). Select a year to show it on the map.</figcaption>
-            <div class="table-wrap">
-                <table id="ex-table" aria-labelledby="cap-t4">
-                </table>
-            </div>
-        </figure>
-    </div>
 
-    
     <section id="data-code" data-reveal aria-labelledby="h-dc">
         <h2 id="h-dc">Data, code and citation</h2>
         <ul class="downloads">
-            <li><a href="report/oueme-ogun-water-balance.pdf">Full report (PDF)</a><span>Same study with complete method</span></li>
             <li><a href="data/annual_balance.csv" download>annual_balance.csv</a><span>Annual values, both catchments</span></li>
             <li><a href="data/basins.geojson" download>basins.geojson</a><span>Catchment boundaries</span></li>
             <li><a href="https://github.com/oloyededavid/Oueme-Ogun-Groundwater-Recharge">Repository</a><span>Scripts, tests, assumptions register</span></li>
@@ -326,24 +306,27 @@
         </div>
     </section>
 
-    <section class="note" aria-labelledby="h-note">
-        <h3 id="h-note" style="margin-top:0">Author's note</h3>
-        <p>I set out to estimate how much rain recharges the aquifers that rural wells here depend on. The balance did not close, and working out why became the study. I will rerun it when recent Bétérou discharge and the AMMA-CATCH well records are available.</p>
+    <section class="note" data-reveal aria-labelledby="h-note">
+        <h2 id="h-note">A note from me</h2>
+        <p>Thank you for reading this far. I started this study wanting a number: how much of the rain that falls on Benin and south-west Nigeria ends up in the aquifers that village wells depend on. I did not get that number, and for a while that felt like failure.</p>
+        <p>Getting here was slower than the page makes it look. The last published river flow at Bétérou ends in 2010, and newer records are not public. The well records I most wanted sit behind a registration process. Satellite files arrived a few gigabytes at a time over connections that kept dropping. And one rainfall layer, labelled only "CHIRPS", turned out after days of checking to be a different version from the one I thought I was using.</p>
+        <p>What I learned is that a result that refuses to add up is still a result, if you are honest about why. When the flow and well records become available I will run this again and update the page. If you see something I missed, I would genuinely like to hear it below.</p>
+        <p class="sign">David</p>
     </section>
 
     <section id="feedback" class="feedback" aria-labelledby="h-feedback">
         <h2 id="h-feedback">Was this research useful?</h2>
         <div class="reactions" role="group" aria-labelledby="h-feedback">
-            <button type="button" class="button react" data-react="Useful" aria-pressed="false">👍 Useful</button>
-            <button type="button" class="button react" data-react="Interesting" aria-pressed="false">💡 Interesting</button>
-            <button type="button" class="button react" data-react="Needs clarity" aria-pressed="false">🤔 Needs clarity</button>
+            <button type="button" class="button react" data-react="Useful" aria-pressed="false">👍 Useful <span class="rc"></span></button>
+            <button type="button" class="button react" data-react="Interesting" aria-pressed="false">💡 Interesting <span class="rc"></span></button>
+            <button type="button" class="button react" data-react="Needs clarity" aria-pressed="false">🤔 Needs clarity <span class="rc"></span></button>
         </div>
         <form class="fb-form" id="fb-form">
             <label for="fb-text">Have a suggestion or observation about this research? <span class="opt">Optional</span></label>
             <textarea id="fb-text" rows="3" maxlength="1500"></textarea>
             <div class="fb-row">
-                <button type="submit" class="button">Send by email</button>
-                <span class="fb-note">This site does not store anything. Sending opens your email app with the message ready; nothing is sent until you send it.</span>
+                <button type="submit" class="button">Send</button>
+                <span class="fb-note">Your note goes straight to the author by email. No name or address needed.</span>
             </div>
             <p class="fb-status" id="fb-status" role="status"></p>
         </form>
@@ -400,8 +383,8 @@
 </dialog>
 <footer>
     <div class="inner">
-        <p class="sig"><span>David Oluwayinka Oloyede</span><span>Remote sensing and GIS</span><span><a href="https://github.com/oloyededavid">github.com/oloyededavid</a></span><span>Version 0.3 · 2026</span></p>
-        <p>© 2026 David Oloyede. Code MIT, derived data CC BY 4.0. Source data keep their own terms: FAO WaPOR v3 (CC BY 4.0), CHIRPS (Climate Hazards Center, UC Santa Barbara), TAMSAT (University of Reading), HydroBASINS, Natural Earth. Basemap © Esri.</p>
+        <p class="sig"><span>David Oloyede</span><span><a href="https://github.com/oloyededavid">github.com/oloyededavid</a></span><span>Last updated <time datetime="2026-11-06">6 November 2026</time></span><span>Version 0.3</span><span class="views" id="views" hidden></span></p>
+        <p>Code MIT, derived data CC BY 4.0. Source data keep their own terms: FAO WaPOR v3 (CC BY 4.0), CHIRPS (Climate Hazards Center, UC Santa Barbara), TAMSAT (University of Reading), HydroBASINS, Natural Earth. Basemap © Esri.</p>
         <p>Other studies: <a href="https://oloyededavid.github.io/Lagos-Urban-Heat-Analytics/">Lagos Urban Heat and Exposure Analytics</a> · <a href="https://oloyededavid.github.io/Ogun-Catchment-Coast-Observatory/">Ogun Catchment-to-Coast Observatory</a></p>
     </div>
 </footer>

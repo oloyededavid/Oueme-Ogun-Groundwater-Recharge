@@ -358,14 +358,15 @@
         const b = S.basin, r = rec(b), oue = b === 'upper_oueme', pr = PRODS.map(p => r[`p_${p}_mm`]);
         $$('#basin-seg button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.basin === b)));
         $$('#locator .loc-basin').forEach(x => { const on = x.dataset.basin === b; x.classList.toggle('is-on', on); x.setAttribute('aria-pressed', String(on)); });
-        $('#basin-info').innerHTML = `<p class="bi-kicker">Selected catchment</p><h3>${BASIN[b]}</h3><dl>
+        $('#basin-info').innerHTML = `<div class="bi-top"><div><p class="bi-kicker">${tour.on ? 'Showing' : 'Selected'} catchment</p><h3>${BASIN[b]}</h3></div>${shapeOf(b)}</div><dl>
             <dt>Country</dt><dd>${D.summary.basins[b].country}</dd>
             <dt>Outlet</dt><dd>${AREA_NOTE[b]}</dd>
             <dt>Area</dt><dd>${fmtInt(props(b).geodesic_area_km2)} km²</dd>
             <dt>Study period</dt><dd>2018–2024</dd>
             <dt>Rainfall</dt><dd>${range(pr)} mm a year</dd>
             <dt>River-flow record</dt><dd>${oue ? 'Mean flows 1971–2010 (Kodja et al., 2020)' : 'None found'}</dd></dl>
-            <p class="bi-hint">Select the other catchment on the map, or switch in Figure 2.</p>`;
+            <p class="bi-hint">${tour.on ? '<button type="button" class="button quiet" id="tour-stop">Pause</button> The map shows each catchment in turn; select one to stay on it.' : 'Select the other catchment on the map, or switch in Figure 2.'}</p>`;
+        const stopBtn = $('#tour-stop'); if (stopBtn) stopBtn.addEventListener('click', () => { stopTour(); $('#locator .loc-basin.is-on').focus(); });
         $('#basin-stats').innerHTML = [
             ['Rainfall', `${range(pr)} mm`], ['Evapotranspiration', `${fmtInt(r.et_wapor_mm)} mm`],
             ['Rainfall − ET', `${range(PRODS.map(p => r[`surplus_${p}_mm`]))} mm`],
@@ -373,13 +374,47 @@
         ].map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
         renderRainChart();
     }
-    function setBasin(b) { S.basin = b; renderBasin(); }
+    function setBasin(b, fromTour) { if (!fromTour) stopTour(true); S.basin = b; renderBasin(); }
+    // the catchment's outline, drawn small in the panel
+    function shapeOf(b) {
+        const f = GEO.features.find(x => x.properties.basin_id === b), pts = ringsOf(f.geometry).flat(2);
+        const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]), x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+        const k = Math.cos(((y0 + y1) / 2) * Math.PI / 180), sc = 76 / Math.max((x1 - x0) * k, y1 - y0);
+        const P = ([x, y]) => [4 + (x - x0) * k * sc, 4 + (y1 - y) * sc];
+        return `<svg class="bi-shape" viewBox="0 0 84 84" aria-hidden="true"><path d="${pathOf(f.geometry, P)}"/></svg>`;
+    }
+    // A short tour: while Figure 1 is on screen, the two catchments are shown in turn every 5 s, until the reader
+    // selects one or pauses it. Off when the reader prefers reduced motion.
+    const tour = { on: false, timer: null };
+    function startTour() {
+        if (reduced || tour.done) return;
+        tour.on = true;
+        const io = new IntersectionObserver(es => es.forEach(e => {
+            clearInterval(tour.timer);
+            if (e.isIntersecting && tour.on) tour.timer = setInterval(() => setBasin(S.basin === 'upper_oueme' ? 'upper_ogun' : 'upper_oueme', true), 5000);
+        }), { threshold: 0.4 });
+        io.observe($('#fig-1')); tour.io = io;
+    }
+    function stopTour(quiet) {
+        if (!tour.on) return;
+        tour.on = false; tour.done = true; clearInterval(tour.timer); if (tour.io) tour.io.disconnect();
+        if (!quiet) renderBasin();
+    }
     function initBasin() {
         $('#basin-seg').innerHTML = BIDS.map(b => `<button type="button" data-basin="${b}">${BASIN[b]}</button>`).join('');
+        startTour();
         $('#basin-seg').addEventListener('click', e => { const t = e.target.closest('[data-basin]'); if (t) setBasin(t.dataset.basin); });
         let w = 0;
         new ResizeObserver(es => { const nw = Math.round(es[0].contentRect.width); if (nw && nw !== w) { w = nw; renderRainChart(); } }).observe($('#rainchart'));
         renderBasin();
+    }
+
+    // ---------- Summary: what happens to every 100 mm of rain (Upper Ouémé, CHIRPS v2.0) ----------
+    function renderRain100() {
+        const o = rec('upper_oueme'), P = o.p_chirps2_mm;
+        const parts = [['s-air', 'Returns to the air', o.et_wapor_mm], ['s-river', 'Leaves by the river (estimated)', o.q_expected_chirps2_mm], ['s-gap', 'Unaccounted for', o.closure_residual_chirps2_mm]];
+        $('#rain100-bar').innerHTML = parts.map(([c, , v]) => `<div class="${c}" style="--w:${100 * v / P}%"><span>${fmtInt(100 * v / P)}</span></div>`).join('');
+        $('#rain100-key').innerHTML = parts.map(([c, n, v]) => `<li><i class="${c}"></i><span>${n}</span><b>${fmtInt(100 * v / P)} mm</b></li>`).join('');
     }
 
     // ---------- Equation 2: select a term to see what it is ----------
@@ -687,7 +722,9 @@
     function initNav() {
         // The current section is the last one whose heading has passed 30% of the viewport height. This also
         // holds for the figures between sections, which an intersection test on the sections would miss.
-        const links = $$('.toc a'), targets = links.map(a => document.getElementById(a.getAttribute('href').slice(1)));
+        const links = $$('.toc a').filter(a => a.getAttribute('href').startsWith('#'));
+        if (!links.length) return;
+        const targets = links.map(a => document.getElementById(a.getAttribute('href').slice(1)));
         let queued = false, current = null;
         const update = () => {
             queued = false;
@@ -701,7 +738,7 @@
         addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(update); } }, { passive: true });
         addEventListener('resize', update);
         update();
-        $('#copy-cite').addEventListener('click', () => {
+        if ($('#copy-cite')) $('#copy-cite').addEventListener('click', () => {
             const t = $('#cite-text').textContent.replace(/\s+/g, ' ').trim();
             const done = () => snack('Citation copied');
             if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, () => window.prompt('Copy the citation:', t));
@@ -732,7 +769,7 @@
             d.addEventListener('click', e => { if (e.target === d || e.target.closest('[data-close]')) d.close(); });
             d.addEventListener('close', () => { if (opener) opener.focus(); });
         });
-        $('#open-datasets').addEventListener('click', e => openDialog($('#datasets'), e.currentTarget));
+        if ($('#open-datasets')) $('#open-datasets').addEventListener('click', e => openDialog($('#datasets'), e.currentTarget));
     }
     function initFigureTools() {
         $$('figure[id]').filter(f => !f.classList.contains('tablefig')).forEach(f => {
@@ -764,29 +801,66 @@
         });
     }
 
-    // ---------- Feedback: no backend, so it is sent by the reader's own email app ----------
+    // ---------- Feedback and counts ----------
+    // The site has no server. Notes are sent to the author's inbox by FormSubmit (formsubmit.co), a form-to-email
+    // service; if it cannot be reached, the reader's own email app is opened instead. Page views and reactions are
+    // counted by Abacus (abacus.jasoncameron.dev), a public counter: a view is counted once per browser session and
+    // each reaction once per browser. No names, addresses or cookies are collected.
     const FEEDBACK_TO = 'oloyededavid10@gmail.com';
+    const COUNTER = 'https://abacus.jasoncameron.dev', NS = 'oloyededavid-oueme-ogun-v1';
+    // Only real visits on the published site add to the counts: not local copies, and not automated browsers
+    // such as the test scripts (navigator.webdriver).
+    const COUNTS_LIVE = location.hostname === 'oloyededavid.github.io' && !navigator.webdriver;
+    const REACT_KEY = { 'Useful': 'useful', 'Interesting': 'interesting', 'Needs clarity': 'clarity' };
+    const store = { get: (k, t = sessionStorage) => { try { return t.getItem(k); } catch (e) { return null; } }, set: (k, v, t = sessionStorage) => { try { t.setItem(k, v); } catch (e) {} } };
+    const count = (op, key) => fetch(`${COUNTER}/${op}/${NS}/${key}`).then(r => r.ok ? r.json() : (r.status === 404 ? { value: 0 } : Promise.reject(r.status))).then(j => Number(j.value) || 0);
+    function showReactCount(label, n) { const el = $(`.react[data-react="${label}"] .rc`); if (el) el.textContent = n ? fmtInt(n) : ''; }
+    function initCounts() {
+        if (!COUNTS_LIVE) return; // counts are read and written on the live site only, never by tests or local copies
+        const v = $('#views');
+        if (v) {
+            const seen = store.get('oo-viewed');
+            count(seen ? 'get' : 'hit', 'views').then(n => { if (!seen) store.set('oo-viewed', '1'); if (n) { v.textContent = `${fmtInt(n)} page views`; v.hidden = false; } }).catch(() => {});
+        }
+        Object.entries(REACT_KEY).forEach(([label, key]) => { if ($(`.react[data-react="${label}"]`)) count('get', key).then(n => showReactCount(label, n)).catch(() => {}); });
+    }
     function initFeedback() {
         let reaction = '';
         $$('.react').forEach(b => b.addEventListener('click', () => {
             reaction = b.getAttribute('aria-pressed') === 'true' ? '' : b.dataset.react;
             $$('.react').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.react === reaction)));
-            $('#fb-status').textContent = reaction ? `Selected: ${reaction}. Add a note if you like, then send it by email.` : '';
+            const key = REACT_KEY[reaction];
+            if (reaction && COUNTS_LIVE && !store.get(`oo-react-${key}`, localStorage)) {
+                count('hit', key).then(n => { store.set(`oo-react-${key}`, '1', localStorage); showReactCount(reaction, n); }).catch(() => {});
+            }
+            $('#fb-status').textContent = reaction ? `Thank you. Add a note below if you like.` : '';
         }));
         $('#fb-form').addEventListener('submit', e => {
             e.preventDefault();
-            const note = $('#fb-text').value.trim();
-            if (!reaction && !note) { $('#fb-status').textContent = 'Choose a reaction or write a note first.'; return; }
+            const note = $('#fb-text').value.trim(), btn = $('#fb-form button[type="submit"]');
+            if (!note) { $('#fb-status').textContent = 'Write a note first.'; $('#fb-text').focus(); return; }
             const subject = `Ouémé–Ogun water balance: ${reaction || 'feedback'}`;
-            const body = `${reaction ? `Reaction: ${reaction}\n` : ''}${note ? `\n${note}\n` : ''}\n— sent from ${location.origin}${location.pathname}`;
-            location.href = `mailto:${FEEDBACK_TO}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            $('#fb-status').textContent = 'Your email app should now open with the message ready. It is sent only when you send it there; this site keeps nothing.';
+            btn.disabled = true; $('#fb-status').textContent = 'Sending…';
+            fetch(`https://formsubmit.co/ajax/${FEEDBACK_TO}`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                body: JSON.stringify({ _subject: subject, _template: 'table', reaction: reaction || '—', message: note, page: `${location.origin}${location.pathname}` })
+            }).then(r => r.json().then(j => ({ ok: r.ok && String(j.success) === 'true', j })))
+              .then(({ ok }) => {
+                  if (!ok) throw new Error('not sent');
+                  $('#fb-text').value = ''; $('#fb-status').textContent = 'Sent. Thank you — the author will read it.';
+              })
+              .catch(() => {
+                  location.href = `mailto:${FEEDBACK_TO}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(note + '\n\n— ' + location.href)}`;
+                  $('#fb-status').textContent = 'The message service did not respond, so your email app has been opened with the note ready to send.';
+              })
+              .finally(() => { btn.disabled = false; });
         });
     }
 
     // ---------- Reading progress, back to top, sections fading in ----------
     function initChrome() {
         const bar = $('#progress'), top = $('#to-top');
+        if (!bar || !top) return;
         let queued = false;
         const update = () => {
             queued = false;
@@ -811,25 +885,32 @@
         readQuery();
         S.fx.ratio = ratioObs();
         fill();
-        drawLocator();
-        new ResizeObserver(() => { if (($('#locator').getBoundingClientRect().width < 520) !== locSmall) drawLocator(); }).observe($('#locator'));
-        renderTables();
-        initBasin();
-        initEq();
-        renderRatioChart();
-        renderUncertainty();
+        // The same script serves the study page and the explorer page; each part runs only where its element is.
+        const has = sel => !!$(sel);
+        if (has('#locator')) {
+            drawLocator();
+            new ResizeObserver(() => { if (($('#locator').getBoundingClientRect().width < 520) !== locSmall) drawLocator(); }).observe($('#locator'));
+        }
+        if (has('#table-2')) renderTables();
+        if (has('#rain100')) renderRain100();
+        if (has('#basin-seg')) initBasin();
+        if (has('#eqx')) initEq();
+        if (has('#ratiochart')) renderRatioChart();
+        if (has('#table-unc')) renderUncertainty();
         buildProdSegs();
-        drawSection();
-        renderScale();
-        initFix(); syncFix(); initRanges();
+        if (has('#section')) drawSection();
+        if (has('#scale')) renderScale();
+        if (has('#fx-et')) { initFix(); syncFix(); }
+        initRanges();
         initNav();
-        initStory();
-        initExplorer();
+        if (has('#story-map')) initStory();
+        if (has('#explore-map')) initExplorer();
         initTableWraps();
         initDialogs();
         initFigureTools();
-        initFeedback();
+        if (has('#fb-form')) initFeedback();
         initChrome();
+        initCounts();
     }).catch(err => {
         console.error(err);
         const m = document.createElement('p');

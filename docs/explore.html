@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="only light">
+    <title>Explorer · Ouémé–Ogun water balance</title>
+    <meta name="description" content="A test of whether satellite rainfall (CHIRPS, TAMSAT) and evapotranspiration (FAO WaPOR v3) can estimate groundwater recharge in the Upper Ouémé (Benin), with an application to the Upper Ogun (Nigeria), 2018–2024.">
+    <meta name="author" content="David Oluwayinka Oloyede">
+    <meta name="citation_title" content="Testing a satellite water balance for groundwater recharge in tropical basement catchments: Upper Ouémé (Benin) and Upper Ogun (Nigeria), 2018–2024">
+    <meta name="citation_author" content="Oloyede, David Oluwayinka">
+    <meta name="citation_publication_date" content="2026/11/06">
+    <meta name="citation_public_url" content="https://oloyededavid.github.io/Oueme-Ogun-Groundwater-Recharge/">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Testing a satellite water balance for groundwater recharge in tropical basement catchments">
+    <meta property="og:description" content="Upper Ouémé (Benin) and Upper Ogun (Nigeria), 2018–2024. With the runoff ratio observed in 1988–2010, the balance at Bétérou does not close, and the residual is as large as published recharge.">
+    <meta property="og:url" content="https://oloyededavid.github.io/Oueme-Ogun-Groundwater-Recharge/">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23111'/%3E%3Cpath d='M16 6c-3.6 4.6-5.6 7.7-5.6 10.2a5.6 5.6 0 0 0 11.2 0C21.6 13.7 19.6 10.6 16 6z' fill='%23fff'/%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://api.fontshare.com">
+    <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+    <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&amp;display=swap">
+    <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=zodiak@500,700&amp;display=swap">
+    <link rel="stylesheet" href="vendor/leaflet-1.9.4/leaflet.css">
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="explore-page">
+<header class="site-header">
+    <div class="site-inner">
+        <a class="site-id" href="./">Ouémé–Ogun water balance</a>
+        <nav class="toc" aria-label="Sections">
+            <a href="./#abstract">Summary</a>
+            <a href="./#study-area">Study area</a>
+            <a href="./#data-method">Method</a>
+            <a href="./#results">Results</a>
+            <a href="./#discussion">Meaning</a>
+            <a href="explore.html" aria-current="page">Explorer</a>
+        </nav>
+    </div>
+    <div class="progress" aria-hidden="true"><span id="progress"></span></div>
+</header>
+
+<main class="article ex-main" id="top">
+    <section id="explorer" class="ex-intro" aria-labelledby="h-explorer">
+        <p class="back"><a href="./">← Back to the study</a></p>
+        <h1 id="h-explorer">Explore the water balance</h1>
+        <p>Every 5 km cell of both catchments, by year, layer and rainfall product. Hover a cell for its value; select a catchment for its totals. mm per year, 2018–2024.</p>
+    </section>
+    <div class="wide">
+        <div class="explorer-bar" role="group" aria-label="Explorer controls">
+            <div class="field"><span class="field-label" id="exl-zone">Catchment</span><div class="seg" id="ex-zone" role="group" aria-labelledby="exl-zone"></div></div>
+            <div class="field"><span class="field-label" id="exl-layer">Layer</span><div class="seg" id="ex-layer" role="group" aria-labelledby="exl-layer"></div></div>
+            <div class="field"><span class="field-label" id="exl-prod">Rainfall</span><div class="seg" id="ex-prod" role="group" aria-labelledby="exl-prod"></div></div>
+            <div class="field"><span class="field-label" id="exl-year">Year</span><div class="field-row"><button type="button" class="play" id="ex-play" aria-label="Play through the years"></button><div class="seg" id="ex-year" role="group" aria-labelledby="exl-year"></div></div></div>
+        </div>
+        <div class="explorer">
+            <div class="explorer-map">
+                <div class="map" id="explore-map" role="group" aria-label="Interactive map of the water-balance terms on the 5 km grid"></div>
+                <div class="legend" id="ex-legend">
+                    <div class="t" id="el-title">—</div>
+                    <div class="s" id="el-source">—</div>
+                    <div class="ramp" id="el-ramp"></div>
+                    <div class="ramp-ticks"><span id="el-min">—</span><span id="el-mid">—</span><span id="el-max">—</span></div>
+                </div>
+            </div>
+            <h2 class="sr-only">Catchment totals</h2><div class="side" id="ex-side" aria-live="polite"></div>
+        </div>
+        <figure class="tablefig">
+            <figcaption id="cap-t4">Annual catchment values, mm per year, for the rainfall product selected above, with <var>Q</var> estimated as in Eq. 1. Class: wet, normal or dry against the terciles of 1991–2020 (CHIRPS v2.0). Select a year to show it on the map.</figcaption>
+            <div class="table-wrap">
+                <table id="ex-table" aria-labelledby="cap-t4">
+                </table>
+            </div>
+        </figure>
+    </div>
+
+    
+</main>
+
+<footer>
+    <div class="inner">
+        <p class="sig"><span>David Oloyede</span><span><a href="https://github.com/oloyededavid">github.com/oloyededavid</a></span><span>Last updated <time datetime="2026-11-06">6 November 2026</time></span><span>Version 0.3</span><span class="views" id="views" hidden></span></p>
+        <p>Code MIT, derived data CC BY 4.0. Source data keep their own terms: FAO WaPOR v3 (CC BY 4.0), CHIRPS (Climate Hazards Center, UC Santa Barbara), TAMSAT (University of Reading), HydroBASINS, Natural Earth. Basemap © Esri.</p>
+        <p>Other studies: <a href="https://oloyededavid.github.io/Lagos-Urban-Heat-Analytics/">Lagos Urban Heat and Exposure Analytics</a> · <a href="https://oloyededavid.github.io/Ogun-Catchment-Coast-Observatory/">Ogun Catchment-to-Coast Observatory</a></p>
+    </div>
+</footer>
+
+<script src="vendor/leaflet-1.9.4/leaflet.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
