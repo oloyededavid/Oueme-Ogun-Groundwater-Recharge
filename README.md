@@ -141,19 +141,18 @@ The validation code is written and tested on synthetic data only; no well data h
 
 Live: <https://oloyededavid.github.io/Oueme-Ogun-Groundwater-Recharge/>
 
-The study is published as a research paper with interactive figures: abstract, introduction with three research questions, study area, data and method, results, discussion, limitations and future work, conclusion, then a data explorer and the references.
+The web version is a short research note in plain language: a summary, why the test matters, the study area, the data and method, the results, what they mean, limits and a conclusion, then a data explorer and the references.
 
-- **Figure 1:** locator map of the two catchments and the Bétérou gauge, with an inset of Africa.
-- **Figure 2:** the workflow, from catchments to the tests of the residual.
-- **Figure 3:** annual rainfall by product and WaPOR evapotranspiration, 2018–2024.
-- **Figure 4:** water-balance terms on the 5 km grid; the map changes with the text beside it.
-- **Figure 5:** the residual against the runoff ratio used to estimate river flow.
-- **Figure 6:** the water-table rise needed to store the residual, with a specific-yield slider and a schematic weathering profile.
-- **Figure 7:** the residual against recharge from groundwater-level studies in Benin.
-- **Figure 8:** the balance with adjustable evapotranspiration, rainfall and runoff ratio.
-- **Tables 1–5:** data, the balance in each catchment, the sources of uncertainty, and annual values in the **data explorer** (every 5 km cell by year, layer and rainfall product, with shareable links).
+- **Figure 1:** the two catchments and the Bétérou gauge, with an inset of Africa.
+- **Figure 2:** annual rainfall from three products and WaPOR evapotranspiration.
+- **Figure 3:** the water balance on the 5 km grid; the map changes with the text beside it.
+- **Figure 4:** the gap against the assumed runoff ratio.
+- **Figure 5:** the water-table rise needed to store the gap, with a specific-yield slider.
+- **Figure 6:** the gap against recharge measured in Benin's wells.
+- **Figure 7:** the balance with each term adjustable.
+- **Tables 1–4:** data, the Upper Ouémé balance, how the gap changes with each assumption, and annual values in the **data explorer**.
 
-The PDF report (`docs/report/oueme-ogun-water-balance.pdf`) is built from the web version by `scripts/07_build_report.js`, so the two carry the same text and numbers.
+The full method lives in `research/` and in the PDF. The PDF report (`docs/report/oueme-ogun-water-balance.pdf`) is built from the web version by `scripts/07_build_report.js`, so the two carry the same text and numbers.
 
 Every number is computed in the browser from `docs/data/app_data.json`, which `scripts/06_build_app.py` writes from the analysis outputs; none is typed into the page. The maps draw each 5 km rainfall cell as a square, with CHIRPS v3.0, TAMSAT and WaPOR evapotranspiration averaged onto the same cells, so they never show more detail than the data has. The page is plain HTML, CSS and JavaScript. Leaflet 1.9.4 is bundled in `docs/vendor/`, the type is Satoshi (Fontshare) and the basemap is Esri Light Gray Canvas. To view it locally:
 

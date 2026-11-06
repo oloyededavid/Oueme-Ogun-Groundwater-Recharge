@@ -62,10 +62,6 @@ const n = s => Number(String(s).replace(/,/g, '').replace('−', '-'));
   // citation, navigation, story
   await p.click('#copy-cite'); await p.waitForTimeout(250);
   ok('citation copied', (await p.evaluate(() => navigator.clipboard.readText())).startsWith('Oloyede, D. O. (2026).') && !!(await p.$('.snack')));
-  await p.evaluate(() => document.getElementById('discussion').scrollIntoView({ block: 'start' })); await p.waitForTimeout(300);
-  ok('contents bar marks Discussion', (await p.$eval('.toc a[aria-current="true"]', a => a.textContent)) === 'Discussion');
-  await p.evaluate(() => document.querySelector('#fig-1').scrollIntoView({ block: 'center' })); await p.waitForTimeout(300);
-  ok('contents bar marks Study area at Figure 1', (await p.$eval('.toc a[aria-current="true"]', a => a.textContent)) === 'Study area');
   for (const [s, title] of [['et', 'Evapotranspiration'], ['gap', 'Rainfall minus evapotranspiration'], ['rain', 'Rainfall,']]) {
     await p.evaluate(s => { const el = document.querySelector(`.step[data-step="${s}"]`); scrollTo(0, el.getBoundingClientRect().top + scrollY - (innerHeight - el.offsetHeight) / 2); }, s); await p.waitForTimeout(900);
     ok(`story step ${s} sets the map`, (await t('#sl-title')).startsWith(title) && (await p.$eval(`.step[data-step="${s}"]`, e => e.classList.contains('is-active'))));

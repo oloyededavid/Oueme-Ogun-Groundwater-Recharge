@@ -381,12 +381,12 @@
         const span = f => range(PRODS.flatMap(f));
         const A = obs.area_km2, areas = [obs.published_area_km2[0], props('upper_oueme').hydrobasins_up_area_km2];
         const rows = [
-            ['Rainfall product (Table 2)', `CHIRPS v2.0, CHIRPS v3.0, TAMSAT v3.1, with <var>r</var> = ${fmt(r, 3)}`, span(p => [res(p)])],
-            ['Runoff ratio, observed', `<var>r</var> = ${fmt(obs.periods['1971-1987'].runoff_ratio, 3)} (1971–1987) instead of ${fmt(r, 3)}`, span(p => [res(p, obs.periods['1971-1987'].runoff_ratio)])],
-            ['Runoff ratio, rainfall basis', 'Each product\'s own 1988–2010 rainfall instead of gauge rainfall', range(Object.values(own).map(v => v.mean_closure_residual_mm))],
-            ['Runoff ratio, single years', '0.14–0.28, Donga sub-basin (Kamagaté et al., 2007)', range(PRODS.flatMap(p => [res(p, 0.14), res(p, 0.28)]))],
-            ['Evapotranspiration', 'WaPOR v3 ± 10%', span(p => [res(p, r, 1.1), res(p, r, 0.9)])],
-            ['Catchment area', `${fmtInt(areas[0])}–${fmtInt(areas[1])} km² instead of ${fmtInt(A)} km²`, span(p => areas.map(a => res(p, r * A / a)))]
+            ['Rainfall product', `CHIRPS v2.0, v3.0 or TAMSAT, <var>r</var> = ${fmt(r, 3)} (Table 2)`, span(p => [res(p)])],
+            ['Older runoff ratio', `1971–1987: <var>r</var> = ${fmt(obs.periods['1971-1987'].runoff_ratio, 3)}`, span(p => [res(p, obs.periods['1971-1987'].runoff_ratio)])],
+            ['Ratio from satellite rainfall', 'Each product\'s own 1988–2010 rainfall, not gauges', range(Object.values(own).map(v => v.mean_closure_residual_mm))],
+            ['Runoff ratio of single years', '0.14–0.28, Donga sub-basin', range(PRODS.flatMap(p => [res(p, 0.14), res(p, 0.28)]))],
+            ['Evapotranspiration', '10% higher or lower', span(p => [res(p, r, 1.1), res(p, r, 0.9)])],
+            ['Catchment area', `${fmtInt(areas[0])}–${fmtInt(areas[1])} km²`, span(p => areas.map(a => res(p, r * A / a)))]
         ];
         $('#table-unc tbody').innerHTML = rows.map(([a, b, c]) => `<tr><td class="text">${a}</td><td class="text">${b}</td><td>${c}</td></tr>`).join('');
     }
@@ -394,7 +394,7 @@
     function renderTables() {
         const o = rec('upper_oueme'), g = rec('upper_ogun'), c = clo();
         $('#table-2 tbody').innerHTML = PRODS.map(p => `<tr><td><span class="swatch" style="background:${pcol(p)}"></span>${PROD[p]}</td><td>${fmtInt(o[`p_${p}_mm`])}</td><td>${fmtInt(o.et_wapor_mm)}</td><td>${fmtInt(o[`surplus_${p}_mm`])}</td><td>${fmtInt(o[`q_expected_${p}_mm`])}</td><td>${fmtInt(c[p].mean_closure_residual_mm)}</td><td>${fmt(c[p].residual_pct_of_rainfall, 1)}</td></tr>`).join('');
-        $('#table-3 tbody').innerHTML = PRODS.map(p => `<tr><td><span class="swatch" style="background:${pcol(p)}"></span>${PROD[p]}</td><td>${fmtInt(g[`p_${p}_mm`])}</td><td>${fmtInt(g.et_wapor_mm)}</td><td>${fmtInt(g[`surplus_${p}_mm`])}</td></tr>`).join('');
+        // the Upper Ogun values are given in the text and the explorer
     }
 
     // ---------- product selectors (Figures 3 and 5) ----------
@@ -445,6 +445,14 @@
         const wt = y(WT), need = wt - rise * pxm, top = Math.max(8, need), off = need < 8;
         const bx0 = X0 + Math.round((W - X0) * 0.34), bx1 = W - 16, ax = bx0 + 22, ly = Math.max(26, top + 22);
         el.append(svg('rect', { x: bx0, y: top, width: bx1 - bx0, height: wt - top, class: 'sec-rise' }));
+        // the part of the rise that would lie above the ground surface is hatched: a water table cannot be there
+        if (top < ground) {
+            const defs = svg('defs'), pat = svg('pattern', { id: 'sec-hatch', width: 7, height: 7, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' });
+            pat.append(svg('line', { x1: 0, y1: 0, x2: 0, y2: 7, class: 'sec-hatch-line' }));
+            defs.append(pat); el.prepend(defs);
+            el.append(svg('rect', { x: bx0, y: top, width: bx1 - bx0, height: ground - top, fill: 'url(#sec-hatch)' }));
+            if (ground - top > 40) el.append(T(bx1 - 8, ground - 8, 'above the ground: not possible', 'sec-note sec-warn', { 'text-anchor': 'end' }));
+        }
         el.append(svg('line', { x1: X0, x2: W, y1: wt, y2: wt, class: 'sec-wt' }));
         el.append(T(X0 + 12, wt + 16, 'water table today (illustrative depth)', 'sec-note'));
         if (!off) el.append(svg('line', { x1: bx0, x2: bx1, y1: need, y2: need, class: 'sec-need' }));
@@ -470,7 +478,7 @@
 
     // ---------- Figure 5: sensitivity ----------
     function resetFix() { S.fx = { et: 0, rain: 0, ratio: ratioObs() }; syncFix(); }
-    function syncFix() { $('#fx-et').value = S.fx.et; $('#fx-rain').value = S.fx.rain; $('#fx-ratio').value = S.fx.ratio; renderFix(); }
+    function syncFix() { $('#fx-et').value = S.fx.et; $('#fx-rain').value = S.fx.rain; $('#fx-ratio').value = S.fx.ratio; ['#fx-et', '#fx-rain', '#fx-ratio'].forEach(id => paintRange($(id))); renderFix(); }
     function renderFix() {
         const o = rec('upper_oueme'), k = S.product, f = S.fx;
         const P = o[`p_${k}_mm`] * (1 + f.rain / 100), ET = o.et_wapor_mm * (1 + f.et / 100), Q = f.ratio * P, gap = P - ET - Q;
@@ -493,6 +501,11 @@
         st.textContent = closed ? `Residual ${fmtInt(gap)} mm: balanced within ±5 mm.`
             : gap > 0 ? `Residual ${fmtInt(gap)} mm: rainfall exceeds evapotranspiration plus river flow.`
             : `Residual ${fmtInt(gap)} mm: evapotranspiration plus river flow exceed rainfall.`;
+    }
+    // The filled part of a slider's track follows its value (CSS variable --pct, used by style.css).
+    const paintRange = el => el.style.setProperty('--pct', `${100 * (el.value - el.min) / (el.max - el.min)}%`);
+    function initRanges() {
+        $$('input[type="range"]').forEach(el => { paintRange(el); el.addEventListener('input', () => paintRange(el)); });
     }
     function initFix() {
         $('#fx-et').addEventListener('input', e => { S.fx.et = Number(e.target.value); renderFix(); });
@@ -663,7 +676,7 @@
         buildProdSegs();
         drawSection();
         renderScale();
-        initFix(); syncFix();
+        initFix(); syncFix(); initRanges();
         initNav();
         initStory();
         initExplorer();

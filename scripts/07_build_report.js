@@ -58,12 +58,12 @@ function serve() {
         // Figure 4: the scroll-driven map becomes the static map figure
         const f4 = $('#fig-map'), cap = f4.querySelector('figcaption');
         f4.innerHTML = '<img src="/figures/fig4_maps.png" alt="Maps of WaPOR v3 evapotranspiration and of CHIRPS v2.0 rainfall minus evapotranspiration, 2018-2024 mean, for both catchments">';
-        cap.innerHTML = '<b>Figure 4.</b> WaPOR v3 evapotranspiration (top) and CHIRPS v2.0 rainfall minus evapotranspiration (bottom), 2018–2024 mean, mm per year, on the 5 km CHIRPS grid. The web version shows these maps year by year.';
+        cap.innerHTML = '<b>Figure 3.</b> WaPOR v3 evapotranspiration (top) and CHIRPS v2.0 rainfall minus evapotranspiration (bottom), 2018–2024 mean, mm per year, on the 5 km CHIRPS grid. The web version shows these maps year by year.';
         f4.append(cap); f4.style.marginTop = '';
         // Figures 6 and 8: drop the controls, keep the drawing at the values reported in the text
         $$('#fig-storage .control, #fig-closing .control, #fig-closing .buttons').forEach(e => e.remove());
         $('#fig-storage figcaption').insertAdjacentHTML('beforeend', ' Drawn for a specific yield of 1.5% and CHIRPS v2.0; the web version lets both be changed.');
-        $('#fig-closing figcaption').innerHTML = '<b>Figure 8.</b> Upper Ouémé water balance, 2018–2024 mean, CHIRPS v2.0, with the runoff ratio of Table 2. The web version lets each term be changed.';
+        $('#fig-closing figcaption').innerHTML = '<b>Figure 7.</b> Upper Ouémé water balance, 2018–2024 mean, CHIRPS v2.0, with the runoff ratio of Table 2. The web version lets each term be changed.';
         $$('#fig-closing .interactive > div:first-child').forEach(e => e.remove());
         // title page and colophon
         const header = $('header.title');
