@@ -131,14 +131,15 @@ The validation code is written and tested on synthetic data only; no well data h
 
 ## Interactive app
 
-`docs/index.html` is a single-page app with no build step:
-- a basin and year selector;
-- the rainfall − ET map;
-- key numbers;
-- charts and a table;
-- a reliability tab and downloads.
+Live: <https://oloyededavid.github.io/Oueme-Ogun-Groundwater-Recharge/>
 
-All numbers in it are computed from `docs/data/app_data.json`, which `scripts/06_build_app.py` writes from the analysis outputs. It can be published with GitHub Pages from the `docs/` folder, or viewed locally:
+`docs/index.html` is a single-page atlas with no build step:
+- a map of both catchments showing rain left after ET, rainfall or ET, at the real grid size of each dataset and on one colour scale for every year;
+- catchment, year, rainfall-estimate, layer and basemap selectors;
+- five numbered sections in plain language: the selected catchment, where the rain goes, whether the gap is real water, the three rainfall estimates, and a year-by-year table;
+- a Methods panel, a short guide, and CSV/GeoJSON downloads.
+
+All numbers in it are computed from `docs/data/app_data.json`, which `scripts/06_build_app.py` writes from the analysis outputs, together with the map overlays in `docs/overlays/`. To view it locally:
 
 ```bash
 python -m http.server 8000 --directory docs
