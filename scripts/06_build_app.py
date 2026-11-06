@@ -4,11 +4,11 @@ Writes
   docs/data/app_data.json      annual table, long-term rainfall, summary and the map grid
   docs/data/*.csv, *.geojson   downloadable copies of the analysis outputs
 
-Map grid: every 5 km CHIRPS cell whose centre lies inside a catchment, for the 2018-2024 mean
-and each year, with three layers:
-  rain     rainfall, CHIRPS v2.0
-  et       actual evapotranspiration and interception, WaPOR v3, averaged from 300 m onto the 5 km cells
-  surplus  rain - et
+Map grid: every 5 km CHIRPS v2.0 cell whose centre lies inside a catchment, for the 2018-2024 mean
+and each year, with these layers:
+  rain_<product>     rainfall for chirps2, chirps3 and tamsat (CHIRPS v3.0 and TAMSAT averaged onto the grid)
+  et                 actual evapotranspiration and interception, WaPOR v3, averaged from 300 m onto the 5 km cells
+  surplus_<product>  rain_<product> - et
 The page draws each cell as a square, so nothing finer than the 5 km rainfall grid is implied.
 One colour range per layer is shared by all years and both catchments.
 """
@@ -35,17 +35,18 @@ YEARS = list(range(2018, 2025))
 
 LAYERS = {
     "surplus": {"label": "Rain left after evapotranspiration", "short": "Rain left after ET", "unit": "mm/year",
-                "source": "CHIRPS v2.0 rainfall − WaPOR v3 evapotranspiration", "diverging": True,
-                "stops": ["#b8302f", "#e34948", "#f0efec", "#2a78d6", "#184f95"],
-                "low_label": "Evapotranspiration exceeds rain", "high_label": "Rain exceeds evapotranspiration"},
-    "rain": {"label": "Rainfall", "short": "Rainfall", "unit": "mm/year", "source": "CHIRPS v2.0", "diverging": False,
-             "stops": ["#cde2fb", "#86b6ef", "#3987e5", "#1c5cab", "#0d366b"],
+                "source": "rainfall − WaPOR v3 evapotranspiration", "diverging": True,
+                "stops": ["#7a2e0e", "#c0623a", "#efe9dd", "#5598e7", "#0d366b"],
+                "low_label": "Plants used more than fell", "high_label": "Rain left over"},
+    "rain": {"label": "Rainfall", "short": "Rainfall", "unit": "mm/year", "source": "satellite rainfall", "diverging": False,
+             "stops": ["#d9e8fb", "#86b6ef", "#3987e5", "#1c5cab", "#0d366b"],
              "low_label": "Less rain", "high_label": "More rain"},
     "et": {"label": "Evapotranspiration", "short": "Evapotranspiration", "unit": "mm/year",
            "source": "WaPOR v3, averaged from 300 m onto the 5 km cells", "diverging": False,
-           "stops": ["#fbe3d6", "#f4b08f", "#eb6834", "#b84a1c", "#7a2e0e"],
-           "low_label": "Less water back to the air", "high_label": "More water back to the air"},
+           "stops": ["#dcf3e8", "#8fdcb9", "#1baf7a", "#0f7d56", "#06492f"],
+           "low_label": "Less water back to the sky", "high_label": "More water back to the sky"},
 }
+PRODUCT_DIRS = {"chirps2": "chirps_v2", "chirps3": "chirps_v3", "tamsat": "tamsat_v3.1"}
 
 
 def onto(src, dst):
@@ -67,14 +68,19 @@ def basin_grid(basin: str, geom) -> dict:
     rows, cols = np.where(inside)
     t = ref.transform
     cells = [[round(t.f + (r + 1) * t.e, 4), round(t.c + c * t.a, 4)] for r, c in zip(rows, cols)]  # [south, west]
-    per_year = {"rain": [], "et": [], "surplus": []}
+    per_year = {"et": []}
+    for k in PRODUCT_DIRS:
+        per_year[f"rain_{k}"], per_year[f"surplus_{k}"] = [], []
     for y in YEARS:
-        rain = load_subset(RASTERS / "chirps_v2" / f"{basin}_{y}.tif")
-        assert rain.transform == ref.transform, "CHIRPS clips must share one grid"
-        et = onto(load_subset(RASTERS / "wapor_aeti" / f"{basin}_{y}.tif"), rain)
-        per_year["rain"].append(rain.data[rows, cols])
-        per_year["et"].append(et[rows, cols])
-        per_year["surplus"].append(rain.data[rows, cols] - et[rows, cols])
+        grid = load_subset(RASTERS / "chirps_v2" / f"{basin}_{y}.tif")
+        assert grid.transform == ref.transform, "CHIRPS v2.0 clips must share one grid"
+        et = onto(load_subset(RASTERS / "wapor_aeti" / f"{basin}_{y}.tif"), grid)[rows, cols]
+        per_year["et"].append(et)
+        for k, folder in PRODUCT_DIRS.items():
+            src = load_subset(RASTERS / folder / f"{basin}_{y}.tif")
+            rain = (src.data if (src.transform == grid.transform and src.data.shape == grid.data.shape) else onto(src, grid))[rows, cols]
+            per_year[f"rain_{k}"].append(rain)
+            per_year[f"surplus_{k}"].append(rain - et)
     values = {}
     for layer, arrs in per_year.items():
         stack = np.vstack(arrs)
@@ -88,7 +94,8 @@ def main() -> None:
     grids = {f["properties"]["basin_id"]: basin_grid(f["properties"]["basin_id"], shape(f["geometry"])) for f in feats}
 
     for layer, meta in LAYERS.items():
-        vals = np.concatenate([np.concatenate(list(g["values"][layer].values())) for g in grids.values()])
+        keys = ["et"] if layer == "et" else [f"{layer}_{k}" for k in PRODUCT_DIRS]
+        vals = np.concatenate([np.concatenate(list(g["values"][key].values())) for g in grids.values() for key in keys])
         vals = vals[np.isfinite(vals)]
         if meta["diverging"]:
             s = nice(np.percentile(np.abs(vals), 99))
