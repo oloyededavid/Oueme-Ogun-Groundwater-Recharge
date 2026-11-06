@@ -687,3 +687,26 @@ input[type="range"]::-webkit-slider-thumb { border-color: var(--accent-ink); }
 .site-header .toc { margin-left: auto; flex: 0 1 auto; }
 .findings li { text-align: left; }
 .toc a[aria-current="page"] { color: var(--accent-ink); background: var(--accent-soft); }
+
+/* alignment pass: one centre line, even edges */
+.article h2 .n, .article h3 .n { color: var(--ink); }
+#ratiochart, #scale { margin-left: auto; margin-right: auto; }
+.eqx { margin-left: 0; }
+.explore-page .ex-intro { grid-column: wide; }
+.explore-page .ex-intro p { max-width: var(--main); }
+.explore-page .ex-intro h1 { margin-left: 0; }
+figcaption { hyphens: manual; -webkit-hyphens: manual; }
+.fb-status { min-height: 1.5em; }
+.react-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.react-status { font-size: 14px; color: var(--accent-ink); }
+.react[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); }
+.react.is-other { opacity: 0.55; }
+.react.pop { animation: react-pop 0.35s ease; }
+@keyframes react-pop { 50% { transform: scale(1.08); } }
+.fb-fallback { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.fb-fallback .button { text-decoration: none; }
+@media (prefers-reduced-motion: reduce) { .react.pop { animation: none; } }
+.react-row { margin-bottom: 16px; }
+.react-row .reactions { margin-bottom: 0; }
+.fb-fallback { align-items: center; }
+.explore-page .ex-intro h1 { margin-bottom: 10px; }
