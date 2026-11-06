@@ -28,7 +28,7 @@ All numbers are computed by the scripts and stored in [`outputs/summary.json`](o
 
 ## Findings
 
-1. **The water balance does not close at Bétérou.** Over several years, rainfall − ET − river flow should be close to zero. Using the higher of the two observed runoff ratios (0.142), which gives the smaller residual, it is 133 mm/year with CHIRPS v2.0, 169 with CHIRPS v3.0 and 121 with TAMSAT (10.6%, 13.0% and 9.7% of rainfall). It is positive in all seven years for all three products.
+1. **The water balance does not close at Bétérou.** Over several years, rainfall − ET − river flow should be close to zero. Using the higher of the two observed runoff ratios (0.142), which gives the smaller residual, it is 133 mm/year with CHIRPS v2.0, 169 with CHIRPS v3.0 and 121 with TAMSAT (10.6%, 13.0% and 9.7% of rainfall). It is positive in all seven years for all three products. Working out the river's share from each CHIRPS version's own 1988–2010 rainfall, instead of the rainfall published with the flow record, gives slightly larger gaps (138 and 179 mm), so these numbers are on the cautious side.
 
 2. **The residual is not stored groundwater.** Summed over 2018–2024 it is 847–1,181 mm. With the specific yield of weathered crystalline aquifers (0.2–1.5%; Lachassagne et al., 2021), storing that much water would raise the water table by 56–79 m even at the highest specific yield, and by up to 590 m at the lowest. Neither is physically plausible, so most of the residual must be error in the inputs or a change in the runoff ratio.
 
@@ -38,7 +38,7 @@ All numbers are computed by the scripts and stored in [`outputs/summary.json`](o
 
 4. **The data cannot say which term is wrong.** Taken one at a time, closing the balance needs:
    - ET 12.8–17.8% higher (the overall error reported for WaPOR v2 across Africa was 29–31%; Blatchford et al., 2020); or
-   - rainfall 9.7–13.0% lower; or
+   - rainfall 11.3–15.1% lower (the expected river flow falls with it); or
    - a runoff ratio of 0.24–0.27 instead of the 0.14 observed at Bétérou in 1971–2010. Single-year runoff coefficients of 0.14–0.28 were calculated for the 586 km² Donga sub-basin (Kamagaté et al., 2007), and 0.10–0.26 downstream at Bonou, a much larger catchment. Such a ratio is possible in a single year, but the balance needs it on average over seven years for the whole 10,000 km².
 
    Any one of these, or a mix, is possible. Measured river flow for 2018–2024 would separate them.
@@ -129,16 +129,23 @@ The validation code is written and tested on synthetic data only; no well data h
 2. **River flow.** AMMA-CATCH has operated a water-level station on the Ouémé at Bétérou ([CEOP dataset description](https://data.eol.ucar.edu/file/download/420FA8AC/CATCH_stream.txt)). Whether discharge for 2018–2024 is available needs to be checked. It would replace the assumed runoff ratio and show which term breaks the balance.
 3. **Ground ET.** Eddy-covariance ET was measured at Nalohou (cultivated) and Bellefoungou (woodland) in northern Benin from July 2008 to June 2010 (Mamadou et al., 2016). The Nalohou site (about 9.74°N, 1.60°E) lies inside this study's catchment. Those years are before WaPOR v3 begins (2018), so a direct check of WaPOR would need later measurements.
 
-## Interactive app
+## Interactive app: *The Missing Millimetres*
 
 Live: <https://oloyededavid.github.io/Oueme-Ogun-Groundwater-Recharge/>
 
-`docs/index.html` is a single-page atlas with no build step:
-- a map of both catchments showing rain left after ET, rainfall or ET on the 5 km grid, one colour scale for every year, with a year slider;
-- five tabs in plain language: Overview (short answer and findings), Catchment (where the rain goes), Year by year (charts and table), Is the gap real?, and Compare;
-- a switch between the three rainfall estimates, light and dark themes, a guided tour, glossary, Methods, shareable links, and data and image downloads.
+The site tells the study as a story you scroll through, then hands over the data:
 
-All numbers in it are computed from `docs/data/app_data.json`, which `scripts/06_build_app.py` writes from the analysis outputs. The map draws every 5 km rainfall cell as a square (evapotranspiration averaged onto the same cells), so it stays sharp at any zoom and never implies more detail than the data has. To view it locally:
+- **Hero:** one year of rain on the Upper Ouémé, drawn to scale in a rain gauge, and the four-line ledger (rain, back to the sky, river, unaccounted for).
+- **Six story steps** with a map that follows along: the catchments, rainfall, evapotranspiration, what is left, the Bétérou gauge, and the gap in each year.
+- **Interactive chapters:**
+  - *Could the ground be hiding it?* A specific-yield slider and a cross-section of the water-table rise needed.
+  - *Do the satellites even agree?* The three rainfall products side by side.
+  - *As big as the thing I was trying to measure.* The gap against published recharge.
+  - *Try to close the gap yourself.* Sliders for ET, rainfall and the river's share, with one-click single fixes.
+- **The Upper Ogun, takeaways, "what would change my mind", and lab notes** on how the study changed along the way.
+- **Explore:** the full map (every 5 km cell, hover to read), year by year with play, all three rainfall products, a table, downloads and shareable links.
+
+All numbers are computed in the browser from `docs/data/app_data.json`, which `scripts/06_build_app.py` writes from the analysis outputs. The map draws every 5 km rainfall cell as a square, with CHIRPS v3.0, TAMSAT and WaPOR evapotranspiration averaged onto the same cells, so it stays sharp at any zoom and never implies more detail than the data has. Leaflet and the fonts (Fraunces and IBM Plex, SIL Open Font License) are bundled in `docs/vendor/`, so the page needs no font or script CDN. To view it locally:
 
 ```bash
 python -m http.server 8000 --directory docs
