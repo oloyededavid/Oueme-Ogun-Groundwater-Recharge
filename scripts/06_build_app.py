@@ -2,6 +2,7 @@
 
 Writes
   docs/data/app_data.json      annual table, long-term rainfall, summary and the map grid
+  docs/data/context.geojson    simplified country outlines for the locator map (Natural Earth 1:50m)
   docs/data/*.csv, *.geojson   downloadable copies of the analysis outputs
 
 Map grid: every 5 km CHIRPS v2.0 cell whose centre lies inside a catchment, for the 2018-2024 mean
@@ -20,31 +21,30 @@ import shutil
 import sys
 from pathlib import Path
 
+import geopandas as gpd
 import numpy as np
 import pandas as pd
 from rasterio.warp import Resampling, reproject
-from shapely.geometry import shape
+from shapely.geometry import box, mapping, shape
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+from recharge.download import NATURAL_EARTH_ADMIN0, ensure_unzipped  # noqa: E402
 from recharge.rasters import inside_mask, load_subset  # noqa: E402
 
 DOCS = ROOT / "docs"
 RASTERS = ROOT / "data/processed/rasters"
 YEARS = list(range(2018, 2025))
 
+# Colour ramps: sequential layers run light to dark in one hue; rainfall minus evapotranspiration is
+# diverging, red-brown below zero and blue above, with a neutral grey at zero.
 LAYERS = {
-    "surplus": {"label": "Rain left after evapotranspiration", "short": "Rain left after ET", "unit": "mm/year",
-                "source": "rainfall − WaPOR v3 evapotranspiration", "diverging": True,
-                "stops": ["#7a2e0e", "#c0623a", "#efe9dd", "#5598e7", "#0d366b"],
-                "low_label": "Plants used more than fell", "high_label": "Rain left over"},
-    "rain": {"label": "Rainfall", "short": "Rainfall", "unit": "mm/year", "source": "satellite rainfall", "diverging": False,
-             "stops": ["#d9e8fb", "#86b6ef", "#3987e5", "#1c5cab", "#0d366b"],
-             "low_label": "Less rain", "high_label": "More rain"},
-    "et": {"label": "Evapotranspiration", "short": "Evapotranspiration", "unit": "mm/year",
-           "source": "WaPOR v3, averaged from 300 m onto the 5 km cells", "diverging": False,
-           "stops": ["#dcf3e8", "#8fdcb9", "#1baf7a", "#0f7d56", "#06492f"],
-           "low_label": "Less water back to the sky", "high_label": "More water back to the sky"},
+    "surplus": {"label": "Rainfall minus evapotranspiration", "short": "Rainfall − ET", "unit": "mm/year", "diverging": True,
+                "stops": ["#7a2e0e", "#c0623a", "#ecebe8", "#5598e7", "#0d366b"]},
+    "rain": {"label": "Rainfall", "short": "Rainfall", "unit": "mm/year", "diverging": False,
+             "stops": ["#d9e8fb", "#86b6ef", "#3987e5", "#1c5cab", "#0d366b"]},
+    "et": {"label": "Evapotranspiration", "short": "Evapotranspiration", "unit": "mm/year", "diverging": False,
+           "stops": ["#dcf3e8", "#8fdcb9", "#1baf7a", "#0f7d56", "#06492f"]},
 }
 PRODUCT_DIRS = {"chirps2": "chirps_v2", "chirps3": "chirps_v3", "tamsat": "tamsat_v3.1"}
 
@@ -119,6 +119,18 @@ def main() -> None:
     (DOCS / "data/app_data.json").write_text(json.dumps(app, ensure_ascii=False, separators=(",", ":")))
     for src in ["outputs/annual_balance.csv", "outputs/long_term_chirps.csv", "data/processed/basins.geojson"]:
         shutil.copy(ROOT / src, DOCS / "data" / Path(src).name)
+    # Locator map: country outlines clipped to the map frame and simplified (about 1 km), plus a coarse
+    # outline of Africa (about 25 km) for the inset.
+    rounded = lambda geom, nd: json.loads(json.dumps(mapping(geom)), parse_float=lambda x: round(float(x), nd))
+    frame = box(0.2, 5.7, 5.2, 11.2)
+    ne_all = gpd.read_file(ensure_unzipped(NATURAL_EARTH_ADMIN0, ROOT / "data/raw"))[["ADMIN", "CONTINENT", "geometry"]]
+    ne = ne_all[ne_all.intersects(frame)].copy()
+    ne["geometry"] = ne.geometry.intersection(frame).simplify(0.008, preserve_topology=True)
+    feats = [{"type": "Feature", "properties": {"name": r.ADMIN}, "geometry": rounded(r.geometry, 3)} for r in ne.itertuples()]
+    africa = ne_all[ne_all["CONTINENT"] == "Africa"].geometry.union_all().simplify(0.25, preserve_topology=True)
+    feats.append({"type": "Feature", "properties": {"name": "Africa", "role": "inset"}, "geometry": rounded(africa, 2)})
+    (DOCS / "data/context.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": feats}, separators=(",", ":")))
+
     old = DOCS / "overlays"
     if old.exists():
         shutil.rmtree(old)
