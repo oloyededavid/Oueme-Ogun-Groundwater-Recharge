@@ -6,7 +6,7 @@ Free satellite data now give annual rainfall (CHIRPS, TAMSAT) and actual evapotr
 
 **Short answer: not with the data available.** No river flow was measured in 2018–2024, so flow at Bétérou is estimated from the runoff ratio observed in 1988–2010. With that ratio, rainfall − ET − river flow in the Upper Ouémé leaves **122–169 mm/year** (10–13% of rainfall), in every year and with every rainfall product. If that were water stored underground, the water table would have risen by **at least 57 m** over the seven years, so it is not stored water. The result is **conditional on the runoff ratio**: a ratio of 0.24–0.27, inside the single-year range reported for a sub-basin of the same catchment, closes the balance. Either way, the uncertainty is **as large as recharge itself**: groundwater-level studies in Benin's crystalline basement report recharge of about 4% of rainfall (Kotchoni et al., 2019) and 5–24% (Kamagaté et al., 2007). A satellite balance therefore cannot resolve recharge here without measured flow and well records. This project measures the size of that gap, shows how it depends on each assumption, and sets out the data needed to close it.
 
-The web version is a research paper with interactive figures: <https://oloyededavid.github.io/Oueme-Ogun-Groundwater-Recharge/>. A typeset PDF of the same text is in [`docs/report/`](docs/report/oueme-ogun-water-balance.pdf).
+The web version is a research paper with interactive figures: <https://oloyededavid.github.io/Oueme-Ogun-Groundwater-Recharge/>. A separate [explorer page](https://oloyededavid.github.io/Oueme-Ogun-Groundwater-Recharge/explore.html) maps every 5 km cell by year, layer and rainfall product.
 
 ![Rainfall minus ET against the river flow expected from the observed Bétérou runoff ratios](figures/fig5_closure.png)
 
@@ -150,13 +150,13 @@ The web version is a short research note in plain language: a summary, why the t
 - **Figure 5:** the water-table rise needed to store the gap, with a specific-yield slider.
 - **Figure 6:** the gap against recharge measured in Benin's wells.
 - **Figure 7:** the balance with each term adjustable.
-- **Tables 1–4:** data, the Upper Ouémé balance, how the gap changes with each assumption, and annual values in the **data explorer**.
+- **Tables 1–4:** data, the Upper Ouémé balance, how the gap changes with each assumption, and annual values on the **explorer page**.
 
-Readers can also select a catchment on the map or in Figure 2, click a term of the water-balance equation to see what it is, open a drawer describing each dataset, enlarge figures or copy a link to them, and send feedback. There is no backend: feedback opens the reader's own email app, and the page stores nothing. A monthly view was considered and left out, because the project keeps only annual totals.
+Readers can also select a catchment on the map or in Figure 2, click a term of the water-balance equation to see what it is, open a drawer describing each dataset, enlarge figures or copy a link to them, and send feedback. A note is sent to the author's email through FormSubmit (formsubmit.co); if that service does not respond, the reader's own email app opens instead. Page views (once per browser session) and reaction clicks (once per browser) are counted with the public Abacus counter (abacus.jasoncameron.dev) on the live site only; no names, addresses or cookies are stored. A monthly view was considered and left out, because the project keeps only annual totals.
 
-The full method lives in `research/` and in the PDF. The PDF report (`docs/report/oueme-ogun-water-balance.pdf`) is built from the web version by `scripts/07_build_report.js`, so the two carry the same text and numbers.
+The full method lives in `research/`.
 
-Every number is computed in the browser from `docs/data/app_data.json`, which `scripts/06_build_app.py` writes from the analysis outputs; none is typed into the page. The maps draw each 5 km rainfall cell as a square, with CHIRPS v3.0, TAMSAT and WaPOR evapotranspiration averaged onto the same cells, so they never show more detail than the data has. The page is plain HTML, CSS and JavaScript. Leaflet 1.9.4 is bundled in `docs/vendor/`, the type is Satoshi (Fontshare) and the basemap is Esri Light Gray Canvas. To view it locally:
+Every number is computed in the browser from `docs/data/app_data.json`, which `scripts/06_build_app.py` writes from the analysis outputs; none is typed into the page. The maps draw each 5 km rainfall cell as a square, with CHIRPS v3.0, TAMSAT and WaPOR evapotranspiration averaged onto the same cells, so they never show more detail than the data has. The page is plain HTML, CSS and JavaScript. Leaflet 1.9.4 is bundled in `docs/vendor/`, the type is Satoshi with Zodiak headings (Fontshare) and the basemap is Esri Light Gray Canvas. To view it locally:
 
 ```bash
 python -m http.server 8000 --directory docs
@@ -198,12 +198,6 @@ python scripts/06_build_app.py
 python -m pytest
 ```
 
-The PDF report needs Node 18+ and Playwright with Chromium:
-
-```bash
-node scripts/07_build_report.js
-```
-
 On first run, `01_build_basins.py` downloads HydroBASINS (80 MB) and `05_figures.py` downloads the Natural Earth country outlines (0.8 MB) into `data/raw/`. Both check the files' SHA-256 against the files used here. `04_validate_wtf.py` exits with "pending" until AMMA-CATCH files are placed in `data/raw/amma_catch/`. `tests/test_core.py` uses hand-calculated values and synthetic inputs; it tests the code, not the method. `tests/test_outputs.py` checks that the committed outputs are internally consistent, use one catchment area, and match the web version's data. GitHub Actions runs them on every push to `main` and on pull requests.
 
 ## Repository structure
@@ -214,12 +208,12 @@ research/                 proposal, literature review, conceptual model, methodo
                           data inventory, assumptions register, references.bib
 src/recharge/             catchments, raster means, water balance, rainfall classes, WTF and storage, downloads
 scripts/                  01 catchments → 02 data → 03 analysis → 04 validation → 05 figures
-                          → 06 web data → 07 PDF report
+                          → 06 web data
 tests/                    unit tests
 data/                     data README, processed catchment clips, provenance (raw downloads not tracked)
 outputs/                  annual table, long-term rainfall, summary.json, map rasters, logs
 figures/                  figures used in this README
-docs/                     web version of the study (GitHub Pages) and docs/report/ (PDF)
+docs/                     web version of the study (GitHub Pages): index.html and explore.html
 ```
 
 ## References

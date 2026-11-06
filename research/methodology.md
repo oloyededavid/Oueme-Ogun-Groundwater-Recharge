@@ -71,7 +71,3 @@ The code has been run on synthetic hydrographs only.
 `tests/test_core.py` checks upstream tracing on a small network, area weighting, the runoff-depth conversion (54.5 m³/s over 10,072 km² = 170.8 mm/year), the balance arithmetic, tercile classification, the WTF calculation, and the storage and water-level-trend calculations, all against hand-calculated values or synthetic series. These are software tests; they say nothing about whether the method is right for these catchments.
 
 `tests/test_outputs.py` checks the committed outputs: seven complete years per catchment, one area for every term, every balance term recomputable from the annual table, the runoff-ratio sensitivity closing where stated, the storage diagnostic following its formula, and the web version's data equal to `outputs/summary.json` and `outputs/annual_balance.csv`.
-
-## 10. Report (`scripts/07_build_report.js`)
-
-The PDF report is built from the web version, so the two carry the same text and numbers. The script loads the page, waits for its numbers to be computed, removes the navigation, explorer and controls, replaces the interactive map with `figures/fig4_maps.png`, and prints the result to A4 with `docs/report/report.css`.
