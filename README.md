@@ -152,6 +152,8 @@ The web version is a short research note in plain language: a summary, why the t
 - **Figure 7:** the balance with each term adjustable.
 - **Tables 1–4:** data, the Upper Ouémé balance, how the gap changes with each assumption, and annual values in the **data explorer**.
 
+Readers can also select a catchment on the map or in Figure 2, click a term of the water-balance equation to see what it is, open a drawer describing each dataset, enlarge figures or copy a link to them, and send feedback. There is no backend: feedback opens the reader's own email app, and the page stores nothing. A monthly view was considered and left out, because the project keeps only annual totals.
+
 The full method lives in `research/` and in the PDF. The PDF report (`docs/report/oueme-ogun-water-balance.pdf`) is built from the web version by `scripts/07_build_report.js`, so the two carry the same text and numbers.
 
 Every number is computed in the browser from `docs/data/app_data.json`, which `scripts/06_build_app.py` writes from the analysis outputs; none is typed into the page. The maps draw each 5 km rainfall cell as a square, with CHIRPS v3.0, TAMSAT and WaPOR evapotranspiration averaged onto the same cells, so they never show more detail than the data has. The page is plain HTML, CSS and JavaScript. Leaflet 1.9.4 is bundled in `docs/vendor/`, the type is Satoshi (Fontshare) and the basemap is Esri Light Gray Canvas. To view it locally:

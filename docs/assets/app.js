@@ -37,7 +37,7 @@
     const BIDS = ['upper_oueme', 'upper_ogun'];
     const BASIN = { upper_oueme: 'Upper Ouémé', upper_ogun: 'Upper Ogun' };
 
-    const S = { product: 'chirps2', sy: 1.5, fx: { et: 0, rain: 0, ratio: null }, ex: { zone: 'ALL', layer: 'surplus', period: 'mean', product: 'chirps2' } };
+    const S = { basin: 'upper_oueme', term: 'P', product: 'chirps2', sy: 1.5, fx: { et: 0, rain: 0, ratio: null }, ex: { zone: 'ALL', layer: 'surplus', period: 'mean', product: 'chirps2' } };
     let D = null, GEO = null, CTX = null;
 
     // ---------- data access ----------
@@ -130,7 +130,14 @@
         const g = svg('g', { 'clip-path': 'url(#loc-frame)' });
         CTX.features.filter(f => f.properties.role !== 'inset')
             .forEach(f => g.append(svg('path', { d: pathOf(f.geometry, P), class: `loc-country${['Benin', 'Nigeria'].includes(f.properties.name) ? ' is-study' : ''}` })));
-        GEO.features.forEach(f => g.append(svg('path', { d: pathOf(f.geometry, P), class: 'loc-basin' })));
+        GEO.features.forEach(f => {
+            const b = f.properties.basin_id;
+            const path = svg('path', { d: pathOf(f.geometry, P), class: `loc-basin${b === S.basin ? ' is-on' : ''}`, 'data-basin': b, tabindex: 0, role: 'button',
+                'aria-label': `${BASIN[b]}: show details`, 'aria-pressed': String(b === S.basin) });
+            path.addEventListener('click', () => setBasin(b));
+            path.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setBasin(b); } });
+            g.append(path);
+        });
         el.append(g);
         el.append(svg('rect', Object.assign({ class: 'loc-edge' }, box)));
         // graticule ticks outside the frame
@@ -312,33 +319,88 @@
 
     // ---------- Figure 3: annual rainfall by product and evapotranspiration ----------
     function renderRainChart() {
-        const el = $('#rainchart'); el.innerHTML = '';
+        const el = $('#rainchart'), b = S.basin;
         const all = D.annual.flatMap(r => PRODS.map(p => r[`p_${p}_mm`]).concat(r.et_wapor_mm));
         const lo = Math.floor((Math.min(...all) - 50) / 100) * 100, hi = Math.ceil((Math.max(...all) + 50) / 100) * 100;
-        const W = 480, H = 300, m = { l: 52, r: 14, t: 34, b: 30 };
+        // drawn at the width it is shown (360-960 units), so the text stays legible on a phone
+        const W = Math.round(Math.max(360, Math.min(960, el.getBoundingClientRect().width || 960))), H = W < 600 ? 300 : 320, m = { l: 52, r: 12, t: 16, b: 30 };
+        if (el.dataset.w && Number(el.dataset.w) !== W) el.innerHTML = '';
+        el.dataset.w = W;
         const x = i => m.l + (W - m.l - m.r) * (i / (YEARS.length - 1)), y = v => m.t + (H - m.t - m.b) * (1 - (v - lo) / (hi - lo));
         const series = [...PRODS.map(p => ({ key: `p_${p}_mm`, name: PROD[p], color: pcol(p), cls: 'ch-line' })), { key: 'et_wapor_mm', name: 'Evapotranspiration, WaPOR v3', color: css('--air'), cls: 'ch-line ch-et' }];
-        const legend = document.createElement('ul'); legend.className = 'keylist ch-legend';
-        legend.innerHTML = series.map(s => `<li><i style="background:${s.color}"></i><span>${s.name}</span></li>`).join('') + '<li><i class="dash"></i><span>Rainfall, 1991–2020 mean (CHIRPS v2.0)</span></li>';
-        el.append(legend);
-        BIDS.forEach(b => {
-            const rows = rowsOf(b), base = D.summary.basins[b].baseline_1991_2020_mean_chirps2_mm;
+        const rows = rowsOf(b), base = D.summary.basins[b].baseline_1991_2020_mean_chirps2_mm;
+        // the axes and legend are drawn once; switching catchment moves the lines and points (CSS transitions)
+        if (!el.querySelector('svg')) {
+            const legend = document.createElement('ul'); legend.className = 'keylist ch-legend';
+            legend.innerHTML = series.map(se => `<li><i style="background:${se.color}"></i><span>${se.name}</span></li>`).join('') + '<li><i class="dash"></i><span>Rainfall, 1991–2020 mean</span></li>';
             const s = svg('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', class: 'chart' });
-            s.setAttribute('aria-label', `${BASIN[b]}: annual rainfall and evapotranspiration 2018–2024. ` + rows.map(r => `${r.year}: ${PRODS.map(p => `${PROD[p]} ${fmtInt(r[`p_${p}_mm`])}`).join(', ')}, ET ${fmtInt(r.et_wapor_mm)} mm`).join('; '));
-            s.append(svg('text', { x: m.l, y: 16, class: 'ch-title' }, BASIN[b]));
             axisY(s, niceTicks(lo, hi, 200), y, m.l, W - m.r, fmtInt);
-            YEARS.forEach((yr, i) => s.append(svg('text', { x: x(i), y: H - 8, 'text-anchor': 'middle', class: 'ch-tick' }, yr)));
-            s.append(svg('line', { x1: m.l, x2: W - m.r, y1: y(base), y2: y(base), class: 'ch-base' }));
-            series.forEach(se => {
-                s.append(svg('path', { d: rows.map((r, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(r[se.key]).toFixed(1)}`).join(''), class: se.cls, stroke: se.color }));
-                rows.forEach((r, i) => {
-                    const c = svg('circle', { cx: x(i), cy: y(r[se.key]), r: 4, fill: se.color, class: 'ch-pt' });
-                    c.append(svg('title', {}, `${BASIN[b]}, ${r.year}: ${se.name} ${fmtInt(r[se.key])} mm`));
-                    s.append(c);
-                });
+            YEARS.forEach((yr, i) => s.append(svg('text', { x: x(i), y: H - 8, 'text-anchor': 'middle', class: 'ch-tick' }, W < 600 ? `'${String(yr).slice(2)}` : yr)));
+            s.append(svg('line', { x1: m.l, x2: W - m.r, y1: 0, y2: 0, class: 'ch-base', id: 'rain-base' }));
+            series.forEach((se, k) => {
+                s.append(svg('path', { d: '', class: se.cls, stroke: se.color, id: `rain-line-${k}` }));
+                YEARS.forEach((yr, i) => { const c = svg('circle', { cx: x(i), cy: 0, r: 4.5, fill: se.color, class: 'ch-pt', id: `rain-pt-${k}-${i}` }); c.append(svg('title')); s.append(c); });
             });
-            el.append(s);
+            el.append(legend, s);
+        }
+        const s = el.querySelector('svg');
+        s.setAttribute('aria-label', `${BASIN[b]}: annual rainfall and evapotranspiration 2018–2024. ` + rows.map(r => `${r.year}: ${PRODS.map(p => `${PROD[p]} ${fmtInt(r[`p_${p}_mm`])}`).join(', ')}, ET ${fmtInt(r.et_wapor_mm)} mm`).join('; '));
+        const bl = $('#rain-base'); bl.setAttribute('y1', y(base)); bl.setAttribute('y2', y(base));
+        series.forEach((se, k) => {
+            $(`#rain-line-${k}`).setAttribute('d', rows.map((r, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(r[se.key]).toFixed(1)}`).join(''));
+            rows.forEach((r, i) => { const c = $(`#rain-pt-${k}-${i}`); c.setAttribute('cy', y(r[se.key])); c.firstChild.textContent = `${BASIN[b]}, ${r.year}: ${se.name} ${fmtInt(r[se.key])} mm`; });
         });
+    }
+
+    // ---------- Catchment selection: Figure 1 panel, Figure 2 and its key numbers ----------
+    const AREA_NOTE = { upper_oueme: 'River gauge at Bétérou, central Benin', upper_ogun: 'Confluence with the Oyan River, south-west Nigeria' };
+    function renderBasin() {
+        const b = S.basin, r = rec(b), oue = b === 'upper_oueme', pr = PRODS.map(p => r[`p_${p}_mm`]);
+        $$('#basin-seg button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.basin === b)));
+        $$('#locator .loc-basin').forEach(x => { const on = x.dataset.basin === b; x.classList.toggle('is-on', on); x.setAttribute('aria-pressed', String(on)); });
+        $('#basin-info').innerHTML = `<p class="bi-kicker">Selected catchment</p><h3>${BASIN[b]}</h3><dl>
+            <dt>Country</dt><dd>${D.summary.basins[b].country}</dd>
+            <dt>Outlet</dt><dd>${AREA_NOTE[b]}</dd>
+            <dt>Area</dt><dd>${fmtInt(props(b).geodesic_area_km2)} km²</dd>
+            <dt>Study period</dt><dd>2018–2024</dd>
+            <dt>Rainfall</dt><dd>${range(pr)} mm a year</dd>
+            <dt>River-flow record</dt><dd>${oue ? 'Mean flows 1971–2010 (Kodja et al., 2020)' : 'None found'}</dd></dl>
+            <p class="bi-hint">Select the other catchment on the map, or switch in Figure 2.</p>`;
+        $('#basin-stats').innerHTML = [
+            ['Rainfall', `${range(pr)} mm`], ['Evapotranspiration', `${fmtInt(r.et_wapor_mm)} mm`],
+            ['Rainfall − ET', `${range(PRODS.map(p => r[`surplus_${p}_mm`]))} mm`],
+            oue ? ['Residual ε', `${range(PRODS.map(p => clo()[p].mean_closure_residual_mm))} mm`] : ['River flow', 'no record']
+        ].map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+        renderRainChart();
+    }
+    function setBasin(b) { S.basin = b; renderBasin(); }
+    function initBasin() {
+        $('#basin-seg').innerHTML = BIDS.map(b => `<button type="button" data-basin="${b}">${BASIN[b]}</button>`).join('');
+        $('#basin-seg').addEventListener('click', e => { const t = e.target.closest('[data-basin]'); if (t) setBasin(t.dataset.basin); });
+        let w = 0;
+        new ResizeObserver(es => { const nw = Math.round(es[0].contentRect.width); if (nw && nw !== w) { w = nw; renderRainChart(); } }).observe($('#rainchart'));
+        renderBasin();
+    }
+
+    // ---------- Equation 2: select a term to see what it is ----------
+    const TERMS = {
+        P: ['Rainfall, P', 'Satellite rainfall averaged over the catchment. Three products are used because they disagree.'],
+        ET: ['Evapotranspiration, ET', 'Water returned to the air by plants, soil and open water, from FAO WaPOR v3. It is the largest term.'],
+        Q: ['River flow, Q', 'Not measured in 2018–2024: estimated as the 1988–2010 runoff ratio times rainfall (Eq. 1).']
+    };
+    function renderEq() {
+        const o = rec('upper_oueme'), k = S.product, t = S.term;
+        const P = o[`p_${k}_mm`], ET = o.et_wapor_mm, Q = o[`q_expected_${k}_mm`], E = P - ET - Q;
+        $$('.term').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.term === t)));
+        const seg = (cls, v, key, label) => `<div class="${cls}${key === t || t === 'P' ? ' is-on' : ''}" style="width:${100 * v / P}%"><span>${label} ${fmtInt(v)}</span></div>`;
+        $('#eqx').innerHTML = `<p class="eqx-head"><b>${TERMS[t][0]}</b> · Upper Ouémé, ${PROD[k]}, 2018–2024 mean: <b>${fmtInt({ P, ET, Q }[t])} mm a year</b></p>
+            <p class="eqx-text">${TERMS[t][1]}</p>
+            <div class="eqx-p${t === 'P' ? ' is-on' : ''}" aria-hidden="true">P = ${fmtInt(P)} mm, the whole bar</div><div class="eqx-bar" aria-hidden="true">${seg('s-air', ET, 'ET', 'ET')}${seg('s-river', Q, 'Q', 'Q')}${seg('s-gap', E, 'E', 'ε')}</div>
+            <p class="eqx-sum">${fmtInt(P)} − ${fmtInt(ET)} − ${fmtInt(Q)} = <b>${fmtInt(E)} mm</b> left over. This residual holds every error in the three terms; it is not a measure of recharge.</p>`;
+    }
+    function initEq() {
+        $$('.term').forEach(b => b.addEventListener('click', () => { S.term = b.dataset.term; renderEq(); }));
+        renderEq();
     }
 
     // ---------- Figure 5: residual against the runoff ratio ----------
@@ -406,7 +468,7 @@
         syncProdSegs();
     }
     const syncProdSegs = () => $$('[data-prod]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.prod === S.product)));
-    function setProduct(p) { S.product = p; fill(); syncProdSegs(); drawSection(); renderScale(); resetFix(); writeQuery(); }
+    function setProduct(p) { S.product = p; fill(); syncProdSegs(); drawSection(); renderScale(); resetFix(); renderEq(); writeQuery(); }
 
     // ---------- Figure 3: storage ----------
     function drawSection() {
@@ -660,6 +722,88 @@
     }
     function snack(msg) { const el = document.createElement('div'); el.className = 'snack'; el.setAttribute('role', 'status'); el.textContent = msg; document.body.append(el); setTimeout(() => el.remove(), 2000); }
 
+    // ---------- Figure tools: enlarge and link ----------
+    // Which part of each figure to show enlarged; interactive figures (maps, sliders) are not enlarged.
+    const ENLARGE = { 'fig-1': '#locator', 'fig-rain': '#rainchart', 'fig-ratio': '#ratiochart', 'fig-recharge': '#scale', 'fig-storage': '#section' };
+    let opener = null;
+    function openDialog(d, from) { opener = from || document.activeElement; d.showModal(); }
+    function initDialogs() {
+        $$('dialog').forEach(d => {
+            d.addEventListener('click', e => { if (e.target === d || e.target.closest('[data-close]')) d.close(); });
+            d.addEventListener('close', () => { if (opener) opener.focus(); });
+        });
+        $('#open-datasets').addEventListener('click', e => openDialog($('#datasets'), e.currentTarget));
+    }
+    function initFigureTools() {
+        $$('figure[id]').filter(f => !f.classList.contains('tablefig')).forEach(f => {
+            const cap = $('figcaption', f); if (!cap) return;
+            const tools = document.createElement('span'); tools.className = 'fig-tools';
+            if (ENLARGE[f.id]) tools.insertAdjacentHTML('beforeend', '<button type="button" class="tool" data-act="enlarge">Enlarge</button>');
+            tools.insertAdjacentHTML('beforeend', '<button type="button" class="tool" data-act="link">Copy link</button>');
+            cap.append(tools);
+            tools.addEventListener('click', e => {
+                const act = e.target.closest('[data-act]'); if (!act) return;
+                if (act.dataset.act === 'link') {
+                    const url = `${location.origin}${location.pathname}#${f.id}`;
+                    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(() => snack('Link to the figure copied'), () => window.prompt('Link to the figure:', url));
+                    else window.prompt('Link to the figure:', url);
+                    return;
+                }
+                const src = $(ENLARGE[f.id], f), body = $('#viewer-body'), copy = src.cloneNode(true);
+                copy.removeAttribute('id'); $$('[id]', copy).forEach(x => x.removeAttribute('id'));
+                $$('[tabindex], [role="button"]', copy).forEach(x => { x.removeAttribute('tabindex'); x.removeAttribute('role'); x.removeAttribute('aria-pressed'); x.removeAttribute('aria-label'); });
+                if (copy.tagName.toLowerCase() === 'svg') copy.setAttribute('role', 'img');
+                body.innerHTML = ''; body.append(copy);
+                const c = cap.cloneNode(true); $('.fig-tools', c).remove();
+                const t = $('b', c); $('#viewer-title').textContent = t ? t.textContent.replace(/\.$/, '') : 'Figure';
+                if (t) t.remove();
+                $('#viewer-cap').innerHTML = c.innerHTML.trim();
+                $('#viewer-src').textContent = f.dataset.source ? `Source: ${f.dataset.source}` : '';
+                openDialog($('#fig-viewer'), act);
+            });
+        });
+    }
+
+    // ---------- Feedback: no backend, so it is sent by the reader's own email app ----------
+    const FEEDBACK_TO = 'oloyededavid10@gmail.com';
+    function initFeedback() {
+        let reaction = '';
+        $$('.react').forEach(b => b.addEventListener('click', () => {
+            reaction = b.getAttribute('aria-pressed') === 'true' ? '' : b.dataset.react;
+            $$('.react').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.react === reaction)));
+            $('#fb-status').textContent = reaction ? `Selected: ${reaction}. Add a note if you like, then send it by email.` : '';
+        }));
+        $('#fb-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const note = $('#fb-text').value.trim();
+            if (!reaction && !note) { $('#fb-status').textContent = 'Choose a reaction or write a note first.'; return; }
+            const subject = `Ouémé–Ogun water balance: ${reaction || 'feedback'}`;
+            const body = `${reaction ? `Reaction: ${reaction}\n` : ''}${note ? `\n${note}\n` : ''}\n— sent from ${location.origin}${location.pathname}`;
+            location.href = `mailto:${FEEDBACK_TO}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            $('#fb-status').textContent = 'Your email app should now open with the message ready. It is sent only when you send it there; this site keeps nothing.';
+        });
+    }
+
+    // ---------- Reading progress, back to top, sections fading in ----------
+    function initChrome() {
+        const bar = $('#progress'), top = $('#to-top');
+        let queued = false;
+        const update = () => {
+            queued = false;
+            const max = document.documentElement.scrollHeight - innerHeight;
+            bar.style.width = `${max > 0 ? Math.min(100, 100 * scrollY / max) : 0}%`;
+            top.hidden = scrollY < innerHeight * 1.5;
+        };
+        addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(update); } }, { passive: true });
+        update();
+        top.addEventListener('click', () => { scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }); $('.site-id').focus({ preventScroll: true }); });
+        const items = $$('.reveal, [data-reveal]');
+        if (reduced || !('IntersectionObserver' in window)) { items.forEach(x => x.classList.add('in')); return; }
+        document.documentElement.classList.add('js-reveal');
+        const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' });
+        items.forEach(x => io.observe(x));
+    }
+
     // ---------- start ----------
     const get = (u, json = true) => fetch(u).then(r => { if (!r.ok) throw new Error(`${u}: HTTP ${r.status}`); return json ? r.json() : r.text(); });
     Promise.all([get('data/app_data.json'), get('data/basins.geojson'), get('data/context.geojson')]).then(([data, geo, ctx]) => {
@@ -670,7 +814,8 @@
         drawLocator();
         new ResizeObserver(() => { if (($('#locator').getBoundingClientRect().width < 520) !== locSmall) drawLocator(); }).observe($('#locator'));
         renderTables();
-        renderRainChart();
+        initBasin();
+        initEq();
         renderRatioChart();
         renderUncertainty();
         buildProdSegs();
@@ -681,6 +826,10 @@
         initStory();
         initExplorer();
         initTableWraps();
+        initDialogs();
+        initFigureTools();
+        initFeedback();
+        initChrome();
     }).catch(err => {
         console.error(err);
         const m = document.createElement('p');

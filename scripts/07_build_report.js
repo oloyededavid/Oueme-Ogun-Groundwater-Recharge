@@ -53,7 +53,10 @@ function serve() {
         const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
         const main = $('main');
         // keep the article: title, abstract, sections 1-7, references
-        $$('.bar, .skip, footer, #explorer, .note, #data-code').forEach(e => e.remove());
+        $$('.bar, .site-header, .skip, footer, #explorer, .note, #data-code, #feedback, dialog, .to-top, .fig-tools, .fig-bar, #open-datasets').forEach(e => e.remove());
+        // everything is shown at once in print: no fade-in, both catchments' key numbers are in the text
+        document.documentElement.classList.remove('js-reveal');
+        $$('.reveal, [data-reveal]').forEach(e => e.classList.add('in'));
         $$('main > .wide').filter(e => e.querySelector('#explore-map')).forEach(e => e.remove());
         // Figure 4: the scroll-driven map becomes the static map figure
         const f4 = $('#fig-map'), cap = f4.querySelector('figcaption');

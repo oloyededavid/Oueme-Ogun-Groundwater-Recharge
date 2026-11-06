@@ -15,12 +15,18 @@ node tests/web/behaviour.js
 ```
 
 ```bash
+URL=http://127.0.0.1:8767/index.html node tests/web/features.js
+```
+
+```bash
 AXE=node_modules/axe-core/axe.min.js node tests/web/accessibility.js
 ```
 
 - `behaviour.js` checks that every control changes what it should, with expected values read from
   `outputs/summary.json`: product selectors, sliders, the single-term buttons, the explorer and its table,
   shareable links, the contents bar, the scroll-driven map, keyboard focus, and the phone layout.
+- `features.js` checks catchment selection, the equation, the datasets drawer, the figure viewer and
+  links, feedback (sent by email, nothing stored), reading progress and back to top.
 - `accessibility.js` runs axe-core on desktop and phone and reports console errors, failed requests and
   horizontal overflow.
 
