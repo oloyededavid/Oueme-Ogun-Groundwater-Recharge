@@ -316,19 +316,28 @@
 
     <section id="feedback" class="feedback" aria-labelledby="h-feedback">
         <h2 id="h-feedback">Was this research useful?</h2>
-        <div class="reactions" role="group" aria-labelledby="h-feedback">
-            <button type="button" class="button react" data-react="Useful" aria-pressed="false">👍 Useful <span class="rc"></span></button>
-            <button type="button" class="button react" data-react="Interesting" aria-pressed="false">💡 Interesting <span class="rc"></span></button>
-            <button type="button" class="button react" data-react="Needs clarity" aria-pressed="false">🤔 Needs clarity <span class="rc"></span></button>
+        <div class="react-row">
+            <div class="reactions" role="group" aria-labelledby="h-feedback">
+                <button type="button" class="button react" data-react="Useful" aria-pressed="false">👍 Useful <span class="rc"></span></button>
+                <button type="button" class="button react" data-react="Interesting" aria-pressed="false">💡 Interesting <span class="rc"></span></button>
+                <button type="button" class="button react" data-react="Needs clarity" aria-pressed="false">🤔 Needs clarity <span class="rc"></span></button>
+            </div>
+            <span class="react-status" id="react-status" role="status"></span>
         </div>
         <form class="fb-form" id="fb-form">
             <label for="fb-text">Have a suggestion or observation about this research? <span class="opt">Optional</span></label>
             <textarea id="fb-text" rows="3" maxlength="1500"></textarea>
+            <input type="checkbox" name="botcheck" class="sr-only" tabindex="-1" aria-hidden="true">
             <div class="fb-row">
                 <button type="submit" class="button">Send</button>
                 <span class="fb-note">Your note goes straight to the author by email. No name or address needed.</span>
             </div>
             <p class="fb-status" id="fb-status" role="status"></p>
+            <div class="fb-fallback" id="fb-fallback" hidden>
+                <a class="button" id="fb-gmail" target="_blank" rel="noopener">Send with Gmail</a>
+                <a class="button" id="fb-mailto">Send with your email app</a>
+                <button type="button" class="button quiet" id="fb-copy">Copy note</button>
+            </div>
         </form>
     </section>
 

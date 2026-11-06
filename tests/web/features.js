@@ -32,18 +32,16 @@ const { chromium } = require('playwright');
   // figure link
   await p.click('#fig-rain .tool[data-act="link"]'); await p.waitForTimeout(200);
   ok('figure link copied', (await p.evaluate(() => navigator.clipboard.readText())).endsWith('#fig-rain'));
-  // feedback: sent by email through FormSubmit (mocked here), mailto fallback when it fails
-  let posted = null;
-  await p.route(/formsubmit\.co/, r => { posted = r.request().postDataJSON(); r.fulfill({ status: 200, contentType: 'application/json', body: '{"success":"true"}' }); });
-  await p.click('.react[data-react="Useful"]'); await p.fill('#fb-text', 'Test note');
-  await p.click('#fb-form button[type="submit"]'); await p.waitForTimeout(500);
-  ok('feedback posts reaction and note', !!posted && posted.reaction === 'Useful' && posted.message === 'Test note');
-  ok('feedback confirms it was sent', (await t('#fb-status')).startsWith('Sent.'));
-  await p.unroute(/formsubmit\.co/);
-  await p.route(/formsubmit\.co/, r => r.fulfill({ status: 522, body: '' }));
-  await p.fill('#fb-text', 'Second note'); await p.click('#fb-form button[type="submit"]'); await p.waitForTimeout(600);
-  ok('feedback falls back to email app', (await t('#fb-status')).includes('email app'));
-  ok('reaction is pressed', (await p.$eval('.react[data-react="Useful"]', e => e.getAttribute('aria-pressed'))) === 'true');
+  // feedback: reaction counted once; note sent through Web3Forms when configured, otherwise visible fallbacks
+  await p.click('.react[data-react="Useful"]'); await p.waitForTimeout(150);
+  ok('reaction is pressed and thanked', (await p.$eval('.react[data-react="Useful"]', e => e.getAttribute('aria-pressed'))) === 'true' && (await t('#react-status')).startsWith('Thank you'));
+  await p.click('.react[data-react="Interesting"]'); await p.waitForTimeout(100);
+  ok('second reaction is refused', (await p.$eval('.react[data-react="Interesting"]', e => e.getAttribute('aria-pressed'))) === 'false' && (await t('#react-status')).includes('already'));
+  await p.fill('#fb-text', 'Test note'); await p.click('#fb-form button[type="submit"]'); await p.waitForTimeout(400);
+  ok('feedback offers Gmail, email app and copy', !(await p.$eval('#fb-fallback', e => e.hidden)) && decodeURIComponent(await p.$eval('#fb-gmail', e => e.href)).includes('to=oloyededavid10@gmail.com'));
+  ok('fallback link carries the note and reaction', decodeURIComponent(await p.$eval('#fb-mailto', e => e.href)).includes('Test note') && decodeURIComponent(await p.$eval('#fb-mailto', e => e.href)).includes('Reaction: Useful'));
+  await p.reload(); await p.waitForTimeout(2500);
+  ok('reaction remembered after reload', (await p.$eval('.react[data-react="Useful"]', e => e.getAttribute('aria-pressed'))) === 'true');
   // header, progress, back to top
   await p.evaluate(() => scrollTo(0, document.body.scrollHeight / 2)); await p.waitForTimeout(400);
   ok('progress bar moves', (await p.$eval('#progress', e => parseFloat(e.style.width))) > 20);

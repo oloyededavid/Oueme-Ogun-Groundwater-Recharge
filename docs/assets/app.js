@@ -802,11 +802,13 @@
     }
 
     // ---------- Feedback and counts ----------
-    // The site has no server. Notes are sent to the author's inbox by FormSubmit (formsubmit.co), a form-to-email
-    // service; if it cannot be reached, the reader's own email app is opened instead. Page views and reactions are
-    // counted by Abacus (abacus.jasoncameron.dev), a public counter: a view is counted once per browser session and
-    // each reaction once per browser. No names, addresses or cookies are collected.
+    // The site has no server. Notes are sent to the author's inbox by Web3Forms (web3forms.com), a form-to-email
+    // service; the access key below is public by design and only lets the form send to the author. If the service
+    // cannot be reached, the reader is offered Gmail, their own email app, or a copy of the note. Page views and
+    // reactions are counted by Abacus (abacus.jasoncameron.dev), a public counter: a view once per browser session,
+    // a reaction once per browser. No names, addresses or cookies are collected.
     const FEEDBACK_TO = 'oloyededavid10@gmail.com';
+    const WEB3FORMS_KEY = '';
     const COUNTER = 'https://abacus.jasoncameron.dev', NS = 'oloyededavid-oueme-ogun-v1';
     // Only real visits on the published site add to the counts: not local copies, and not automated browsers
     // such as the test scripts (navigator.webdriver).
@@ -825,35 +827,51 @@
         Object.entries(REACT_KEY).forEach(([label, key]) => { if ($(`.react[data-react="${label}"]`)) count('get', key).then(n => showReactCount(label, n)).catch(() => {}); });
     }
     function initFeedback() {
-        let reaction = '';
+        // A reader gives one reaction per browser; it stays selected on later visits and is sent with any note.
+        let reaction = store.get('oo-reaction', localStorage) || '';
+        const mark = () => $$('.react').forEach(x => { x.setAttribute('aria-pressed', String(x.dataset.react === reaction)); x.classList.toggle('is-other', !!reaction && x.dataset.react !== reaction); });
+        mark();
+        if (reaction) $('#react-status').textContent = 'Thanks, your reaction is counted.';
         $$('.react').forEach(b => b.addEventListener('click', () => {
-            reaction = b.getAttribute('aria-pressed') === 'true' ? '' : b.dataset.react;
-            $$('.react').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.react === reaction)));
-            const key = REACT_KEY[reaction];
-            if (reaction && COUNTS_LIVE && !store.get(`oo-react-${key}`, localStorage)) {
-                count('hit', key).then(n => { store.set(`oo-react-${key}`, '1', localStorage); showReactCount(reaction, n); }).catch(() => {});
-            }
-            $('#fb-status').textContent = reaction ? `Thank you. Add a note below if you like.` : '';
+            if (reaction) { $('#react-status').textContent = reaction === b.dataset.react ? 'Thanks, your reaction is counted.' : 'You have already reacted from this browser.'; return; }
+            reaction = b.dataset.react; store.set('oo-reaction', reaction, localStorage); mark();
+            $('#react-status').textContent = 'Thank you! Counted.';
+            const rc = b.querySelector('.rc'), before = Number((rc.textContent || '0').replace(/,/g, '')) || 0;
+            rc.textContent = fmtInt(before + 1); b.classList.add('pop');
+            if (COUNTS_LIVE) count('hit', REACT_KEY[reaction]).then(n => showReactCount(reaction, n)).catch(() => {});
         }));
+        const subjectOf = () => `Ouémé–Ogun feedback${reaction ? `: ${reaction}` : ''}`;
+        const bodyOf = note => `${note}\n\n${reaction ? `Reaction: ${reaction}\n` : ''}Page: ${location.origin}${location.pathname}`;
+        const fallback = (note, failed = true) => {
+            const su = encodeURIComponent(subjectOf()), body = encodeURIComponent(bodyOf(note));
+            $('#fb-gmail').href = `https://mail.google.com/mail/?view=cm&fs=1&to=${FEEDBACK_TO}&su=${su}&body=${body}`;
+            $('#fb-mailto').href = `mailto:${FEEDBACK_TO}?subject=${su}&body=${body}`;
+            $('#fb-fallback').hidden = false;
+            $('#fb-status').textContent = failed ? `The message service did not answer. Send your note to ${FEEDBACK_TO} with one of these:` : `Choose how to send your note to ${FEEDBACK_TO}:`;
+        };
+        $('#fb-copy').addEventListener('click', () => {
+            const t = `${bodyOf($('#fb-text').value.trim())}`;
+            (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => { $('#fb-status').textContent = `Note copied. Paste it into an email to ${FEEDBACK_TO}.`; }, () => { $('#fb-text').select(); });
+        });
         $('#fb-form').addEventListener('submit', e => {
             e.preventDefault();
             const note = $('#fb-text').value.trim(), btn = $('#fb-form button[type="submit"]');
             if (!note) { $('#fb-status').textContent = 'Write a note first.'; $('#fb-text').focus(); return; }
-            const subject = `Ouémé–Ogun water balance: ${reaction || 'feedback'}`;
+            if ($('#fb-form [name="botcheck"]').checked) return;
+            $('#fb-fallback').hidden = true;
+            if (!WEB3FORMS_KEY) { fallback(note, false); return; }
             btn.disabled = true; $('#fb-status').textContent = 'Sending…';
-            fetch(`https://formsubmit.co/ajax/${FEEDBACK_TO}`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-                body: JSON.stringify({ _subject: subject, _template: 'table', reaction: reaction || '—', message: note, page: `${location.origin}${location.pathname}` })
-            }).then(r => r.json().then(j => ({ ok: r.ok && String(j.success) === 'true', j })))
-              .then(({ ok }) => {
+            const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 12000);
+            fetch('https://api.web3forms.com/submit', {
+                method: 'POST', signal: ctl.signal, headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: subjectOf(), from_name: 'Ouémé–Ogun website', reaction: reaction || '—', message: note, page: `${location.origin}${location.pathname}` })
+            }).then(r => r.json().then(j => r.ok && j.success === true))
+              .then(ok => {
                   if (!ok) throw new Error('not sent');
-                  $('#fb-text').value = ''; $('#fb-status').textContent = 'Sent. Thank you — the author will read it.';
+                  $('#fb-text').value = ''; $('#fb-status').textContent = 'Sent. Thank you, I will read it.';
               })
-              .catch(() => {
-                  location.href = `mailto:${FEEDBACK_TO}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(note + '\n\n— ' + location.href)}`;
-                  $('#fb-status').textContent = 'The message service did not respond, so your email app has been opened with the note ready to send.';
-              })
-              .finally(() => { btn.disabled = false; });
+              .catch(() => fallback(note))
+              .finally(() => { clearTimeout(timer); btn.disabled = false; });
         });
     }
 
