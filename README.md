@@ -152,7 +152,7 @@ The web version is a short research note in plain language: a summary, why the t
 - **Figure 7:** the balance with each term adjustable.
 - **Tables 1–4:** data, the Upper Ouémé balance, how the gap changes with each assumption, and annual values on the **explorer page**.
 
-Readers can also select a catchment on the map or in Figure 2, click a term of the water-balance equation to see what it is, open a drawer describing each dataset, enlarge figures or copy a link to them, and send feedback. A note is sent to the author's email through Web3Forms (web3forms.com) once its access key is set in `docs/assets/app.js`; until then, or if the service does not respond, the reader can send it with Gmail, their own email app, or copy it. Page views (once per browser session) and one reaction per browser are counted with the public Abacus counter (abacus.jasoncameron.dev) on the live site only; no names, addresses or cookies are stored. A monthly view was considered and left out, because the project keeps only annual totals.
+Readers can also select a catchment on the map or in Figure 2, click a term of the water-balance equation to see what it is, open a drawer describing each dataset, enlarge figures or copy a link to them, and leave a reaction. Page views (once per browser session) and one reaction per browser are counted with the public Abacus counter (abacus.jasoncameron.dev) on the live site only; no names, addresses or cookies are stored. A monthly view was considered and left out, because the project keeps only annual totals.
 
 The full method lives in `research/`.
 

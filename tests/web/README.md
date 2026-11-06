@@ -26,7 +26,7 @@ AXE=node_modules/axe-core/axe.min.js node tests/web/accessibility.js
   `outputs/summary.json`: product selectors, sliders, the single-term buttons, the explorer and its table,
   shareable links, the contents bar, the scroll-driven map, keyboard focus, and the phone layout.
 - `features.js` checks catchment selection, the equation, the datasets drawer, the figure viewer and
-  links, feedback (one reaction per browser; note via Web3Forms or Gmail/email-app/copy fallback), view and reaction counts (live host only), reading progress and back to top.
+  links, reactions (one per browser), view and reaction counts (live host only), reading progress and back to top.
 - `accessibility.js` runs axe-core on desktop and phone and reports console errors, failed requests and
   horizontal overflow.
 

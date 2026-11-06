@@ -532,13 +532,6 @@ dialog[open] { animation: dlg-in 0.18s ease-out; }
 .feedback h2 { font-size: 19px; margin: 24px 0 12px; }
 .reactions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
 .react[aria-pressed="true"] { border-color: var(--ink); background: var(--fill); }
-.fb-form label { display: block; font-size: 14.5px; margin-bottom: 6px; }
-.fb-form .opt { color: var(--ink-3); font-size: 13px; margin-left: 6px; }
-.fb-form textarea { width: 100%; font: inherit; font-size: 15px; padding: 10px 12px; border: 1px solid var(--rule-2); border-radius: 6px; resize: vertical; background: var(--bg); color: var(--ink); }
-.fb-form textarea:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; border-color: transparent; }
-.fb-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-top: 10px; }
-.fb-note { font-size: 13px; color: var(--ink-3); flex: 1; min-width: 220px; }
-.fb-status { font-size: 14px; color: #0d6e43; margin: 8px 0 0; min-height: 1.4em; }
 
 /* ---------- Back to top ---------- */
 .to-top { position: fixed; right: 20px; bottom: 20px; z-index: 900; width: 40px; height: 40px; display: grid; place-items: center; border: 1px solid var(--rule-2); border-radius: 50%; background: var(--bg); color: var(--ink); cursor: pointer; transition: border-color 0.15s ease, transform 0.15s ease; }
@@ -696,17 +689,13 @@ input[type="range"]::-webkit-slider-thumb { border-color: var(--accent-ink); }
 .explore-page .ex-intro p { max-width: var(--main); }
 .explore-page .ex-intro h1 { margin-left: 0; }
 figcaption { hyphens: manual; -webkit-hyphens: manual; }
-.fb-status { min-height: 1.5em; }
 .react-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
 .react-status { font-size: 14px; color: var(--accent-ink); }
 .react[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); }
 .react.is-other { opacity: 0.55; }
 .react.pop { animation: react-pop 0.35s ease; }
 @keyframes react-pop { 50% { transform: scale(1.08); } }
-.fb-fallback { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
-.fb-fallback .button { text-decoration: none; }
 @media (prefers-reduced-motion: reduce) { .react.pop { animation: none; } }
 .react-row { margin-bottom: 16px; }
 .react-row .reactions { margin-bottom: 0; }
-.fb-fallback { align-items: center; }
 .explore-page .ex-intro h1 { margin-bottom: 10px; }

@@ -1,5 +1,5 @@
 // Checks for the reader features: catchment selection, equation, datasets drawer, figure viewer and links,
-// feedback (one reaction, note fallbacks), reading progress and back to top. Set URL to the page to test.
+// reactions (one per browser), reading progress and back to top. Set URL to the page to test.
 const { chromium } = require('playwright');
 (async () => { const b = await chromium.launch(), fails = [], errs = [];
   const ok = (n, c) => { if (!c) fails.push(n); console.log(c ? 'PASS' : 'FAIL', n); };
@@ -32,14 +32,12 @@ const { chromium } = require('playwright');
   // figure link
   await p.click('#fig-rain .tool[data-act="link"]'); await p.waitForTimeout(200);
   ok('figure link copied', (await p.evaluate(() => navigator.clipboard.readText())).endsWith('#fig-rain'));
-  // feedback: reaction counted once; note sent through Web3Forms when configured, otherwise visible fallbacks
+  // reactions: counted once per browser
   await p.click('.react[data-react="Useful"]'); await p.waitForTimeout(150);
   ok('reaction is pressed and thanked', (await p.$eval('.react[data-react="Useful"]', e => e.getAttribute('aria-pressed'))) === 'true' && (await t('#react-status')).startsWith('Thank you'));
   await p.click('.react[data-react="Interesting"]'); await p.waitForTimeout(100);
   ok('second reaction is refused', (await p.$eval('.react[data-react="Interesting"]', e => e.getAttribute('aria-pressed'))) === 'false' && (await t('#react-status')).includes('already'));
-  await p.fill('#fb-text', 'Test note'); await p.click('#fb-form button[type="submit"]'); await p.waitForTimeout(400);
-  ok('feedback offers Gmail, email app and copy', !(await p.$eval('#fb-fallback', e => e.hidden)) && decodeURIComponent(await p.$eval('#fb-gmail', e => e.href)).includes('to=oloyededavid10@gmail.com'));
-  ok('fallback link carries the note and reaction', decodeURIComponent(await p.$eval('#fb-mailto', e => e.href)).includes('Test note') && decodeURIComponent(await p.$eval('#fb-mailto', e => e.href)).includes('Reaction: Useful'));
+  ok('note box removed', !(await p.$('#fb-form')));
   await p.reload(); await p.waitForTimeout(2500);
   ok('reaction remembered after reload', (await p.$eval('.react[data-react="Useful"]', e => e.getAttribute('aria-pressed'))) === 'true');
   // header, progress, back to top
