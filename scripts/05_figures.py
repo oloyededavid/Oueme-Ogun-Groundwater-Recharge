@@ -1,7 +1,8 @@
 """Report figures, drawn only from outputs/ (produced by 03_analysis.py).
 
-Colour roles (validated, light mode): rainfall products CHIRPS v2.0 = blue, CHIRPS v3.0 = orange,
-TAMSAT v3.1 = aqua. ET is a single series in neutral ink. Catchments are identified by labels.
+Colour roles, the same as the web version (checked for colour-vision deficiency, light mode):
+CHIRPS v2.0 = violet, CHIRPS v3.0 = amber, TAMSAT v3.1 = pink; evapotranspiration = green.
+Catchments are identified by labels.
 """
 
 from __future__ import annotations
@@ -27,7 +28,8 @@ from recharge.rasters import load_subset  # noqa: E402
 OUT = ROOT / "figures"
 OUT.mkdir(exist_ok=True)
 
-BLUE, ORANGE, AQUA = "#2a78d6", "#eb6834", "#1baf7a"
+BLUE, ORANGE, AQUA = "#6250d6", "#c98500", "#d55181"  # CHIRPS v2.0, CHIRPS v3.0, TAMSAT v3.1
+GREEN = "#1baf7a"  # evapotranspiration
 INK, INK2, GRID, MUTED, FILL = "#0b0b0b", "#52514e", "#e6e5e1", "#c3c2b7", "#f5f4f1"
 PROD = {"chirps2": ("CHIRPS v2.0", BLUE, "o"), "chirps3": ("CHIRPS v3.0", ORANGE, "D"), "tamsat": ("TAMSAT v3.1", AQUA, "s")}
 BASIN_SHORT = {"upper_oueme": "Upper Ouémé (Benin)", "upper_ogun": "Upper Ogun (Nigeria)"}
@@ -73,7 +75,7 @@ def fig_rainfall_context():
     for ax, b in zip(axes, BIDS):
         s = lt[lt.basin_id == b]
         lo, hi = summary["basins"][b]["baseline_terciles_chirps2_mm"]
-        ax.bar(s.year, s.p_chirps2_mm, color=[BLUE if y >= 2018 else "#9ec5f4" for y in s.year], width=0.8,
+        ax.bar(s.year, s.p_chirps2_mm, color=[BLUE if y >= 2018 else "#cbc5f2" for y in s.year], width=0.8,
                label="CHIRPS v2.0 (2018–2024 darker)")
         ax.plot(s.year, s.p_chirps3_mm, color=ORANGE, linewidth=2, marker="D", ms=3, label="CHIRPS v3.0")
         ax.axhline(hi, color=INK2, linestyle="--", linewidth=0.9, label=f"Upper tercile 1991–2020 (v2.0): {hi:,.0f} mm")
@@ -99,7 +101,7 @@ def fig_annual_balance():
             axes[0, j].bar(x + (i - 1) * w, s[f"p_{k}_mm"], w * 0.92, color=col, label=lab)
         axes[0, j].set_title(f"{BASIN_SHORT[b]}: rainfall by product")
         axes[0, j].set_xticks(x, s.year.astype(int))
-        axes[1, j].bar(x, s.et_wapor_mm, 0.5, color=INK2)
+        axes[1, j].bar(x, s.et_wapor_mm, 0.5, color=GREEN)
         axes[1, j].set_title(f"{BASIN_SHORT[b]}: WaPOR v3 evapotranspiration")
         axes[1, j].set_xticks(x, s.year.astype(int))
     axes[0, 0].set_ylabel("mm/year"); axes[1, 0].set_ylabel("mm/year")
@@ -110,7 +112,8 @@ def fig_annual_balance():
 
 
 def diverging_cmap():
-    return LinearSegmentedColormap.from_list("rb", ["#b8302f", "#e34948", "#f0efec", BLUE, "#184f95"])
+    # the same ramp as the web maps: red-brown below zero, neutral grey at zero, blue above
+    return LinearSegmentedColormap.from_list("rb", ["#7a2e0e", "#c0623a", "#ecebe8", "#5598e7", "#0d366b"])
 
 
 def fig_maps():
@@ -175,7 +178,7 @@ def fig_residual_vs_recharge():
     c = summary["closure_upper_oueme_2018_2024"]
     refs = summary["published_recharge_fraction"]
     fig, ax = plt.subplots(figsize=(8.2, 2.9))
-    rows = ["Closure residual, this study\n(2018–2024 mean, three rainfall products)",
+    rows = ["Residual, this study\n(2018–2024 mean, three rainfall products)",
             "Recharge, Kamagaté et al. (2007)\nDonga sub-basin, 2 years of water-table data",
             "Recharge, Kotchoni et al. (2019)\nweathered crystalline aquifer, 19–25-year records"]
     lo, hi = refs["kamagate2007"]
@@ -188,10 +191,30 @@ def fig_residual_vs_recharge():
     ax.set_yticks([2, 1, 0]); ax.set_yticklabels(rows, fontsize=8); ax.set_ylim(-0.6, 2.6)
     ax.set_xlim(0, 26); ax.set_xlabel("% of annual rainfall"); ax.grid(axis="y", visible=False)
     ax.legend(loc="upper center", bbox_to_anchor=(0.32, -0.3), ncol=3, fontsize=7.5)
-    ax.set_title("Upper Ouémé: the closure error is as large as published recharge", loc="left")
+    ax.set_title("Upper Ouémé: the residual is as large as published recharge", loc="left")
     fig.tight_layout(); fig.savefig(OUT / "fig6_residual_vs_recharge.png"); plt.close(fig)
+
+
+def fig_runoff_ratio():
+    """Upper Ouémé: mean 2018-2024 residual against the runoff ratio used to estimate river flow."""
+    sens = summary["runoff_ratio_sensitivity"]
+    r = np.array(sens["ratio"])
+    (b0, b1), (d0, d1) = sens["reference_ratios"]["beterou_1971_2010"], sens["reference_ratios"]["donga_single_years_kamagate2007"]
+    fig, ax = plt.subplots(figsize=(7.4, 3.8))
+    ax.axvspan(d0, d1, color=FILL, label="Single-year ratios, Donga sub-basin (Kamagaté et al., 2007)")
+    ax.axvspan(b0, b1, color=MUTED, label="Ratios observed at Bétérou, 1971–2010")
+    for k, (pl, col, mk) in PROD.items():
+        ax.plot(r, sens["mean_residual_mm"][k], color=col, linewidth=2, label=pl)
+        need = summary["closure_upper_oueme_2018_2024"][k]["runoff_ratio_needed"]
+        ax.plot(need, 0, marker=mk, ms=6, color=col, linestyle="none")
+    ax.axhline(0, color=INK2, linewidth=0.8)
+    ax.set_xlabel("Runoff ratio r"); ax.set_ylabel("Mean residual, mm/year")
+    ax.legend(loc="upper right", fontsize=7.5)
+    ax.set_title("Upper Ouémé: the residual depends on the assumed runoff ratio", loc="left")
+    fig.tight_layout(); fig.savefig(OUT / "fig7_runoff_ratio.png"); plt.close(fig)
 
 
 if __name__ == "__main__":
     fig_study_area(); fig_rainfall_context(); fig_annual_balance(); fig_maps(); fig_closure(); fig_residual_vs_recharge()
+    fig_runoff_ratio()
     print("figures written:", sorted(p.name for p in OUT.glob("*.png")))
