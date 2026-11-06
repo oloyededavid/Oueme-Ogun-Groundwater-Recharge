@@ -1,10 +1,12 @@
-# A Satellite Water Balance for Groundwater Recharge in Tropical Basement Catchments
+# Testing a Satellite Water Balance for Groundwater Recharge in Tropical Basement Catchments
 
 **Upper Ouémé (Benin) and Upper Ogun (Nigeria), 2018–2024**
 
 Free satellite data now give annual rainfall (CHIRPS, TAMSAT) and actual evapotranspiration (FAO WaPOR) for any catchment, and "rainfall minus evapotranspiration" is often used as a first estimate of groundwater recharge where wells are not monitored. This project tests whether that works in the crystalline-basement catchments that supply rural wells in Benin and southwestern Nigeria. The Upper Ouémé, where river flow has been measured, is the test case. The Upper Ogun, where no flow data were found, is the application.
 
-**Short answer: not with these products at this scale.** In the Upper Ouémé, rainfall − ET over 2018–2024 exceeds the river flow expected at Bétérou by **121–169 mm/year** (10–13% of rainfall), in every year and with every rainfall product. If that were water stored underground, the water table would have risen by **at least 56 m** over the seven years, so it is not stored water. It is error in the rainfall, ET or river-flow terms, and it is **as large as recharge itself**: groundwater-level studies in Benin's crystalline basement report recharge of about 4% of rainfall (Kotchoni et al., 2019) and 5–24% (Kamagaté et al., 2007). A satellite balance therefore cannot resolve recharge here without field data. This project measures the size of that gap and sets out the data needed to close it.
+**Short answer: not with the data available.** No river flow was measured in 2018–2024, so flow at Bétérou is estimated from the runoff ratio observed in 1988–2010. With that ratio, rainfall − ET − river flow in the Upper Ouémé leaves **122–169 mm/year** (10–13% of rainfall), in every year and with every rainfall product. If that were water stored underground, the water table would have risen by **at least 57 m** over the seven years, so it is not stored water. The result is **conditional on the runoff ratio**: a ratio of 0.24–0.27, inside the single-year range reported for a sub-basin of the same catchment, closes the balance. Either way, the uncertainty is **as large as recharge itself**: groundwater-level studies in Benin's crystalline basement report recharge of about 4% of rainfall (Kotchoni et al., 2019) and 5–24% (Kamagaté et al., 2007). A satellite balance therefore cannot resolve recharge here without measured flow and well records. This project measures the size of that gap, shows how it depends on each assumption, and sets out the data needed to close it.
+
+The web version is a research paper with interactive figures: <https://oloyededavid.github.io/Oueme-Ogun-Groundwater-Recharge/>. A typeset PDF of the same text is in [`docs/report/`](docs/report/oueme-ogun-water-balance.pdf).
 
 ![Rainfall minus ET against the river flow expected from the observed Bétérou runoff ratios](figures/fig5_closure.png)
 
@@ -18,38 +20,43 @@ Free satellite data now give annual rainfall (CHIRPS, TAMSAT) and actual evapotr
 | Rainfall: CHIRPS v2.0 / CHIRPS v3.0 / TAMSAT v3.1 | 1,257 / 1,298 / 1,243 mm/yr | 1,311 / 1,492 / 1,296 mm/yr |
 | Actual ET (WaPOR v3) | 945 mm/yr | 946 mm/yr |
 | Rainfall − ET (range over the three products) | 298–353 mm/yr | 349–545 mm/yr |
+| Runoff ratio that would close the balance | 0.24–0.27 (observed 1971–2010: 0.136–0.142) | — |
 | Spread of the three rainfall estimates: mean (largest year) | 105 (211) mm/yr | 222 (305) mm/yr |
 | 2018–2024 rainfall vs 1991–2020 (CHIRPS v2.0 / v3.0) | +4.0% / +4.3% | +8.2% / +13.0% |
-| Expected river flow (observed runoff ratio × rainfall) | 177–184 mm/yr | no flow data |
-| Closure residual (rainfall − ET − expected flow) | **121–169 mm/yr** (10–13% of rainfall; 69–91% of the flow) | cannot be checked |
+| Estimated river flow (1988–2010 runoff ratio × rainfall) | 176–184 mm/yr | no flow data |
+| Residual (rainfall − ET − estimated flow) | **122–169 mm/yr** (10–13% of rainfall; 69–92% of the estimated flow) | cannot be checked |
 | Published recharge from groundwater levels | 4% of rainfall (Kotchoni et al., 2019); 5–24% (Kamagaté et al., 2007) | no study found for the Upper Ogun |
 
 All numbers are computed by the scripts and stored in [`outputs/summary.json`](outputs/summary.json) and [`outputs/annual_balance.csv`](outputs/annual_balance.csv).
 
 ## Findings
 
-1. **The water balance does not close at Bétérou.** Over several years, rainfall − ET − river flow should be close to zero. Using the higher of the two observed runoff ratios (0.142), which gives the smaller residual, it is 133 mm/year with CHIRPS v2.0, 169 with CHIRPS v3.0 and 121 with TAMSAT (10.6%, 13.0% and 9.7% of rainfall). It is positive in all seven years for all three products. Working out the river's share from each CHIRPS version's own 1988–2010 rainfall, instead of the rainfall published with the flow record, gives slightly larger gaps (138 and 179 mm), so these numbers are on the cautious side.
+1. **With the 1988–2010 runoff ratio, the water balance does not close at Bétérou.** Over several years, rainfall − ET − river flow should be close to zero. Using the higher of the two observed runoff ratios (0.142), which gives the smaller residual, it is 134 mm/year with CHIRPS v2.0, 169 with CHIRPS v3.0 and 122 with TAMSAT (10.6%, 13.0% and 9.8% of rainfall). It is positive in all seven years for all three products. The published ratio divides gauged flow by gauge rainfall (30 stations; Kodja et al., 2020). Recomputing it from each product's own 1988–2010 rainfall changes the residual by −1 to +10 mm (138, 179 and 121 mm), so mixing gauge and satellite rainfall is not what opens the gap.
 
-2. **The residual is not stored groundwater.** Summed over 2018–2024 it is 847–1,181 mm. With the specific yield of weathered crystalline aquifers (0.2–1.5%; Lachassagne et al., 2021), storing that much water would raise the water table by 56–79 m even at the highest specific yield, and by up to 590 m at the lowest. Neither is physically plausible, so most of the residual must be error in the inputs or a change in the runoff ratio.
+2. **The residual is not stored groundwater.** Summed over 2018–2024 it is 851–1,184 mm. With the specific yield of weathered crystalline aquifers (0.2–1.5%; Lachassagne et al., 2021), storing that much water would raise the water table by 57–79 m even at the highest specific yield, and by up to 592 m at the lowest. Holding it in a 10 m rise would need a specific yield of 8.5–11.8%. None of this is physically plausible, so the residual must be error in one or more terms, most plausibly the estimated river flow or ET.
 
-3. **The error is as large as recharge.** Recharge estimated from groundwater levels in Benin's crystalline basement is about 4% of rainfall from 19–25-year records (Kotchoni et al., 2019), and 5–24% from two years of water-table data in the Donga sub-basin of the Upper Ouémé (Kamagaté et al., 2007). The closure error, at 10–13% of rainfall, sits inside that range. A balance with this error cannot measure recharge.
+3. **The result depends on river flow that was not measured.** Each 0.01 added to the runoff ratio lowers the residual by about 13 mm/year. The balance closes at 0.24–0.27, 1.7–1.9 times the ratio observed in 1971–2010 but inside the 0.14–0.28 found in single years in the Donga sub-basin (Kamagaté et al., 2007). Across that range the residual runs from +171 to −50 mm/year.
+
+   ![Residual against the runoff ratio](figures/fig7_runoff_ratio.png)
+
+4. **The uncertainty is as large as recharge.** Recharge estimated from groundwater levels in Benin's crystalline basement is about 4% of rainfall from 19–25-year records (Kotchoni et al., 2019), and 5–24% from two years of water-table data in the Donga sub-basin of the Upper Ouémé (Kamagaté et al., 2007). The residual, at 10–13% of rainfall, sits inside that range. A balance with this uncertainty cannot measure recharge.
 
    ![Closure residual against published recharge](figures/fig6_residual_vs_recharge.png)
 
-4. **The data cannot say which term is wrong.** Taken one at a time, closing the balance needs:
-   - ET 12.8–17.8% higher (the overall error reported for WaPOR v2 across Africa was 29–31%; Blatchford et al., 2020); or
-   - rainfall 11.3–15.1% lower (the expected river flow falls with it); or
+5. **The data cannot say which term is wrong.** Taken one at a time, closing the balance needs:
+   - ET 12.9–17.9% higher (the overall error reported for WaPOR v2 across Africa was 29–31%; Blatchford et al., 2020); or
+   - rainfall 11.4–15.2% lower (the estimated river flow falls with it); or
    - a runoff ratio of 0.24–0.27 instead of the 0.14 observed at Bétérou in 1971–2010. Single-year runoff coefficients of 0.14–0.28 were calculated for the 586 km² Donga sub-basin (Kamagaté et al., 2007), and 0.10–0.26 downstream at Bonou, a much larger catchment. Such a ratio is possible in a single year, but the balance needs it on average over seven years for the whole 10,000 km².
 
    Any one of these, or a mix, is possible. Measured river flow for 2018–2024 would separate them.
 
-5. **The two CHIRPS versions disagree more than CHIRPS and TAMSAT.** WaPOR v3's own precipitation layer matches CHIRPS v3.0 to within 0.25 mm/year in every catchment-year, although its metadata only says "CHIRPS". CHIRPS v3.0 is on average 41 mm/year wetter than v2.0 in the Upper Ouémé (range −8 to +93) and 181 mm/year wetter in the Upper Ogun (+67 to +305). TAMSAT is on average about 15 mm/year drier than CHIRPS v2.0 in both catchments. Even a year's class depends on the version: 2020 in the Upper Ogun is "dry" by CHIRPS v2.0 and "normal" by v3.0.
+6. **The rainfall products agree on the mean, not on individual years.** In the Upper Ouémé the annual totals of CHIRPS v2.0 and TAMSAT correlate at −0.26, so they do not agree on which years were wetter. The two CHIRPS versions also differ. WaPOR v3's own precipitation layer matches CHIRPS v3.0 to within 0.25 mm/year in every catchment-year, although its metadata only says "CHIRPS". CHIRPS v3.0 is on average 41 mm/year wetter than v2.0 in the Upper Ouémé (range −8 to +93) and 181 mm/year wetter in the Upper Ogun (+67 to +305). TAMSAT is on average about 15 mm/year drier than CHIRPS v2.0 in both catchments. Even a year's class depends on the version: 2020 in the Upper Ogun is "dry" by CHIRPS v2.0 and "normal" by v3.0.
 
-6. **ET uncertainty matters as much as rainfall.** A 10% change in WaPOR ET moves rainfall − ET by about 95 mm/year in both catchments. That is close to the mean rainfall spread in the Upper Ouémé (105 mm/year) and about half of it in the Upper Ogun (222 mm/year).
+7. **ET uncertainty matters as much as rainfall.** A 10% change in WaPOR ET moves rainfall − ET by about 95 mm/year in both catchments. That is close to the mean rainfall spread in the Upper Ouémé (105 mm/year) and about half of it in the Upper Ogun (222 mm/year).
 
-7. **Wet and dry years cannot be compared from this period.** 2018–2024 was wetter than 1991–2020. The Upper Ouémé had no dry year with either CHIRPS version. The Upper Ogun had one, 2020, and only by CHIRPS v2.0. In that year rainfall − ET fell to 122 mm with CHIRPS v2.0, against a mean of 405 mm in the other six years. One year is not enough to generalise.
+8. **Wet and dry years cannot be compared from this period.** 2018–2024 was wetter than 1991–2020. The Upper Ouémé had no dry year with either CHIRPS version. The Upper Ogun had one, 2020, and only by CHIRPS v2.0. In that year rainfall − ET fell to 122 mm with CHIRPS v2.0, against a mean of 405 mm in the other six years. One year is not enough to generalise.
 
-8. **The Upper Ogun results are not recharge estimates.** The same method, applied unchanged, gives rainfall − ET of 349–545 mm/year. There are no flow data to check it, its rainfall products disagree twice as much as in the Upper Ouémé, and at Bétérou the same products leave rainfall − ET well above the river flow.
+9. **The Upper Ogun results are not recharge estimates.** The same method, applied unchanged, gives rainfall − ET of 349–545 mm/year. There are no flow data to check it, its rainfall products disagree twice as much as in the Upper Ouémé, and at Bétérou the same products leave rainfall − ET well above the river flow.
 
 ### Against the hypotheses in the [proposal](research/proposal.md)
 
@@ -62,21 +69,22 @@ All numbers are computed by the scripts and stored in [`outputs/summary.json`](o
 
 Both catchments lie on Precambrian crystalline basement, with groundwater in a weathered layer (saprolite) over fissured rock ([conceptual model](research/conceptual_model.md)). They are built from HydroBASINS level 9 by tracing all units upstream of a fixed outlet:
 
-- **Upper Ouémé at Bétérou** (outlet unit 1090852360). The script checks that the Bétérou gauge lies inside. The HydroBASINS upstream area of 10,143 km² is about 0.7% larger than the published 10,070–10,076 km².
+- **Upper Ouémé at Bétérou** (outlet unit 1090852360). The script checks that the Bétérou gauge lies inside.
+- **One area per catchment** is used in every calculation: the polygon area on the WGS84 ellipsoid, 10,102 km² (Upper Ouémé) and 9,534 km² (Upper Ogun). HydroBASINS' own upstream-area attribute (10,143 and 9,575 km²) and the published area at Bétérou (10,070–10,076 km²) are recorded as cross-checks only; any of them changes the residual by less than 1 mm/year.
 - **Upper Ogun above the Oyan confluence** (outlet unit 1090928900, the same definition as zone Z1 of the Ogun Catchment-to-Coast Observatory).
 
 ## Data
 
 | Term | Product | Resolution | Years |
 |---|---|---|---|
-| Rainfall | CHIRPS v2.0 and CHIRPS v3.0 (Climate Hazards Center); TAMSAT v3.1 (University of Reading) | 0.05°; 0.05°; 0.0375° | 1981–2024 (CHIRPS), 2018–2024 (TAMSAT) |
+| Rainfall | CHIRPS v2.0 and CHIRPS v3.0 (Climate Hazards Center); TAMSAT v3.1 (University of Reading) | 0.05°; 0.05°; 0.0375° | 1981–2024 (CHIRPS), 1988–2010 and 2018–2024 (TAMSAT) |
 | Actual ET | FAO WaPOR v3 L1-AETI-A | 300 m | 2018–2024 |
 | Reference ET | FAO WaPOR v3 L1-RET-A | ~30 km | 2018–2024 |
 | Quality check | FAO WaPOR v3 L1-PCP-A (equal to CHIRPS v3.0) | 0.05° | 2018–2024 |
 | Catchments | HydroBASINS v1c level 9 | vector | — |
-| River flow | Published mean flow at Bétérou: 47.5 m³/s (1971–1987), 54.5 m³/s (1988–2010) | station | — |
+| River flow | Published mean flow at Bétérou: 47.5 m³/s (1971–1987), 54.5 m³/s (1988–2010), with gauge rainfall of 1,091 and 1,202 mm (Kodja et al., 2020) | station | 1971–2010 |
 
-Sources, licences, and the URL, size, access time and SHA-256 of every downloaded file are in [`data/README.md`](data/README.md) and `data/processed/provenance.json`.
+Every dataset, with version, units, scale factor and processing, is listed in [`research/data_inventory.csv`](research/data_inventory.csv). Sources, licences, and the URL, size, access time and SHA-256 of every downloaded file are in [`data/README.md`](data/README.md) and `data/processed/provenance.json`. Every assumption, its effect and what would test it are in [`research/assumptions.md`](research/assumptions.md).
 
 ## Method
 
@@ -85,8 +93,8 @@ Full details: [`research/methodology.md`](research/methodology.md).
 1. **Catchment means.** Area-weighted mean of every pixel whose centre lies inside the catchment, for each layer and year. A mean is accepted only if at least 95% of the area has valid data (all were 100%).
 2. **Rainfall context.** Each year is classed dry, normal or wet against the terciles of 1991–2020, separately for CHIRPS v2.0 and v3.0.
 3. **Surplus** = rainfall − ET, for each rainfall product.
-4. **Closure check (Upper Ouémé).** The published Bétérou flows give runoff of 148.8 and 170.8 mm/year, or 0.136 and 0.142 of the rainfall reported for the same periods. Expected flow = 0.142 × rainfall, and closure residual = rainfall − ET − expected flow.
-5. **Diagnostics.** These are the change in ET, rainfall or runoff ratio that would close the balance, and the water-table rise that storing the residual would need.
+4. **Closure check (Upper Ouémé).** The published Bétérou flows give runoff of 148.4 and 170.3 mm/year over the catchment polygon, or 0.136 and 0.142 of the gauge rainfall reported for the same periods. Estimated flow = 0.142 × rainfall, and residual = rainfall − ET − estimated flow. Observed, derived and estimated quantities are kept apart throughout.
+5. **Diagnostics.** The residual for runoff ratios of 0.10–0.30; the ratio recomputed from each product's own 1988–2010 rainfall; the change in ET, rainfall or runoff ratio that would close the balance; the water-table rise that storing the residual would need; and the agreement between rainfall products.
 6. **Reference levels.** Published recharge from groundwater levels in Benin crystalline basement: about 4% of rainfall (Kotchoni et al., 2019) and 5–24% (Kamagaté et al., 2007). These give scale; they are not a validation.
 7. **Maps.** Rainfall − ET is computed on the 5 km CHIRPS grid after averaging the 300 m ET onto it, so no map implies more detail than its coarsest input.
 
@@ -110,7 +118,7 @@ A satellite balance also sees only **net** recharge (recharge minus groundwater 
 
 ## Limitations
 
-- No observed river flow for 2018–2024 was available. The runoff ratio from 1971–2010 is assumed to still apply.
+- No observed river flow for 2018–2024 was available. The runoff ratio from 1988–2010 is assumed to still apply; land-cover and abstraction changes since 2010 were not assessed. This is the largest uncertainty (finding 3).
 - No river-flow data were found for the Upper Ogun, so its balance cannot be checked at all.
 - WaPOR v3 has not been checked against ground measurements in these catchments.
 - The rainfall products all rely on sparse rain gauges, so they are not fully independent.
@@ -133,14 +141,19 @@ The validation code is written and tested on synthetic data only; no well data h
 
 Live: <https://oloyededavid.github.io/Oueme-Ogun-Groundwater-Recharge/>
 
-The study is published as a research paper with interactive figures. It follows the usual order: abstract, study area, data and method, results, discussion, limitations, then the data and references.
+The study is published as a research paper with interactive figures: abstract, introduction with three research questions, study area, data and method, results, discussion, limitations and future work, conclusion, then a data explorer and the references.
 
 - **Figure 1:** locator map of the two catchments and the Bétérou gauge, with an inset of Africa.
-- **Figure 2:** water-balance terms on the 5 km grid. The map changes as the reader moves through rainfall, evapotranspiration, rainfall minus evapotranspiration and the closure at Bétérou.
-- **Figure 3:** the water-table rise needed to store the residual, with a specific-yield slider and a schematic weathering profile.
-- **Figure 4:** the residual against recharge from groundwater-level studies in Benin.
-- **Figure 5:** the balance with adjustable evapotranspiration, rainfall and runoff ratio, and the single-term changes that close it.
-- **Tables 1–4** and a **data explorer**: every 5 km cell by year, layer and rainfall product, with a table of annual values and shareable links.
+- **Figure 2:** the workflow, from catchments to the tests of the residual.
+- **Figure 3:** annual rainfall by product and WaPOR evapotranspiration, 2018–2024.
+- **Figure 4:** water-balance terms on the 5 km grid; the map changes with the text beside it.
+- **Figure 5:** the residual against the runoff ratio used to estimate river flow.
+- **Figure 6:** the water-table rise needed to store the residual, with a specific-yield slider and a schematic weathering profile.
+- **Figure 7:** the residual against recharge from groundwater-level studies in Benin.
+- **Figure 8:** the balance with adjustable evapotranspiration, rainfall and runoff ratio.
+- **Tables 1–5:** data, the balance in each catchment, the sources of uncertainty, and annual values in the **data explorer** (every 5 km cell by year, layer and rainfall product, with shareable links).
+
+The PDF report (`docs/report/oueme-ogun-water-balance.pdf`) is built from the web version by `scripts/07_build_report.js`, so the two carry the same text and numbers.
 
 Every number is computed in the browser from `docs/data/app_data.json`, which `scripts/06_build_app.py` writes from the analysis outputs; none is typed into the page. The maps draw each 5 km rainfall cell as a square, with CHIRPS v3.0, TAMSAT and WaPOR evapotranspiration averaged onto the same cells, so they never show more detail than the data has. The page is plain HTML, CSS and JavaScript. Leaflet 1.9.4 is bundled in `docs/vendor/`, the type is Satoshi (Fontshare) and the basemap is Esri Light Gray Canvas. To view it locally:
 
@@ -150,7 +163,7 @@ python -m http.server 8000 --directory docs
 
 ## Reproduce
 
-Requires Python 3.10 or later. About 3.2 GB of CHIRPS and TAMSAT files are downloaded one at a time, clipped to the catchments and deleted. WaPOR is read in windows directly from FAO's cloud storage. The clipped data kept in `data/processed/` total 8.3 MB.
+Requires Python 3.10 or later. About 4.3 GB of CHIRPS and TAMSAT files are downloaded one at a time, clipped to the catchments and deleted. WaPOR is read in windows directly from FAO's cloud storage. The clipped data kept in `data/processed/` total 8.4 MB.
 
 ```bash
 python -m pip install -r requirements-dev.txt
@@ -184,20 +197,28 @@ python scripts/06_build_app.py
 python -m pytest
 ```
 
-On first run, `01_build_basins.py` downloads HydroBASINS (80 MB) and `05_figures.py` downloads the Natural Earth country outlines (0.8 MB) into `data/raw/`. Both check the files' SHA-256 against the files used here. `04_validate_wtf.py` exits with "pending" until AMMA-CATCH files are placed in `data/raw/amma_catch/`. The tests use hand-calculated values and synthetic inputs. GitHub Actions runs them on every push to `main` and on pull requests.
+The PDF report needs Node 18+ and Playwright with Chromium:
+
+```bash
+node scripts/07_build_report.js
+```
+
+On first run, `01_build_basins.py` downloads HydroBASINS (80 MB) and `05_figures.py` downloads the Natural Earth country outlines (0.8 MB) into `data/raw/`. Both check the files' SHA-256 against the files used here. `04_validate_wtf.py` exits with "pending" until AMMA-CATCH files are placed in `data/raw/amma_catch/`. `tests/test_core.py` uses hand-calculated values and synthetic inputs; it tests the code, not the method. `tests/test_outputs.py` checks that the committed outputs are internally consistent, use one catchment area, and match the web version's data. GitHub Actions runs them on every push to `main` and on pull requests.
 
 ## Repository structure
 
 ```
 README.md                 this file
-research/                 proposal, literature review, conceptual model, methodology
+research/                 proposal, literature review, conceptual model, methodology,
+                          data inventory, assumptions register, references.bib
 src/recharge/             catchments, raster means, water balance, rainfall classes, WTF and storage, downloads
-scripts/                  01 catchments → 02 data → 03 analysis → 04 validation → 05 figures → 06 app
+scripts/                  01 catchments → 02 data → 03 analysis → 04 validation → 05 figures
+                          → 06 web data → 07 PDF report
 tests/                    unit tests
 data/                     data README, processed catchment clips, provenance (raw downloads not tracked)
 outputs/                  annual table, long-term rainfall, summary.json, map rasters, logs
 figures/                  figures used in this README
-docs/                     web version of the study (GitHub Pages)
+docs/                     web version of the study (GitHub Pages) and docs/report/ (PDF)
 ```
 
 ## References
@@ -212,6 +233,7 @@ docs/                     web version of the study (GitHub Pages)
 - Kotchoni, D. O. V., et al. (2019). Relationships between rainfall and groundwater recharge in seasonally humid Benin: a comparative analysis of long-term hydrographs in sedimentary and crystalline aquifers. *Hydrogeology Journal* 27, 447–457. https://doi.org/10.1007/s10040-018-1806-2
 - Lachassagne, P., Dewandel, B., & Wyns, R. (2021). Review: Hydrogeology of weathered crystalline/hard-rock aquifers — guidelines for the operational survey and management of their groundwater resources. *Hydrogeology Journal* 29, 2561–2594. https://doi.org/10.1007/s10040-021-02339-7
 - Lehner, B., & Grill, G. (2013). Global river hydrography and network routing: baseline data and new approaches to study the world's large river systems. *Hydrological Processes* 27, 2171–2186. https://doi.org/10.1002/hyp.9740
+- MacDonald, A. M., Lark, R. M., Taylor, R. G., et al. (2021). Mapping groundwater recharge in Africa from ground observations and implications for water security. *Environmental Research Letters* 16, 034012. https://doi.org/10.1088/1748-9326/abd661
 - Maidment, R. I., et al. (2017). A new, long-term daily satellite-based rainfall dataset for operational monitoring in Africa. *Scientific Data* 4, 170063. https://doi.org/10.1038/sdata.2017.63
 - Mamadou, O., et al. (2016). Dynamics of water vapor and energy exchanges above two contrasting Sudanian climate ecosystems in Northern Benin (West Africa). *Journal of Geophysical Research: Atmospheres* 121, 11269–11286. https://doi.org/10.1002/2016JD024749
 - Runoff coefficients at Bonou: *Hydrological Sciences Journal* (2016). https://doi.org/10.1080/02626667.2016.1164315
