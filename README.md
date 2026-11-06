@@ -129,23 +129,20 @@ The validation code is written and tested on synthetic data only; no well data h
 2. **River flow.** AMMA-CATCH has operated a water-level station on the Ouémé at Bétérou ([CEOP dataset description](https://data.eol.ucar.edu/file/download/420FA8AC/CATCH_stream.txt)). Whether discharge for 2018–2024 is available needs to be checked. It would replace the assumed runoff ratio and show which term breaks the balance.
 3. **Ground ET.** Eddy-covariance ET was measured at Nalohou (cultivated) and Bellefoungou (woodland) in northern Benin from July 2008 to June 2010 (Mamadou et al., 2016). The Nalohou site (about 9.74°N, 1.60°E) lies inside this study's catchment. Those years are before WaPOR v3 begins (2018), so a direct check of WaPOR would need later measurements.
 
-## Interactive app: *The Missing Millimetres*
+## Web version
 
 Live: <https://oloyededavid.github.io/Oueme-Ogun-Groundwater-Recharge/>
 
-The site tells the study as a story you scroll through, then hands over the data:
+The study is published as a research paper with interactive figures. It follows the usual order: abstract, study area, data and method, results, discussion, limitations, then the data and references.
 
-- **Hero:** one year of rain on the Upper Ouémé, drawn to scale in a rain gauge, and the four-line ledger (rain, back to the sky, river, unaccounted for).
-- **Six story steps** with a map that follows along: the catchments, rainfall, evapotranspiration, what is left, the Bétérou gauge, and the gap in each year.
-- **Interactive chapters:**
-  - *Could the ground be hiding it?* A specific-yield slider and a cross-section of the water-table rise needed.
-  - *Do the satellites even agree?* The three rainfall products side by side.
-  - *As big as the thing I was trying to measure.* The gap against published recharge.
-  - *Try to close the gap yourself.* Sliders for ET, rainfall and the river's share, with one-click single fixes.
-- **The Upper Ogun, takeaways, "what would change my mind", and lab notes** on how the study changed along the way.
-- **Explore:** the full map (every 5 km cell, hover to read), year by year with play, all three rainfall products, a table, downloads and shareable links.
+- **Figure 1:** locator map of the two catchments and the Bétérou gauge, with an inset of Africa.
+- **Figure 2:** water-balance terms on the 5 km grid. The map changes as the reader moves through rainfall, evapotranspiration, rainfall minus evapotranspiration and the closure at Bétérou.
+- **Figure 3:** the water-table rise needed to store the residual, with a specific-yield slider and a schematic weathering profile.
+- **Figure 4:** the residual against recharge from groundwater-level studies in Benin.
+- **Figure 5:** the balance with adjustable evapotranspiration, rainfall and runoff ratio, and the single-term changes that close it.
+- **Tables 1–4** and a **data explorer**: every 5 km cell by year, layer and rainfall product, with a table of annual values and shareable links.
 
-All numbers are computed in the browser from `docs/data/app_data.json`, which `scripts/06_build_app.py` writes from the analysis outputs. The map draws every 5 km rainfall cell as a square, with CHIRPS v3.0, TAMSAT and WaPOR evapotranspiration averaged onto the same cells, so it stays sharp at any zoom and never implies more detail than the data has. Leaflet and the fonts (Fraunces and IBM Plex, SIL Open Font License) are bundled in `docs/vendor/`, so the page needs no font or script CDN. To view it locally:
+Every number is computed in the browser from `docs/data/app_data.json`, which `scripts/06_build_app.py` writes from the analysis outputs; none is typed into the page. The maps draw each 5 km rainfall cell as a square, with CHIRPS v3.0, TAMSAT and WaPOR evapotranspiration averaged onto the same cells, so they never show more detail than the data has. The page is plain HTML, CSS and JavaScript. Leaflet 1.9.4 is bundled in `docs/vendor/`, the type is Satoshi (Fontshare) and the basemap is Esri Light Gray Canvas. To view it locally:
 
 ```bash
 python -m http.server 8000 --directory docs
@@ -200,7 +197,7 @@ tests/                    unit tests
 data/                     data README, processed catchment clips, provenance (raw downloads not tracked)
 outputs/                  annual table, long-term rainfall, summary.json, map rasters, logs
 figures/                  figures used in this README
-docs/                     interactive app (GitHub Pages)
+docs/                     web version of the study (GitHub Pages)
 ```
 
 ## References
