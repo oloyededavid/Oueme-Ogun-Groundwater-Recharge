@@ -1,6 +1,6 @@
-/* The Missing Millimetres: story, interactive chapters and data explorer.
-   Every number on the page is computed here from data/app_data.json, which scripts/06_build_app.py
-   writes from the analysis outputs. Nothing is typed in by hand. */
+/* Page logic for the Ouémé–Ogun water-balance study.
+   Every number is computed here from data/app_data.json (written by scripts/06_build_app.py from the
+   analysis outputs); none is typed into the HTML. */
 (function () {
     'use strict';
 
@@ -9,27 +9,35 @@
     const $$ = (s, r = document) => [...r.querySelectorAll(s)];
     const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
     const isNum = v => v !== null && v !== undefined && Number.isFinite(Number(v));
-    const fmtInt = v => isNum(v) ? Math.round(v).toLocaleString('en-GB') : '—';
-    const fmt = (v, d = 1) => isNum(v) ? Number(v).toLocaleString('en-GB', { minimumFractionDigits: d, maximumFractionDigits: d }) : '—';
-    const signed = (v, d = 1) => (v > 0 ? '+' : v < 0 ? '−' : '±') + fmt(Math.abs(v), d);
+    // Negative numbers take a true minus sign (U+2212), and a value that rounds to zero is shown as 0, not −0.
+    const num = (v, d) => {
+        if (!isNum(v)) return '—';
+        const r = Math.round(Number(v) * 10 ** d) / 10 ** d;
+        return (r === 0 ? 0 : r).toLocaleString('en-GB', { minimumFractionDigits: d, maximumFractionDigits: d }).replace('-', '−');
+    };
+    const fmtInt = v => num(v, 0);
+    const fmt = (v, d = 1) => num(v, d);
+    const signed = (v, d = 1) => (v > 0 ? '+' : v < 0 ? '−' : '') + fmt(Math.abs(v), d);
     const range = (vals, f = fmtInt) => { const v = vals.filter(isNum); const a = f(Math.min(...v)), b = f(Math.max(...v)); return a === b ? a : `${a}–${b}`; };
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const coarse = matchMedia('(pointer: coarse)').matches;
-    const svgEl = (tag, attrs = {}, text) => { const e = document.createElementNS('http://www.w3.org/2000/svg', tag); Object.entries(attrs).forEach(([k, v]) => e.setAttribute(k, v)); if (text !== undefined) e.textContent = text; return e; };
+    const svg = (tag, attrs = {}, text) => {
+        const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+        Object.entries(attrs).forEach(([k, v]) => e.setAttribute(k, v));
+        if (text !== undefined) e.textContent = text;
+        return e;
+    };
 
     const YEARS = ['2018', '2019', '2020', '2021', '2022', '2023', '2024'];
     const PRODS = ['chirps2', 'chirps3', 'tamsat'];
     const PROD = { chirps2: 'CHIRPS v2.0', chirps3: 'CHIRPS v3.0', tamsat: 'TAMSAT v3.1' };
     const pcol = k => css(`--p-${k}`);
     const BIDS = ['upper_oueme', 'upper_ogun'];
-    const BASIN = {
-        upper_oueme: { short: 'Upper Ouémé', full: 'Upper Ouémé at Bétérou', country: 'Benin' },
-        upper_ogun: { short: 'Upper Ogun', full: 'Upper Ogun above the Oyan confluence', country: 'Nigeria' }
-    };
+    const BASIN = { upper_oueme: 'Upper Ouémé', upper_ogun: 'Upper Ogun' };
 
-    const S = { product: 'chirps2', sy: 1.5, ex: { zone: 'ALL', layer: 'surplus', period: 'mean', product: 'chirps2' } };
-    let D = null, GEO = null;
+    const S = { product: 'chirps2', sy: 1.5, fx: { et: 0, rain: 0, ratio: null }, ex: { zone: 'ALL', layer: 'surplus', period: 'mean', product: 'chirps2' } };
+    let D = null, GEO = null, CTX = null;
 
     // ---------- data access ----------
     const rowsOf = b => D.annual.filter(r => r.basin_id === b);
@@ -41,92 +49,105 @@
         return o;
     }
     const clo = () => D.summary.closure_upper_oueme_2018_2024;
-    const area = b => GEO.features.find(f => f.properties.basin_id === b).properties.geodesic_area_km2;
+    const props = b => GEO.features.find(f => f.properties.basin_id === b).properties;
     const ratioObs = () => D.summary.beterou_observed_runoff.ratio_range[1];
 
-    // ---------- every templated number ----------
     function values() {
         const o = rec('upper_oueme'), g = rec('upper_ogun'), c = clo(), q = D.summary.qa, k = S.product, ck = c[k];
-        const own = D.summary.closure_check_own_product_ratio || {};
+        const B = D.summary.basins, own = D.summary.closure_check_own_product_ratio || {}, per = D.summary.beterou_observed_runoff.periods;
         return {
-            oP: fmtInt(o.p_chirps2_mm), oPmm: `${fmtInt(o.p_chirps2_mm)} mm`, oET: fmtInt(o.et_wapor_mm), oETpct: fmtInt(100 * o.et_wapor_mm / o.p_chirps2_mm),
-            oLeft: fmtInt(o.surplus_chirps2_mm), oQ: fmtInt(o.q_expected_chirps2_mm), oGap: fmtInt(o.closure_residual_chirps2_mm),
-            gP: fmtInt(g.p_chirps2_mm), gET: fmtInt(g.et_wapor_mm), gLeft: fmtInt(g.surplus_chirps2_mm),
-            gLeftRange: range(PRODS.map(p => g[`surplus_${p}_mm`])),
-            oArea: fmtInt(area('upper_oueme')), gArea: fmtInt(area('upper_ogun')),
-            ratio: fmt(ratioObs(), 3),
+            oArea: fmtInt(props('upper_oueme').geodesic_area_km2), gArea: fmtInt(props('upper_ogun').geodesic_area_km2),
+            upArea: fmtInt(props('upper_oueme').hydrobasins_up_area_km2),
+            oP: fmtInt(o.p_chirps2_mm), gP: fmtInt(g.p_chirps2_mm),
+            oPrange: range(PRODS.map(p => o[`p_${p}_mm`])), gPrange: range(PRODS.map(p => g[`p_${p}_mm`])),
+            oWet: fmt(B.upper_oueme.period_vs_baseline_pct_chirps2, 1), gWet: fmt(B.upper_ogun.period_vs_baseline_pct_chirps2, 1),
+            oET: fmtInt(o.et_wapor_mm), gET: fmtInt(g.et_wapor_mm),
+            oETpct: fmtInt(100 * o.et_wapor_mm / o.p_chirps2_mm), gETpct: fmtInt(100 * g.et_wapor_mm / g.p_chirps2_mm),
+            oLeft: fmtInt(o.surplus_chirps2_mm), gLeft: fmtInt(g.surplus_chirps2_mm), gLeftRange: range(PRODS.map(p => g[`surplus_${p}_mm`])),
+            oQ: fmtInt(o.q_expected_chirps2_mm), oGap: fmtInt(o.closure_residual_chirps2_mm),
+            r1: fmt(per['1971-1987'].runoff_ratio, 3), r2: fmt(per['1988-2010'].runoff_ratio, 3), ratio: fmt(ratioObs(), 3),
             gapRange: range(PRODS.map(p => c[p].mean_closure_residual_mm)),
             gapPctRange: range(PRODS.map(p => c[p].residual_pct_of_rainfall), v => fmt(v, 1)),
+            riseMin: fmtInt(Math.min(...PRODS.map(p => c[p].water_table_rise_if_stored_m[0]))),
             needRainRange: range(PRODS.map(p => c[p].rain_decrease_needed_pct), v => fmt(v, 1)),
             oSpread: fmtInt(q.upper_oueme_product_spread_mm.mean), gSpread: fmtInt(q.upper_ogun_product_spread_mm.mean),
             v3o: fmtInt(q.upper_oueme_chirps3_minus_chirps2_mm.mean), v3g: fmtInt(q.upper_ogun_chirps3_minus_chirps2_mm.mean),
             v3gMax: fmtInt(q.upper_ogun_chirps3_minus_chirps2_mm.max), wapor: fmt(q.wapor_pcp_minus_chirps3_mm.max_abs, 2),
             ownV2: own.chirps2 ? fmtInt(own.chirps2.mean_closure_residual_mm) : '—', ownV3: own.chirps3 ? fmtInt(own.chirps3.mean_closure_residual_mm) : '—',
-            selName: PROD[k], selGap: fmtInt(ck.mean_closure_residual_mm), selGapPct: fmt(ck.residual_pct_of_rainfall, 1), selCum: fmtInt(ck.cumulative_residual_mm)
+            selName: PROD[k], selCum: fmtInt(ck.cumulative_residual_mm),
+            selRiseRange: `${fmtInt(ck.water_table_rise_if_stored_m[0])}–${fmtInt(ck.water_table_rise_if_stored_m[1])}`,
+            needET: fmt(ck.et_increase_needed_pct, 1), needRain: fmt(ck.rain_decrease_needed_pct, 1), needRatio: fmt(ck.runoff_ratio_needed, 2)
         };
     }
     function fill() { const v = values(); $$('[data-v]').forEach(el => { if (el.dataset.v in v) el.textContent = v[el.dataset.v]; }); }
 
-    // ---------- hero: ledger and rain gauge ----------
-    function animateLedger() {
-        const items = $$('#ledger li');
-        if (reduced) { items.forEach(li => li.classList.add('in')); return; }
-        items.forEach((li, i) => setTimeout(() => li.classList.add('in'), 250 + i * 420));
-    }
-
-    function drawGauge() {
-        const svg = $('#gauge'); svg.innerHTML = '';
-        const o = rec('upper_oueme'), P = o.p_chirps2_mm;
-        const parts = [
-            { v: o.et_wapor_mm, c: css('--air'), name: 'back to the sky', id: 'air' },
-            { v: o.q_expected_chirps2_mm, c: css('--river'), name: 'in the river', id: 'river' },
-            { v: o.closure_residual_chirps2_mm, c: css('--gap'), name: 'unaccounted for', id: 'gap' }
-        ];
-        const x = 52, w = 84, top = 28, bottom = 402, H = bottom - top, k = H / P;
-        const defs = svgEl('defs');
-        const pat = svgEl('pattern', { id: 'hatch', patternUnits: 'userSpaceOnUse', width: 8, height: 8, patternTransform: 'rotate(45)' });
-        pat.append(svgEl('rect', { width: 8, height: 8, fill: css('--gap') }), svgEl('line', { x1: 0, y1: 0, x2: 0, y2: 8, stroke: 'rgba(255,255,255,0.4)', 'stroke-width': 3 }));
-        defs.append(pat); svg.append(defs);
-        // scale
-        for (let t = 0; t <= P; t += 250) {
-            const y = bottom - t * k;
-            svg.append(svgEl('line', { x1: x - 8, x2: x, y1: y, y2: y, stroke: css('--ink-3'), 'stroke-width': 1 }));
-            svg.append(svgEl('text', { x: x - 12, y: y + 4, 'text-anchor': 'end', 'font-family': 'IBM Plex Mono, monospace', 'font-size': 11, fill: css('--ink-3') }, fmtInt(t)));
+    // ---------- Figure 1: locator map ----------
+    // Equirectangular, scaled by cos(8.5°) so shapes are true at the centre of the frame. Over 4.4° of
+    // longitude this is indistinguishable from a conformal projection at this size.
+    const ringsOf = g => g.type === 'Polygon' ? [g.coordinates] : g.type === 'MultiPolygon' ? g.coordinates : [];
+    const pathOf = (g, P) => ringsOf(g).map(poly => poly.map(ring => ring.map((pt, i) => `${i ? 'L' : 'M'}${P(pt).map(n => n.toFixed(1)).join(',')}`).join('') + 'Z').join('')).join('');
+    let locSmall = null;
+    function drawLocator() {
+        const el = $('#locator'); el.innerHTML = '';
+        // Text is sized in map units. Below 520 px the map is drawn with larger text so it stays legible,
+        // and the Upper Ogun label moves below the catchment, where the larger text fits.
+        const small = locSmall = el.getBoundingClientRect().width < 520;
+        el.classList.toggle('is-small', small);
+        const W = 680, H = 700, frame = { w: 0.6, e: 5.0, s: 5.95, n: 10.8 }, pad = 30;
+        const k0 = Math.cos(8.5 * Math.PI / 180);
+        const sc = Math.min((W - 2 * pad) / ((frame.e - frame.w) * k0), (H - 2 * pad) / (frame.n - frame.s));
+        const ox = (W - (frame.e - frame.w) * k0 * sc) / 2, oy = (H - (frame.n - frame.s) * sc) / 2;
+        const P = ([x, y]) => [ox + (x - frame.w) * k0 * sc, oy + (frame.n - y) * sc];
+        const [fx0, fy0] = P([frame.w, frame.n]), [fx1, fy1] = P([frame.e, frame.s]);
+        const box = { x: fx0, y: fy0, width: fx1 - fx0, height: fy1 - fy0 };
+        const clip = svg('clipPath', { id: 'loc-frame' }); clip.append(svg('rect', box));
+        el.append(svg('defs')); el.firstChild.append(clip);
+        el.append(svg('rect', Object.assign({ class: 'loc-sea' }, box)));
+        const g = svg('g', { 'clip-path': 'url(#loc-frame)' });
+        CTX.features.filter(f => f.properties.role !== 'inset')
+            .forEach(f => g.append(svg('path', { d: pathOf(f.geometry, P), class: `loc-country${['Benin', 'Nigeria'].includes(f.properties.name) ? ' is-study' : ''}` })));
+        GEO.features.forEach(f => g.append(svg('path', { d: pathOf(f.geometry, P), class: 'loc-basin' })));
+        el.append(g);
+        el.append(svg('rect', Object.assign({ class: 'loc-edge' }, box)));
+        // graticule ticks outside the frame
+        [1, 2, 3, 4].forEach(lon => { const [x] = P([lon, frame.s]); el.append(svg('line', { x1: x, x2: x, y1: fy1, y2: fy1 + 5, class: 'loc-tickline' })); el.append(svg('text', { x, y: fy1 + 18, 'text-anchor': 'middle', class: 'loc-tick' }, `${lon}°E`)); });
+        [6, 7, 8, 9, 10].forEach(lat => { const [, y] = P([frame.w, lat]); el.append(svg('line', { x1: fx0 - 5, x2: fx0, y1: y, y2: y, class: 'loc-tickline' })); el.append(svg('text', { x: fx0 - 8, y: y + 4, 'text-anchor': 'end', class: 'loc-tick' }, `${lat}°N`)); });
+        const T = (lon, lat, t, cls, o = {}) => { const [x, y] = P([lon, lat]); el.append(svg('text', Object.assign({ x, y, class: cls }, o), t)); };
+        T(1.08, 8.55, 'TOGO', 'loc-label', { 'text-anchor': 'middle' });
+        T(2.16, 8.05, 'BENIN', 'loc-label', { 'text-anchor': 'middle' });
+        T(4.62, 8.95, 'NIGERIA', 'loc-label', { 'text-anchor': 'middle' });
+        T(2.95, 6.12, 'Gulf of Guinea', 'loc-sea-label', { 'text-anchor': 'middle' });
+        T(2.17, 9.7, 'Upper Ouémé', 'loc-basin-label', { 'text-anchor': 'middle' });
+        if (small) T(3.62, 6.98, 'Upper Ogun', 'loc-basin-label is-out', { 'text-anchor': 'middle' });
+        else T(4.2, 8.06, 'Upper Ogun', 'loc-basin-label is-out');
+        // gauge (triangle, as for hydrometric stations) and the two largest towns near the coast
+        const [gx, gy] = P([D.gauge.lon, D.gauge.lat]);
+        el.append(svg('path', { d: `M${gx - 6} ${gy - 5}L${gx + 6} ${gy - 5}L${gx} ${gy + 6}Z`, class: 'loc-gauge' }));
+        el.append(svg('text', { x: gx + 10, y: gy + 15, class: 'loc-small' }, 'Bétérou gauge'));
+        [['Cotonou', 2.42, 6.37], ['Lagos', 3.39, 6.45]].forEach(([n, lon, lat]) => {
+            const [x, y] = P([lon, lat]);
+            el.append(svg('circle', { cx: x, cy: y, r: 3, class: 'loc-town' }));
+            el.append(svg('text', { x: x + 7, y: y - 6, class: 'loc-small' }, n));
+        });
+        // 100 km scale bar, in the sea, measured at the latitude where it is drawn
+        const dx = (100 / (111.32 * Math.cos(6.05 * Math.PI / 180))) * k0 * sc, [sx0, sy0] = P([3.92, 6.05]);
+        el.append(svg('path', { d: `M${sx0} ${sy0 - 5}V${sy0}H${sx0 + dx}V${sy0 - 5}`, class: 'loc-scale' }));
+        el.append(svg('text', { x: sx0 + dx / 2, y: sy0 - 9, 'text-anchor': 'middle', class: 'loc-small' }, '100 km'));
+        // inset: Africa, with the frame of the main map
+        const af = CTX.features.find(f => f.properties.role === 'inset');
+        if (af) {
+            const S2 = 150, ix = fx1 - S2 - 12, iy = fy0 + 12, A = { w: -18, e: 52, s: -35.5, n: 38 };
+            const s2 = Math.min((S2 - 16) / (A.e - A.w), (S2 - 16) / (A.n - A.s));
+            const Q = ([x, y]) => [ix + 8 + (x - A.w) * s2 + ((S2 - 16) - (A.e - A.w) * s2) / 2, iy + 8 + (A.n - y) * s2];
+            el.append(svg('rect', { x: ix, y: iy, width: S2, height: S2, class: 'loc-inset' }));
+            el.append(svg('path', { d: pathOf(af.geometry, Q), class: 'loc-inset-land' }));
+            const [a0, b0] = Q([frame.w, frame.n]), [a1, b1] = Q([frame.e, frame.s]);
+            el.append(svg('rect', { x: a0, y: b0, width: Math.max(4, a1 - a0), height: Math.max(4, b1 - b0), class: 'loc-inset-frame' }));
         }
-        svg.append(svgEl('text', { x: x - 12, y: top - 10, 'text-anchor': 'end', 'font-family': 'IBM Plex Mono, monospace', 'font-size': 11, fill: css('--ink-3') }, 'mm'));
-        // water
-        let y0 = bottom;
-        const mids = [];
-        parts.forEach(p => {
-            const h = p.v * k, y = y0 - h;
-            svg.append(svgEl('rect', { class: 'seg-rect', x: x + 3, y, width: w - 6, height: h, fill: p.id === 'gap' ? 'url(#hatch)' : p.c }));
-            mids.push({ ...p, y: y + h / 2, h });
-            y0 = y;
-        });
-        // glass
-        svg.append(svgEl('path', { d: `M${x} ${top - 6} V${bottom - 10} Q${x} ${bottom} ${x + 10} ${bottom} H${x + w - 10} Q${x + w} ${bottom} ${x + w} ${bottom - 10} V${top - 6}`, fill: 'none', stroke: css('--ink'), 'stroke-width': 2.2 }));
-        svg.append(svgEl('line', { x1: x - 6, x2: x + w + 6, y1: top - 6, y2: top - 6, stroke: css('--ink'), 'stroke-width': 2.2, 'stroke-linecap': 'round' }));
-        // labels, kept apart
-        const gapMin = 40; mids.sort((a, b) => b.y - a.y);
-        for (let i = 1; i < mids.length; i++) if (mids[i - 1].y - mids[i].y < gapMin) mids[i].ly = (mids[i - 1].ly ?? mids[i - 1].y) - gapMin;
-        mids.forEach(m => {
-            const ly = m.ly ?? m.y, g = svgEl('g', { class: 'lbl' });
-            g.append(svgEl('path', { d: `M${x + w + 4} ${m.y} H${x + w + 14} L${x + w + 22} ${ly} H${x + w + 28}`, fill: 'none', stroke: css('--ink-3'), 'stroke-width': 1 }));
-            g.append(svgEl('text', { x: x + w + 32, y: ly - 1, 'font-family': 'IBM Plex Mono, monospace', 'font-size': 17, 'font-weight': 500, fill: m.id === 'gap' ? css('--gap') : css('--ink') }, `${fmtInt(m.v)} mm`));
-            g.append(svgEl('text', { x: x + w + 32, y: ly + 16, 'font-family': 'IBM Plex Sans, sans-serif', 'font-size': 13, fill: css('--ink-2') }, `${m.name} · ${fmtInt(100 * m.v / P)}%`));
-            svg.append(g);
-        });
-        requestAnimationFrame(() => requestAnimationFrame(() => svg.classList.add('filled')));
-    }
-
-    function drawMiniYears() {
-        const el = $('#mini-years'), rs = rowsOf('upper_oueme'), vals = rs.map(r => r.closure_residual_chirps2_mm), max = Math.max(...vals);
-        el.innerHTML = rs.map(r => `<div style="height:${Math.max(2, 100 * r.closure_residual_chirps2_mm / max)}%" title="${r.year}: ${fmtInt(r.closure_residual_chirps2_mm)} mm"><span>${fmtInt(r.closure_residual_chirps2_mm)}</span></div>`).join('');
-        el.setAttribute('aria-label', `Unexplained gap each year: ${rs.map(r => `${r.year} ${fmtInt(r.closure_residual_chirps2_mm)} mm`).join(', ')}`);
     }
 
     // ---------- maps ----------
-    function hex(h) { const n = parseInt(h.replace('#', ''), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+    const hex = h => { const n = parseInt(h.replace('#', ''), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
     function colorFor(v, meta) {
         if (!isNum(v)) return null;
         const t = Math.max(0, Math.min(1, (v - meta.vmin) / (meta.vmax - meta.vmin))), s = meta.stops;
@@ -135,402 +156,406 @@
     }
     const layerKey = (layer, product) => layer === 'et' ? 'et' : `${layer}_${product}`;
     const annualCol = (layer, product) => layer === 'et' ? 'et_wapor_mm' : layer === 'rain' ? `p_${product}_mm` : `surplus_${product}_mm`;
-    const esri = (path, max = 16) => L.tileLayer(`https://server.arcgisonline.com/ArcGIS/rest/services/${path}/MapServer/tile/{z}/{y}/{x}`, { maxZoom: max, attribution: 'Basemap © Esri' });
-    function dark() { const t = document.documentElement.getAttribute('data-theme'); return t ? t === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; }
+    const esri = (path, pane = 'tilePane') => L.tileLayer(`https://server.arcgisonline.com/ArcGIS/rest/services/${path}/MapServer/tile/{z}/{y}/{x}`, { maxZoom: 16, pane, attribution: 'Basemap © Esri' });
 
-    function createGridMap(el, opts) {
-        const map = L.map(el, {
+    function gridMap(id, opts) {
+        const map = L.map(id, {
             zoomControl: false, scrollWheelZoom: false, attributionControl: true, zoomSnap: 0.25, boxZoom: false,
             dragging: opts.interactive || !coarse, touchZoom: opts.interactive, doubleClickZoom: opts.interactive, keyboard: opts.interactive
         });
         if (opts.interactive) L.control.zoom({ position: 'topright' }).addTo(map);
         map.setView([8.6, 2.9], 7);
+        // Place names would be cut off by the cells if drawn under them. The figure map leaves them out; the
+        // explorer draws them above the cells, where they do not catch the pointer.
+        esri('Canvas/World_Light_Gray_Base').addTo(map);
+        if (opts.interactive) {
+            const pane = map.createPane('placenames');
+            pane.style.zIndex = 450; pane.style.pointerEvents = 'none';
+            esri('Canvas/World_Light_Gray_Reference', 'placenames').addTo(map);
+        }
         map.createPane('cells').style.zIndex = 380;
         const renderer = L.canvas({ pane: 'cells', padding: 0.4 });
-        let baseLayer = null, baseKind = opts.basemap || 'terrain';
-        const outline = L.geoJSON(GEO, { interactive: false, style: { color: css('--ink'), weight: 1.8, fill: false } }).addTo(map);
-        const labels = L.layerGroup().addTo(map);
-        const centers = {};
-        outline.eachLayer(l => { centers[l.feature.properties.basin_id] = l.getBounds().getCenter(); });
-        const rects = {};
+        const outline = L.geoJSON(GEO, { interactive: false, style: { color: '#111', weight: 1.4, fill: false } }).addTo(map);
+        // Catchment labels sit outside the catchments so they never cover cells: the Upper Ouémé label
+        // above its northern edge, the Upper Ogun label west of it.
+        const labels = L.layerGroup().addTo(map), anchors = {}, rects = {};
+        outline.eachLayer(l => {
+            const b = l.feature.properties.basin_id, bb = l.getBounds();
+            if (b !== 'upper_ogun') { anchors[b] = { at: L.latLng(bb.getNorth(), bb.getCenter().lng), side: 'n' }; return; }
+            const lat = bb.getCenter().lat, near = ringsOf(l.feature.geometry).flat().flat().filter(([, y]) => Math.abs(y - lat) < 0.08);
+            anchors[b] = { at: L.latLng(lat, near.length ? Math.min(...near.map(([x]) => x)) : bb.getWest()), side: 'w' };
+        });
         BIDS.forEach(b => {
             const g = D.grid[b], c = g.cell_deg;
-            rects[b] = g.cells.map(([s, w], i) => {
+            rects[b] = g.cells.map(([s, w]) => {
                 const r = L.rectangle([[s, w], [s + c, w + c]], { renderer, weight: 0.5, fillOpacity: 0.92, interactive: !!opts.interactive });
                 if (opts.interactive) {
                     r.bindTooltip('', { sticky: true, className: 'tip', direction: 'top', offset: [0, -8] });
-                    r.on('mouseover', () => r.setStyle({ weight: 2, color: css('--ink') }));
+                    r.on('mouseover', () => r.setStyle({ weight: 1.6, color: '#111' }));
                     r.on('mouseout', () => r.setStyle({ weight: 0.5, color: r.options.fillColor }));
                     r.on('click', () => opts.onSelect && opts.onSelect(b));
                 }
                 return r.addTo(map);
             });
         });
-        const gz = D.gauge;
-        const gauge = L.marker([gz.lat, gz.lon], { interactive: false, keyboard: false, icon: L.divIcon({ className: 'gauge-pin', iconSize: [0, 0], html: '<div></div><span>Bétérou gauge</span>' }) }).addTo(map);
-        const api = {
+        const gauge = L.marker([D.gauge.lat, D.gauge.lon], { interactive: false, keyboard: false, icon: L.divIcon({ className: 'gauge-pin', iconSize: [0, 0], html: '<div></div><span>Bétérou gauge</span>' }) }).addTo(map);
+        return {
             map,
-            setBase(kind) {
-                baseKind = kind || baseKind;
-                if (baseLayer) map.removeLayer(baseLayer);
-                const dk = dark();
-                baseLayer = baseKind === 'satellite' ? L.layerGroup([esri('World_Imagery', 17), esri('Reference/World_Boundaries_and_Places', 17)])
-                    : (baseKind === 'terrain' && !dk) ? L.layerGroup([esri('World_Terrain_Base', 13), esri('Canvas/World_Light_Gray_Reference')])
-                    : L.layerGroup([esri(dk ? 'Canvas/World_Dark_Gray_Base' : 'Canvas/World_Light_Gray_Base'), esri(dk ? 'Canvas/World_Dark_Gray_Reference' : 'Canvas/World_Light_Gray_Reference')]);
-                baseLayer.addTo(map);
-            },
             paint(st) {
-                const none = st.layer === 'none', meta = none ? null : D.layers[st.layer], key = none ? null : layerKey(st.layer, st.product);
+                const meta = D.layers[st.layer], key = layerKey(st.layer, st.product);
                 BIDS.forEach(b => {
-                    const vals = none ? null : D.grid[b].values[key][st.period];
+                    const vals = D.grid[b].values[key][st.period], dim = st.zone !== 'ALL' && st.zone !== b;
                     rects[b].forEach((r, i) => {
-                        const fillColor = none ? css('--accent') : (colorFor(vals[i], meta) || css('--paper-2'));
-                        const dim = st.zone !== 'ALL' && st.zone !== b;
-                        r.setStyle({ fillColor, color: fillColor, fillOpacity: none ? 0 : (dim ? 0.45 : 0.92), opacity: none ? 0 : (dim ? 0.45 : 0.92) });
-                        if (opts.interactive && !none) r.setTooltipContent(`<strong>${esc(meta.short)}: ${fmtInt(vals[i])} mm</strong><br>${esc(BASIN[b].short)} · one 5 km cell · ${st.period === 'mean' ? '2018–2024 average' : st.period}${st.layer !== 'et' ? ` · ${PROD[st.product]}` : ''}`);
+                        const fillColor = colorFor(vals[i], meta) || '#e5e5e5';
+                        r.setStyle({ fillColor, color: fillColor, fillOpacity: dim ? 0.4 : 0.92, opacity: dim ? 0.4 : 0.92 });
+                        if (opts.interactive) r.setTooltipContent(`<b>${esc(meta.short)}: ${fmtInt(vals[i])} mm</b><br>${esc(BASIN[b])}, one 5 km cell, ${st.period === 'mean' ? '2018–2024 mean' : st.period}${st.layer !== 'et' ? `, ${PROD[st.product]}` : ''}`);
                     });
                 });
-                outline.setStyle(f => ({ color: css('--ink'), weight: st.zone === f.properties.basin_id ? 3.2 : 1.6, fill: none, fillColor: css('--accent'), fillOpacity: 0.16 }));
+                outline.setStyle(f => ({ color: '#111', weight: st.zone === f.properties.basin_id ? 2.6 : 1.4, fill: false }));
                 labels.clearLayers();
                 BIDS.forEach(b => {
-                    const r = rec(b, st.period);
-                    const sub = none ? `${BASIN[b].country} · ${fmtInt(area(b))} km²` : `${fmtInt(r[annualCol(st.layer, st.product)])} mm · catchment average`;
-                    labels.addLayer(L.marker(centers[b], { interactive: false, keyboard: false, icon: L.divIcon({ className: `basin-label ${st.zone === b ? 'is-on' : ''}`, iconSize: [0, 0], html: `<div>${esc(BASIN[b].short)}<span>${esc(sub)}</span></div>` }) }));
+                    const v = rec(b, st.period)[annualCol(st.layer, st.product)];
+                    labels.addLayer(L.marker(anchors[b].at, { interactive: false, keyboard: false, icon: L.divIcon({ className: `basin-label at-${anchors[b].side}${st.zone === b ? ' is-on' : ''}`, iconSize: [0, 0], html: `<div>${esc(BASIN[b])}<span>${fmtInt(v)} mm, catchment mean</span></div>` }) }));
                 });
-                const pin = gauge.getElement(); if (pin) pin.classList.toggle('pulse', !!st.gauge && !reduced);
+                const pin = gauge.getElement(); if (pin) pin.classList.toggle('is-on', !!st.gauge);
             },
             fit(zone, animate, pad) {
                 map.invalidateSize();
                 let bounds = null;
                 outline.eachLayer(l => { if (zone === 'ALL' || l.feature.properties.basin_id === zone) bounds = bounds ? bounds.extend(l.getBounds()) : L.latLngBounds(l.getBounds().getSouthWest(), l.getBounds().getNorthEast()); });
-                const o = Object.assign({ paddingTopLeft: [40, 56], paddingBottomRight: [40, 40] }, pad || {}, zone === 'ALL' ? {} : { maxZoom: 9 });
-                if (animate && !reduced) map.flyToBounds(bounds, Object.assign({ duration: 0.9 }, o)); else map.fitBounds(bounds, Object.assign({ animate: false }, o));
+                const o = Object.assign({ paddingTopLeft: [32, 48], paddingBottomRight: [32, 32] }, pad || {}, zone === 'ALL' ? {} : { maxZoom: 9 });
+                if (animate && !reduced) map.flyToBounds(bounds, Object.assign({ duration: 0.8 }, o)); else map.fitBounds(bounds, Object.assign({ animate: false }, o));
             }
         };
-        api.setBase(baseKind);
-        return api;
     }
-
-    function setLegend(prefix, layer, period, product) {
+    function setLegend(p, layer, period, product) {
         const meta = D.layers[layer];
-        $(`#${prefix}-title`).textContent = `${meta.label}, mm a year · ${period === 'mean' ? '2018–2024 average' : period}`;
-        $(`#${prefix}-source`).textContent = layer === 'et' ? meta.source : `${PROD[product]}${layer === 'surplus' ? ' rainfall − WaPOR v3 evapotranspiration' : ''} · same colours every year`;
-        $(`#${prefix}-ramp`).style.background = `linear-gradient(90deg, ${meta.stops.join(', ')})`;
-        $(`#${prefix}-min`).textContent = `≤ ${fmtInt(meta.vmin)}`;
-        $(`#${prefix}-mid`).textContent = fmtInt((meta.vmin + meta.vmax) / 2);
-        $(`#${prefix}-max`).textContent = `≥ ${fmtInt(meta.vmax)}`;
+        $(`#${p}-title`).textContent = `${meta.label}, mm per year, ${period === 'mean' ? '2018–2024 mean' : period}`;
+        $(`#${p}-source`).textContent = layer === 'et' ? 'WaPOR v3, averaged onto the 5 km grid' : layer === 'rain' ? PROD[product] : `${PROD[product]} minus WaPOR v3`;
+        $(`#${p}-ramp`).style.background = `linear-gradient(90deg, ${meta.stops.join(', ')})`;
+        $(`#${p}-min`).textContent = `≤ ${fmtInt(meta.vmin)}`;
+        $(`#${p}-mid`).textContent = fmtInt((meta.vmin + meta.vmax) / 2);
+        $(`#${p}-max`).textContent = `≥ ${fmtInt(meta.vmax)}`;
     }
 
-    // ---------- story ----------
+    // ---------- Figure 2: scroll-driven map ----------
     const STEPS = {
-        place: { layer: 'none', zone: 'ALL', chip: '01 · The place' },
-        shortcut: { layer: 'rain', zone: 'ALL', chip: '02 · Rainfall' },
-        sky: { layer: 'et', zone: 'ALL', chip: '03 · Back to the sky' },
-        left: { layer: 'surplus', zone: 'ALL', chip: '04 · What’s left' },
-        river: { layer: 'surplus', zone: 'upper_oueme', gauge: true, chip: '05 · The river gauge' },
-        gap: { layer: 'surplus', zone: 'upper_oueme', gauge: true, chip: '06 · The gap' }
+        rain: { layer: 'rain', zone: 'ALL' },
+        et: { layer: 'et', zone: 'ALL' },
+        left: { layer: 'surplus', zone: 'ALL' },
+        gap: { layer: 'surplus', zone: 'upper_oueme', gauge: true }
     };
-    let story = null, storyStep = 'place';
-    function storyPad() { const lg = $('#story-legend'); const h = lg.hidden ? 0 : lg.offsetHeight + 16; return { paddingTopLeft: [36, 64], paddingBottomRight: [36, h + 28] }; }
+    let story = null, step = 'rain';
+    const storyPad = () => ({ paddingTopLeft: [24, 64], paddingBottomRight: [24, $('#story-legend').offsetHeight + 28] });
     function applyStep(name, animate = true) {
-        storyStep = name;
+        step = name;
         const st = STEPS[name];
         $$('.step').forEach(s => s.classList.toggle('is-active', s.dataset.step === name));
-        $('#story-chip').textContent = st.chip;
-        $('#story-legend').hidden = st.layer === 'none';
-        if (st.layer !== 'none') setLegend('sl', st.layer, 'mean', 'chirps2');
+        setLegend('sl', st.layer, 'mean', 'chirps2');
         story.paint({ layer: st.layer, zone: st.zone, period: 'mean', product: 'chirps2', gauge: st.gauge });
         story.fit(st.zone, animate, storyPad());
     }
     function initStory() {
-        story = createGridMap('story-map', { interactive: false, basemap: 'terrain' });
-        applyStep('place', false);
-        const io = new IntersectionObserver(entries => {
-            entries.forEach(e => { if (e.isIntersecting && e.target.dataset.step !== storyStep) applyStep(e.target.dataset.step); });
-        }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 });
-        $$('.step').forEach(s => io.observe(s));
-        new ResizeObserver(() => { story.map.invalidateSize(); story.fit(STEPS[storyStep].zone, false, storyPad()); }).observe($('.map-frame'));
+        story = gridMap('story-map', { interactive: false });
+        applyStep('rain', false);
+        // Side by side, a step is current when it crosses the middle of the screen. On a phone the cards pass over
+        // the map, which fills the top half, so a step is current while its card is in the lower half.
+        const narrow = matchMedia('(max-width: 860px)');
+        let io = null;
+        const observe = () => {
+            if (io) io.disconnect();
+            io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && e.target.dataset.step !== step) applyStep(e.target.dataset.step); }),
+                { rootMargin: narrow.matches ? '-55% 0px -15% 0px' : '-45% 0px -45% 0px' });
+            $$('.step').forEach(s => io.observe(s));
+        };
+        observe();
+        narrow.addEventListener('change', observe);
+        new ResizeObserver(() => { story.map.invalidateSize(); story.fit(STEPS[step].zone, false, storyPad()); }).observe($('.scrolly-map'));
+        const rs = rowsOf('upper_oueme'), vals = rs.map(r => r.closure_residual_chirps2_mm), max = Math.max(...vals);
+        $('#bars7').innerHTML = rs.map(r => `<div style="height:${Math.max(2, 100 * r.closure_residual_chirps2_mm / max)}%"><span>${fmtInt(r.closure_residual_chirps2_mm)}</span></div>`).join('');
+        $('#bars7').setAttribute('aria-label', `Annual residual: ${rs.map(r => `${r.year}, ${fmtInt(r.closure_residual_chirps2_mm)} mm`).join('; ')}`);
     }
 
-    // ---------- 07: could the ground hide it? ----------
+    // ---------- Tables 2 and 3 ----------
+    function renderTables() {
+        const o = rec('upper_oueme'), g = rec('upper_ogun'), c = clo();
+        $('#table-2 tbody').innerHTML = PRODS.map(p => `<tr><td><span class="swatch" style="background:${pcol(p)}"></span>${PROD[p]}</td><td>${fmtInt(o[`p_${p}_mm`])}</td><td>${fmtInt(o.et_wapor_mm)}</td><td>${fmtInt(o[`surplus_${p}_mm`])}</td><td>${fmtInt(o[`q_expected_${p}_mm`])}</td><td>${fmtInt(c[p].mean_closure_residual_mm)}</td><td>${fmt(c[p].residual_pct_of_rainfall, 1)}</td></tr>`).join('');
+        $('#table-3 tbody').innerHTML = PRODS.map(p => `<tr><td><span class="swatch" style="background:${pcol(p)}"></span>${PROD[p]}</td><td>${fmtInt(g[`p_${p}_mm`])}</td><td>${fmtInt(g.et_wapor_mm)}</td><td>${fmtInt(g[`surplus_${p}_mm`])}</td></tr>`).join('');
+    }
+
+    // ---------- product selectors (Figures 3 and 5) ----------
+    // Buttons are built once and then only their pressed state changes, so keyboard focus is never lost.
+    function buildProdSegs() {
+        $$('[data-prod-seg]').forEach(seg => {
+            seg.innerHTML = PRODS.map(p => `<button type="button" data-prod="${p}"><span class="swatch" style="background:${pcol(p)}"></span>${PROD[p]}</button>`).join('');
+        });
+        syncProdSegs();
+    }
+    const syncProdSegs = () => $$('[data-prod]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.prod === S.product)));
+    function setProduct(p) { S.product = p; fill(); syncProdSegs(); drawSection(); renderScale(); resetFix(); writeQuery(); }
+
+    // ---------- Figure 3: storage ----------
     function drawSection() {
         const c = clo()[S.product], cum = c.cumulative_residual_mm, rise = cum / (S.sy / 100 * 1000);
         $('#sy-out').textContent = `${fmt(S.sy, 1)}%`;
         $('#sy').setAttribute('aria-valuetext', `${fmt(S.sy, 1)} percent`);
         $('#rise-out').textContent = fmtInt(rise);
-        $('#storeys-out').textContent = `Roughly the height of a ${fmtInt(rise / 3)}-storey building.`;
-        const svg = $('#section'); svg.innerHTML = '';
-        const dk = dark(), W = 680, ground = 168, pxm = 2.0, y = m => ground + m * pxm;
-        const col = dk ? { sky: '#1c1914', soil: '#7a4129', sap: '#5b4d35', fis: '#3f3b35', rock: '#26231f', ink: '#f1ebdf', ink2: '#cfc5b4', crack: '#625c53', well: '#14120e' }
-                       : { sky: '#ebe3d2', soil: '#d49a74', sap: '#e8d3a8', fis: '#cbc3b4', rock: '#6f685d', ink: '#1e1a15', ink2: '#4b443a', crack: '#a39a8a', well: '#fffcf5' };
-        const T = (x, yy, t, o = {}) => svgEl('text', Object.assign({ x, y: yy, 'font-family': 'IBM Plex Sans, sans-serif', 'font-size': 15, fill: col.ink }, o), t);
-        svg.append(svgEl('rect', { x: 0, y: 0, width: W, height: ground, fill: col.sky }));
-        [[0, 5, col.soil], [5, 45, col.sap], [45, 100, col.fis], [100, 130, col.rock]].forEach(([a, b, f]) => svg.append(svgEl('rect', { x: 0, y: y(a), width: W, height: (b - a) * pxm, fill: f })));
-        for (let i = 0; i < 8; i++) { const x0 = 120 + i * 62; svg.append(svgEl('path', { d: `M${x0} ${y(56 + (i % 3) * 10)} l12 9 l-5 11 l11 8`, fill: 'none', stroke: col.crack, 'stroke-width': 1.5 })); }
-        svg.append(svgEl('line', { x1: 0, x2: W, y1: ground, y2: ground, stroke: col.ink, 'stroke-width': 2 }));
-        svg.append(T(56, y(34), 'Saprolite: weathered rock that stores the water', { 'font-weight': 600 }));
-        svg.append(T(56, y(80), 'Fissured layer: lets water move'));
-        svg.append(T(56, y(112) + 4, 'Fresh bedrock: little or no water', { fill: dk ? col.ink2 : '#f4efe4' }));
-        [0, 25, 50, 75, 100].forEach(m => {
-            svg.append(svgEl('line', { x1: 0, x2: 8, y1: y(m), y2: y(m), stroke: col.ink, 'stroke-width': 1.2 }));
-            svg.append(T(11, y(m) + 4, `${m}`, { 'font-family': 'IBM Plex Mono, monospace', 'font-size': 11, fill: m === 100 && !dk ? '#f4efe4' : col.ink2 }));
+        // Schematic weathering profile of a crystalline-basement aquifer, after Lachassagne et al. (2021).
+        // Depth axis on the left; 2.1 px per metre, so the frame shows 71 m above the ground surface. It is drawn
+        // at the width it is shown (340–640 units), so the text stays legible on a phone.
+        const el = $('#section'); el.innerHTML = '';
+        const W = Math.round(Math.max(340, Math.min(640, el.getBoundingClientRect().width || 640)));
+        el.setAttribute('viewBox', `0 0 ${W} 400`);
+        const X0 = 44, ground = 150, pxm = 2.1, y = m => ground + m * pxm, WT = 12;
+        const T = (x, yy, t, cls = 'sec-text', o = {}) => svg('text', Object.assign({ x, y: yy, class: cls }, o), t);
+        el.append(svg('rect', { x: X0, y: 0, width: W - X0, height: ground, class: 'sec-air' }));
+        [[0, 5, 'sec-laterite'], [5, 45, 'sec-saprolite'], [45, 100, 'sec-fissured'], [100, 125, 'sec-bedrock']]
+            .forEach(([a, b, c]) => el.append(svg('rect', { x: X0, y: y(a), width: W - X0, height: (b - a) * pxm, class: c })));
+        // sub-horizontal fissures, denser near the top of the fissured layer
+        [[50, 0.9], [55, 0.75], [61, 0.6], [68, 0.45], [76, 0.35], [85, 0.25], [93, 0.15]].forEach(([m, density], r) => {
+            for (let x = X0 + 18 + (r % 2) * 23; x < W - 30; x += 46 / density) el.append(svg('line', { x1: x, x2: x + 18, y1: y(m), y2: y(m) + (r % 2 ? 1.5 : -1.5), class: 'sec-fissure' }));
         });
-        svg.append(T(11, y(100) + 18, 'm deep', { 'font-family': 'IBM Plex Mono, monospace', 'font-size': 11, fill: dk ? col.ink2 : '#f4efe4' }));
-        // a well and its hut
-        const wx = 600;
-        svg.append(svgEl('rect', { x: wx, y: ground, width: 12, height: 30 * pxm, fill: col.well, stroke: col.ink, 'stroke-width': 1.5 }));
-        svg.append(svgEl('path', { d: `M${wx - 16} ${ground} v-20 h44 v20 M${wx - 22} ${ground - 20} l28 -16 l28 16`, fill: col.well, stroke: col.ink, 'stroke-width': 1.8, 'stroke-linejoin': 'round' }));
-        svg.append(T(wx - 6, ground + 30 * pxm + 18, 'a well', { 'font-size': 13, fill: col.ink2 }));
-        // today's water table (illustrative) and the level needed to hold the gap
-        const river = css('--river'), wt = y(12), need = wt - rise * pxm, top = Math.max(8, need), off = need < 8;
-        svg.append(svgEl('rect', { x: 150, y: top, width: 400, height: wt - top, fill: river, opacity: dk ? 0.28 : 0.2 }));
-        svg.append(svgEl('line', { x1: 0, x2: W, y1: wt, y2: wt, stroke: river, 'stroke-width': 2.5, 'stroke-dasharray': '9 6' }));
-        svg.append(T(56, wt + 20, 'water table today (illustrative)', { 'font-size': 13, 'font-weight': 600, fill: col.ink }));
-        if (!off) svg.append(svgEl('line', { x1: 150, x2: 550, y1: need, y2: need, stroke: river, 'stroke-width': 2.5 }));
-        svg.append(svgEl('path', { d: `M350 ${wt - 4} V${top + 14}`, stroke: river, 'stroke-width': 3, fill: 'none' }));
-        svg.append(svgEl('path', { d: `M340 ${top + 20} L350 ${top + 6} L360 ${top + 20}`, stroke: river, 'stroke-width': 3, fill: 'none', 'stroke-linejoin': 'round' }));
-        const ly = Math.min(ground - 46, Math.max(30, top + 26));
-        svg.append(T(368, ly, `+${fmtInt(rise)} m`, { 'font-family': 'IBM Plex Mono, monospace', 'font-size': 24, 'font-weight': 500 }));
-        svg.append(T(368, ly + 20, off ? 'above today\u2019s water table: far beyond this chart' : 'above today\u2019s water table', { 'font-size': 13.5, fill: col.ink2 }));
-        svg.append(T(W - 10, 22, 'ground level is the black line', { 'font-size': 12, fill: col.ink2, 'text-anchor': 'end' }));
-        svg.setAttribute('aria-label', `Illustrative cross-section: storing the ${fmtInt(cum)} mm gap with ${fmt(S.sy, 1)}% specific yield would need the water table to rise ${fmtInt(rise)} metres.`);
+        el.append(svg('line', { x1: X0, x2: W, y1: ground, y2: ground, class: 'sec-ground' }));
+        el.append(T(X0 + 12, ground - 7, 'ground surface', 'sec-note'));
+        el.append(T(X0 + 12, y(30), 'Saprolite'));
+        el.append(T(X0 + 12, y(30) + 16, 'weathered rock, most of the storage', 'sec-note'));
+        el.append(T(X0 + 12, y(80), 'Fissured layer'));
+        el.append(T(X0 + 12, y(112) + 4, 'Fresh bedrock', 'sec-text sec-on-dark'));
+        // depth axis
+        el.append(svg('line', { x1: X0, x2: X0, y1: ground, y2: y(118), class: 'sec-axis' }));
+        [0, 25, 50, 75, 100].forEach(m => {
+            el.append(svg('line', { x1: X0 - 5, x2: X0, y1: y(m), y2: y(m), class: 'sec-axis' }));
+            el.append(T(X0 - 8, y(m) + 4, m === 0 ? '0 m' : `${m}`, 'sec-tick', { 'text-anchor': 'end' }));
+        });
+        // water table today and the level needed to hold the residual
+        const wt = y(WT), need = wt - rise * pxm, top = Math.max(8, need), off = need < 8;
+        const bx0 = X0 + Math.round((W - X0) * 0.34), bx1 = W - 16, ax = bx0 + 22, ly = Math.max(26, top + 22);
+        el.append(svg('rect', { x: bx0, y: top, width: bx1 - bx0, height: wt - top, class: 'sec-rise' }));
+        el.append(svg('line', { x1: X0, x2: W, y1: wt, y2: wt, class: 'sec-wt' }));
+        el.append(T(X0 + 12, wt + 16, 'water table today (illustrative depth)', 'sec-note'));
+        if (!off) el.append(svg('line', { x1: bx0, x2: bx1, y1: need, y2: need, class: 'sec-need' }));
+        el.append(svg('path', { d: `M${ax} ${wt - 3}V${top + 4}M${ax - 7} ${top + 14}L${ax} ${top + 3}L${ax + 7} ${top + 14}`, class: 'sec-arrow' }));
+        const above = rise - WT;
+        el.append(T(ax + 12, ly, `+${fmtInt(rise)} m${off ? ', beyond the frame' : ''}`, 'sec-label'));
+        if (above > 0) el.append(T(ax + 12, ly + 17, `${fmtInt(above)} m above ground`, 'sec-note'));
+        el.setAttribute('aria-label', `Schematic profile: storing ${fmtInt(cum)} mm with a specific yield of ${fmt(S.sy, 1)}% needs a water-table rise of ${fmtInt(rise)} m${above > 0 ? `, to ${fmtInt(above)} m above the ground surface` : ''}.`);
     }
 
-    // ---------- 08: products ----------
-    function renderProducts() {
-        const o = rec('upper_oueme'), c = clo();
-        $('#prod-seg').innerHTML = PRODS.map(p => `<button type="button" data-prod="${p}" aria-pressed="${S.product === p}"><span class="dot" style="background:${pcol(p)}"></span>${PROD[p]}</button>`).join('');
-        const maxRain = Math.max(...PRODS.map(p => o[`p_${p}_mm`])), maxGap = Math.max(...PRODS.map(p => c[p].mean_closure_residual_mm));
-        $('#prod-table tbody').innerHTML = PRODS.map(p => `<tr data-prod="${p}" aria-selected="${S.product === p}" tabindex="0">
-            <td><span class="prod-name"><span class="dot" style="background:${pcol(p)}"></span>${PROD[p]}</span></td>
-            <td class="bar-cell"><div class="hbar"><i style="width:${70 * o[`p_${p}_mm`] / maxRain}%;background:${pcol(p)}"></i><b>${fmtInt(o[`p_${p}_mm`])}</b></div></td>
-            <td class="bar-cell"><div class="hbar"><i style="width:${70 * c[p].mean_closure_residual_mm / maxGap}%;background:var(--gap)"></i><b>${fmtInt(c[p].mean_closure_residual_mm)}</b></div></td></tr>`).join('');
-    }
-    function setProduct(p) {
-        if (!PROD[p]) return;
-        S.product = p;
-        fill(); renderProducts(); drawSection(); renderScale(); resetFix(); writeQuery();
-    }
-
-    // ---------- 09: scale ----------
+    // ---------- Figure 4: published recharge ----------
     function renderScale() {
         const c = clo(), rf = D.summary.published_recharge_fraction, X = 25, pos = v => `${Math.min(100, 100 * v / X)}%`;
         const [ka, kb] = rf.kamagate2007, ko = rf.kotchoni2019[0];
-        const dots = PRODS.map(p => `<span class="cmp-dot ${p === S.product ? 'is-on' : ''}" style="left:${pos(c[p].residual_pct_of_rainfall)};background:${pcol(p)}" title="${PROD[p]}: ${fmt(c[p].residual_pct_of_rainfall, 1)}% of rainfall"></span>`).join('');
-        $('#cmp').innerHTML =
-            `<div class="cmp-row"><div class="cmp-name">My unexplained gap<span>Upper Ouémé, 2018–2024</span></div><div class="cmp-track">${dots}</div></div>` +
-            `<div class="cmp-row"><div class="cmp-name">Recharge from wells<span>Kamagaté et al., 2007 · Donga</span></div><div class="cmp-track"><span class="cmp-range" style="left:${pos(100 * ka)};width:${100 * (kb - ka) * 100 / X}%" title="${fmtInt(100 * ka)}–${fmtInt(100 * kb)}% of rainfall"></span></div></div>` +
-            `<div class="cmp-row"><div class="cmp-name">Recharge from wells<span>Kotchoni et al., 2019 · Benin</span></div><div class="cmp-track"><span class="cmp-tick" style="left:${pos(100 * ko)}" title="about ${fmtInt(100 * ko)}% of rainfall"></span></div></div>` +
-            `<div class="cmp-axis"><div></div><div class="cmp-ticks">${[0, 5, 10, 15, 20, 25].map(t => `<span style="left:${pos(t)}">${t}%</span>`).join('')}</div></div>` +
-            `<p class="fine" style="margin:6px 0 0">Share of yearly rainfall. Dots: ${PRODS.map(p => `<span style="white-space:nowrap"><span class="dot" style="background:${pcol(p)};margin-right:5px;vertical-align:-1px"></span>${PROD[p]} ${fmt(c[p].residual_pct_of_rainfall, 1)}%</span>`).join(' · ')}</p>`;
+        $('#scale').innerHTML = `<div class="scale-plot"><div class="scale-grid">${[0, 5, 10, 15, 20, 25].map(t => `<span style="left:${pos(t)}"></span>`).join('')}</div>` +
+            `<div class="scale-row"><div class="scale-name">Residual, this study<span>Upper Ouémé, 2018–2024</span></div><div class="scale-track">${PRODS.map(p => `<span class="scale-dot ${p === S.product ? 'is-on' : ''}" style="left:${pos(c[p].residual_pct_of_rainfall)};background:${pcol(p)}" title="${PROD[p]}: ${fmt(c[p].residual_pct_of_rainfall, 1)}%"></span>`).join('')}</div></div>` +
+            `<div class="scale-row"><div class="scale-name">Kamagaté et al. (2007)<span>Donga sub-basin, 2 years</span></div><div class="scale-track"><span class="scale-range" style="left:${pos(100 * ka)};width:${100 * (kb - ka) * 100 / X}%"></span><span class="scale-val" style="left:calc(${pos(100 * ka)} + 6px);top:-12px">${fmtInt(100 * ka)}–${fmtInt(100 * kb)}%</span></div></div>` +
+            `<div class="scale-row"><div class="scale-name">Kotchoni et al. (2019)<span>Benin, 19–25-year records</span></div><div class="scale-track"><span class="scale-tick" style="left:${pos(100 * ko)}"></span><span class="scale-val" style="left:calc(${pos(100 * ko)} + 8px)">about ${fmtInt(100 * ko)}%</span></div></div>` +
+            `<div class="scale-axis"><div></div><div class="scale-ticks">${[0, 5, 10, 15, 20, 25].map(t => `<span style="left:${pos(t)}">${t}%</span>`).join('')}</div></div></div>` +
+            `<p class="small" style="margin:8px 0 0">${PRODS.map(p => `<span style="white-space:nowrap"><span class="swatch" style="background:${pcol(p)}"></span>${PROD[p]} ${fmt(c[p].residual_pct_of_rainfall, 1)}%</span>`).join('&ensp; ')}</p>`;
+        $('#scale').setAttribute('aria-label', `Share of annual rainfall. Residual, this study: ${PRODS.map(p => `${PROD[p]} ${fmt(c[p].residual_pct_of_rainfall, 1)}%`).join(', ')}. Kamagaté et al. (2007): ${fmtInt(100 * ka)}–${fmtInt(100 * kb)}%. Kotchoni et al. (2019): about ${fmtInt(100 * ko)}%.`);
     }
 
-    // ---------- 10: close the gap ----------
-    const FX = { et: 0, rain: 0, ratio: null };
-    function resetFix() { FX.et = 0; FX.rain = 0; FX.ratio = ratioObs(); syncFix(); }
-    function syncFix() {
-        $('#fx-et').value = FX.et; $('#fx-rain').value = FX.rain; $('#fx-ratio').value = FX.ratio;
-        renderFix();
-    }
+    // ---------- Figure 5: sensitivity ----------
+    function resetFix() { S.fx = { et: 0, rain: 0, ratio: ratioObs() }; syncFix(); }
+    function syncFix() { $('#fx-et').value = S.fx.et; $('#fx-rain').value = S.fx.rain; $('#fx-ratio').value = S.fx.ratio; renderFix(); }
     function renderFix() {
-        const o = rec('upper_oueme'), k = S.product;
-        const P = o[`p_${k}_mm`] * (1 + FX.rain / 100), ET = o.et_wapor_mm * (1 + FX.et / 100), Q = FX.ratio * P, gap = P - ET - Q;
-        $('#fx-et-out').textContent = `${signed(FX.et)}%`;
-        $('#fx-rain-out').textContent = `${signed(FX.rain)}%`;
-        $('#fx-ratio-out').textContent = fmt(FX.ratio, 3);
-        $('#fx-et').setAttribute('aria-valuetext', `${signed(FX.et)} percent`);
-        $('#fx-rain').setAttribute('aria-valuetext', `${signed(FX.rain)} percent`);
-        $('#fx-gap').textContent = fmtInt(Math.abs(gap) < 0.5 ? 0 : gap);
-        const closed = Math.abs(gap) <= 5;
-        $('#fx-status').textContent = closed ? 'left over: the books balance' : gap > 0 ? 'still unaccounted for each year' : 'too little water: you went past zero';
-        $('#fx-verdict').hidden = !closed;
-        if (closed) {
-            const what = [];
-            if (Math.abs(FX.et) >= 0.1) what.push(`evapotranspiration ${signed(FX.et)}%`);
-            if (Math.abs(FX.rain) >= 0.1) what.push(`rainfall ${signed(FX.rain)}%`);
-            if (Math.abs(FX.ratio - ratioObs()) >= 0.0005) what.push(`a river share of ${fmt(FX.ratio, 3)}`);
-            $('#fx-verdict-text').textContent = `Balanced with ${what.join(', ') || 'no change'}. Each fix is plausible, so the data alone cannot say which one is real.`;
-        }
-        const tot = Math.max(P, ET + Q), parts = [['b-air', 'Back to the sky', ET], ['b-river', 'River', Q]].concat(gap > 0 ? [['b-gap', 'Unaccounted for', gap]] : []);
-        $('#fx-bar').innerHTML = parts.map(([c, n, v]) => { const w = 100 * v / tot; return `<div class="${c}" style="width:${w}%" title="${n}: ${fmtInt(v)} mm">${w > 9 ? fmtInt(v) : ''}</div>`; }).join('');
-        $('#fx-keys').innerHTML = [['var(--air)', 'Back to the sky', ET], ['#1f66c2', 'Carried by the river', Q], ['var(--gap)', gap >= -0.5 ? 'Unaccounted for' : 'Short by', Math.abs(gap) < 0.5 ? 0 : Math.abs(gap)], ['transparent', 'Rain (adjusted)', P]]
-            .map(([c, n, v]) => `<div><i style="background:${c};${c === 'transparent' ? 'border:1px solid var(--line-2)' : ''}"></i><span>${n}</span><b>${fmtInt(v)} mm</b></div>`).join('');
+        const o = rec('upper_oueme'), k = S.product, f = S.fx;
+        const P = o[`p_${k}_mm`] * (1 + f.rain / 100), ET = o.et_wapor_mm * (1 + f.et / 100), Q = f.ratio * P, gap = P - ET - Q;
+        $('#fx-et-out').textContent = `${signed(f.et)}%`;
+        $('#fx-rain-out').textContent = `${signed(f.rain)}%`;
+        $('#fx-ratio-out').textContent = fmt(f.ratio, 3);
+        $('#fx-et').setAttribute('aria-valuetext', `${signed(f.et)} percent`);
+        $('#fx-rain').setAttribute('aria-valuetext', `${signed(f.rain)} percent`);
+        $('#fx-gap').textContent = fmtInt(gap);
+        // Rainfall is drawn as a bracket; evapotranspiration, river flow and a positive residual fill it.
+        // A negative residual shows as segments running past the end of the bracket.
+        const tot = Math.max(P, ET + Q), pct = v => `${100 * v / tot}%`;
+        const parts = [['s-air', ET], ['s-river', Q]].concat(gap > 0.5 ? [['s-gap', gap]] : []);
+        $('#fx-bar').innerHTML = `<div class="budget-p" style="width:${pct(P)}"><span>Rainfall ${fmtInt(P)} mm</span></div>` +
+            `<div class="stack">${parts.map(([c, v]) => `<div class="${c}" style="width:${pct(v)}">${v / tot > 0.1 ? fmtInt(v) : ''}</div>`).join('')}</div>`;
+        $('#fx-keys').innerHTML = [['var(--air)', 'Evapotranspiration', ET], ['var(--river-fill)', 'Expected river flow', Q], ['var(--gap)', 'Residual', gap]]
+            .map(([c, n, v]) => `<li><i style="background:${c}"></i><span>${n}</span><b>${fmtInt(v)} mm</b></li>`).join('');
+        const st = $('#fx-status'), closed = Math.abs(gap) <= 5;
+        st.className = `status${closed ? ' ok' : ''}`;
+        st.textContent = closed ? `Residual ${fmtInt(gap)} mm: balanced within ±5 mm.`
+            : gap > 0 ? `Residual ${fmtInt(gap)} mm: rainfall exceeds evapotranspiration plus river flow.`
+            : `Residual ${fmtInt(gap)} mm: evapotranspiration plus river flow exceed rainfall.`;
     }
     function initFix() {
-        $('#fx-et').addEventListener('input', e => { FX.et = Number(e.target.value); renderFix(); });
-        $('#fx-rain').addEventListener('input', e => { FX.rain = Number(e.target.value); renderFix(); });
-        $('#fx-ratio').addEventListener('input', e => { FX.ratio = Number(e.target.value); renderFix(); });
+        $('#fx-et').addEventListener('input', e => { S.fx.et = Number(e.target.value); renderFix(); });
+        $('#fx-rain').addEventListener('input', e => { S.fx.rain = Number(e.target.value); renderFix(); });
+        $('#fx-ratio').addEventListener('input', e => { S.fx.ratio = Number(e.target.value); renderFix(); });
         $$('[data-preset]').forEach(b => b.addEventListener('click', () => {
             const c = clo()[S.product];
-            resetFix();
-            if (b.dataset.preset === 'et') FX.et = Math.round(c.et_increase_needed_pct * 10) / 10;
-            if (b.dataset.preset === 'rain') FX.rain = -Math.round(c.rain_decrease_needed_pct * 10) / 10;
-            if (b.dataset.preset === 'ratio') FX.ratio = Math.round(c.runoff_ratio_needed * 1000) / 1000;
+            S.fx = { et: 0, rain: 0, ratio: ratioObs() };
+            if (b.dataset.preset === 'et') S.fx.et = Math.round(c.et_increase_needed_pct * 10) / 10;
+            if (b.dataset.preset === 'rain') S.fx.rain = -Math.round(c.rain_decrease_needed_pct * 10) / 10;
+            if (b.dataset.preset === 'ratio') S.fx.ratio = Math.round(c.runoff_ratio_needed * 1000) / 1000;
             syncFix();
         }));
+        $('#sy').addEventListener('input', e => { S.sy = Number(e.target.value); drawSection(); });
+        let secW = 0;
+        new ResizeObserver(es => { const w = Math.round(es[0].contentRect.width); if (w !== secW) { secW = w; drawSection(); } }).observe($('#section'));
     }
 
-    // ---------- 11: Upper Ogun ----------
-    function renderOgun() {
-        const g = rec('upper_ogun'), P = g.p_chirps2_mm, ET = g.et_wapor_mm, L0 = g.surplus_chirps2_mm;
-        $('#og-bar').innerHTML = `<div class="b-air" style="width:${100 * ET / P}%">${fmtInt(100 * ET / P)}%</div><div class="b-left" style="width:${100 * L0 / P}%">${fmtInt(100 * L0 / P)}%</div>`;
-        $('#og-keys').innerHTML = [['var(--air)', 'Back to the sky', ET], ['color-mix(in srgb, var(--river) 45%, var(--paper-2))', 'Left over, unchecked', L0], ['transparent', 'Rain', P]]
-            .map(([c, n, v]) => `<div><i style="background:${c};${c === 'transparent' ? 'border:1px solid var(--line-2)' : ''}"></i><span>${n}</span><b>${fmtInt(v)} mm</b></div>`).join('');
+    // ---------- Figure 6 / Table 4: explorer ----------
+    let ex = null, timer = null;
+    const LAYERS = { surplus: 'Rainfall − ET', rain: 'Rainfall', et: 'Evapotranspiration' };
+    function buildExControls() {
+        $('#ex-zone').innerHTML = [['ALL', 'Both'], ['upper_oueme', 'Upper Ouémé'], ['upper_ogun', 'Upper Ogun']].map(([v, t]) => `<button type="button" data-zone="${v}">${t}</button>`).join('');
+        $('#ex-layer').innerHTML = Object.entries(LAYERS).map(([v, t]) => `<button type="button" data-layer="${v}">${t}</button>`).join('');
+        $('#ex-prod').innerHTML = PRODS.map(p => `<button type="button" data-xprod="${p}"><span class="swatch" style="background:${pcol(p)}"></span>${PROD[p]}</button>`).join('');
+        $('#ex-year').innerHTML = [['mean', 'Mean']].concat(YEARS.map(y => [y, y])).map(([v, t]) => `<button type="button" data-year="${v}">${t}</button>`).join('');
     }
-
-    // ---------- explore ----------
-    let ex = null, playTimer = null;
-    const EXL = { surplus: 'Rain left after ET', rain: 'Rainfall', et: 'Evapotranspiration' };
-    function renderExploreControls() {
-        const E = S.ex;
-        $('#ex-zone').innerHTML = [['ALL', 'Both'], ['upper_oueme', 'Upper Ouémé'], ['upper_ogun', 'Upper Ogun']].map(([v, t]) => `<button type="button" data-zone="${v}" aria-pressed="${E.zone === v}">${t}</button>`).join('');
-        $('#ex-layer').innerHTML = Object.entries(EXL).map(([v, t]) => `<button type="button" data-layer="${v}" aria-pressed="${E.layer === v}">${t}</button>`).join('');
-        $('#ex-prod').innerHTML = PRODS.map(p => `<button type="button" data-xprod="${p}" aria-pressed="${E.product === p}" ${E.layer === 'et' ? 'disabled title="Evapotranspiration does not depend on the rainfall product"' : ''}><span class="dot" style="background:${pcol(p)}"></span>${PROD[p]}</button>`).join('');
-        $('#ex-year').innerHTML = [['mean', '2018–2024']].concat(YEARS.map(y => [y, y])).map(([v, t]) => `<button type="button" data-year="${v}" aria-pressed="${E.period === v}">${t}</button>`).join('');
-        $('#ex-play').innerHTML = playTimer
-            ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>'
-            : '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg>';
-        $('#ex-play').setAttribute('aria-label', playTimer ? 'Pause' : 'Play through the years');
+    function syncExControls() {
+        const E = S.ex, press = (sel, key, val) => $$(sel).forEach(b => b.setAttribute('aria-pressed', String(b.dataset[key] === val)));
+        press('#ex-zone button', 'zone', E.zone);
+        press('#ex-layer button', 'layer', E.layer);
+        press('#ex-prod button', 'xprod', E.product);
+        press('#ex-year button', 'year', E.period);
+        $$('#ex-prod button').forEach(b => { b.disabled = E.layer === 'et'; b.title = E.layer === 'et' ? 'Evapotranspiration does not depend on the rainfall product' : ''; });
+        $('#ex-play').innerHTML = timer
+            ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>'
+            : '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg>';
+        $('#ex-play').setAttribute('aria-label', timer ? 'Pause' : 'Play through the years');
     }
-    function renderSide() {
-        const E = S.ex, k = E.product, list = E.zone === 'ALL' ? BIDS : [E.zone];
-        const when = E.period === 'mean' ? '2018–2024 average' : E.period;
-        $('#sd-kicker').textContent = `${when} · ${PROD[k]}`;
-        $('#sd-title').textContent = E.zone === 'ALL' ? 'Both catchments' : BASIN[E.zone].full;
-        const blocks = list.map(b => {
-            const r = rec(b, E.period), P = r[`p_${k}_mm`], ET = r.et_wapor_mm, oue = b === 'upper_oueme';
-            const Q = r[`q_expected_${k}_mm`], gap = r[`closure_residual_${k}_mm`], left = r[`surplus_${k}_mm`];
-            const segs = oue && isNum(Q) ? [['b-air', ET], ['b-river', Q]].concat(gap > 0 ? [['b-gap', gap]] : []) : [['b-air', ET], ['b-left', left]];
-            const tot = Math.max(P, segs.reduce((a, s) => a + s[1], 0));
-            const cls = r.rain_class_chirps2 || (E.period === 'mean' ? `${D.summary.basins[b].rain_class_counts_chirps2.wet} wet years` : '—');
-            return `${list.length > 1 ? `<div class="kicker" style="margin-top:14px;color:var(--ink-2)">${esc(BASIN[b].short)}</div>` : ''}
-                <div class="budget-bar">${segs.map(([c, v]) => `<div class="${c}" style="width:${100 * v / tot}%">${100 * v / tot > 12 ? fmtInt(v) : ''}</div>`).join('')}</div>
-                <dl class="kv"><dt>Rain</dt><dd>${fmtInt(P)} mm</dd><dt>Back to the sky</dt><dd>${fmtInt(ET)} mm</dd><dt>Left after ET</dt><dd>${fmtInt(left)} mm</dd>
-                ${oue ? `<dt>River (expected)</dt><dd>${fmtInt(Q)} mm</dd><dt>Unaccounted for</dt><dd class="hl">${fmtInt(gap)} mm</dd>` : '<dt>River</dt><dd>no records</dd>'}
-                <dt>Wet or dry?</dt><dd>${esc(cls)}</dd></dl>`;
+    function renderExSide() {
+        const E = S.ex, k = E.product, list = E.zone === 'ALL' ? BIDS : [E.zone], when = E.period === 'mean' ? '2018–2024 mean' : E.period;
+        $('#ex-side').innerHTML = list.map(b => {
+            const r = rec(b, E.period), oue = b === 'upper_oueme';
+            const cls = E.period === 'mean' ? (() => { const c = D.summary.basins[b].rain_class_counts_chirps2; return `${c.wet} wet, ${c.normal} normal, ${c.dry} dry`; })() : r.rain_class_chirps2;
+            return `<div class="basin"><h3>${esc(BASIN[b])}</h3><p class="when">${when}, ${PROD[k]}</p><dl>
+                <dt>Rainfall</dt><dd>${fmtInt(r[`p_${k}_mm`])} mm</dd><dt>Evapotranspiration</dt><dd>${fmtInt(r.et_wapor_mm)} mm</dd><dt>Rainfall − ET</dt><dd>${fmtInt(r[`surplus_${k}_mm`])} mm</dd>
+                ${oue ? `<dt>Expected river flow</dt><dd>${fmtInt(r[`q_expected_${k}_mm`])} mm</dd><dt>Residual</dt><dd>${fmtInt(r[`closure_residual_${k}_mm`])} mm</dd>` : '<dt>River flow</dt><dd>no record</dd>'}
+                <dt>Years vs 1991–2020</dt><dd>${esc(cls)}</dd></dl></div>`;
         }).join('');
-        $('#sd-body').innerHTML = blocks;
-        $('#sd-note').textContent = list.includes('upper_ogun') ? 'No river-flow records were found for the Upper Ogun, so its left-over water cannot be checked.' : 'Expected river flow uses the share the Ouémé carried in 1988–2010.';
     }
-    function renderTable() {
-        const E = S.ex, k = E.product, list = E.zone === 'ALL' ? BIDS : [E.zone];
-        const head = `<thead><tr>${list.length > 1 ? '<th>Catchment</th>' : ''}<th>Year</th><th>Wet / dry</th><th>Rain</th><th>Back to sky</th><th>Left</th><th>River</th><th>Gap</th></tr></thead>`;
+    function renderExTable() {
+        const E = S.ex, k = E.product, list = E.zone === 'ALL' ? BIDS : [E.zone], two = list.length > 1;
+        const head = `<thead><tr>${two ? '<th class="text">Catchment</th>' : ''}<th class="text">Year</th><th class="text">Class</th><th><var>P</var></th><th><var>ET</var></th><th><var>P</var> − <var>ET</var></th><th><var>Q</var></th><th><var>ε</var></th></tr></thead>`;
+        const cell = v => isNum(v) ? fmtInt(v) : '—';
         const row = (b, r, avg) => {
-            const on = (avg && E.period === 'mean') || (!avg && String(r.year) === E.period);
-            const cls = r.rain_class_chirps2;
-            return `<tr class="${avg ? 'avg' : ''} ${on ? 'is-on' : ''}" data-year="${avg ? 'mean' : r.year}" tabindex="0">${list.length > 1 ? `<td>${esc(BASIN[b].short)}</td>` : ''}<td>${avg ? 'Average' : r.year}</td><td>${cls ? `<span class="chip ${cls}">${cls}</span>` : '—'}</td><td>${fmtInt(r[`p_${k}_mm`])}</td><td>${fmtInt(r.et_wapor_mm)}</td><td>${fmtInt(r[`surplus_${k}_mm`])}</td><td>${isNum(r[`q_expected_${k}_mm`]) ? fmtInt(r[`q_expected_${k}_mm`]) : '—'}</td><td>${isNum(r[`closure_residual_${k}_mm`]) ? fmtInt(r[`closure_residual_${k}_mm`]) : '—'}</td></tr>`;
+            const year = avg ? 'mean' : String(r.year), on = E.period === year;
+            return `<tr class="${avg ? 'avg' : ''}${on ? ' is-on' : ''}" data-year="${year}" data-key="${b}-${year}">${two ? `<td class="text">${esc(BASIN[b])}</td>` : ''}` +
+                `<td class="text"><button type="button" class="yr" aria-pressed="${on}">${avg ? 'Mean' : r.year}</button></td><td class="text">${avg ? '' : esc(r.rain_class_chirps2)}</td>` +
+                `<td>${cell(r[`p_${k}_mm`])}</td><td>${cell(r.et_wapor_mm)}</td><td>${cell(r[`surplus_${k}_mm`])}</td><td>${cell(r[`q_expected_${k}_mm`])}</td><td>${cell(r[`closure_residual_${k}_mm`])}</td></tr>`;
         };
-        $('#ex-table').innerHTML = head + '<tbody>' + list.map(b => rowsOf(b).map(r => row(b, r, false)).join('') + row(b, Object.assign(rec(b), { rain_class_chirps2: null }), true)).join('') + '</tbody>';
-        $$('#ex-table tbody tr').forEach(tr => { const go = () => setEx({ period: tr.dataset.year }); tr.addEventListener('click', go); tr.addEventListener('keydown', e => { if (e.key === 'Enter') go(); }); });
+        $('#ex-table').innerHTML = head + '<tbody>' + list.map(b => rowsOf(b).map(r => row(b, r, false)).join('') + row(b, rec(b), true)).join('') + '</tbody>';
     }
-    function exPad() { const lg = $('#ex-legend'); return { paddingTopLeft: [40, 40], paddingBottomRight: [40, lg.offsetHeight + 30] }; }
+    const exPad = () => ({ paddingTopLeft: [32, 56], paddingBottomRight: [32, $('#ex-legend').offsetHeight + 28] });
     function setEx(change, refit) {
+        // The table is rebuilt, so a focused year button in it gets its focus back afterwards.
+        const f = document.activeElement, refocus = f && f.matches('#ex-table .yr') ? f.closest('tr').dataset.key : null;
         Object.assign(S.ex, change);
-        renderExploreControls();
+        syncExControls();
         setLegend('el', S.ex.layer, S.ex.period, S.ex.product);
-        ex.paint({ layer: S.ex.layer, zone: S.ex.zone, period: S.ex.period, product: S.ex.product });
+        ex.paint({ layer: S.ex.layer, zone: S.ex.zone, period: S.ex.period, product: S.ex.product, gauge: false });
         if (refit) ex.fit(S.ex.zone, true, exPad());
-        renderSide(); renderTable(); writeQuery();
+        renderExSide(); renderExTable(); writeQuery();
+        if (wrapCheck) wrapCheck($('#ex-table').closest('.table-wrap'));
+        if (refocus) { const b = $(`#ex-table tr[data-key="${refocus}"] .yr`); if (b) b.focus(); }
     }
-    function stopPlay() { if (playTimer) clearInterval(playTimer); playTimer = null; renderExploreControls(); }
-    function initExplore() {
-        ex = createGridMap('explore-map', { interactive: true, basemap: 'terrain', onSelect: b => setEx({ zone: b }) });
+    function stop() { if (timer) clearInterval(timer); timer = null; syncExControls(); }
+    function initExplorer() {
+        ex = gridMap('explore-map', { interactive: true, onSelect: b => setEx({ zone: b }) });
+        buildExControls();
+        $('#ex-table').addEventListener('click', e => { const tr = e.target.closest('tbody tr[data-year]'); if (tr) { stop(); setEx({ period: tr.dataset.year }); } });
         $('#ex-zone').addEventListener('click', e => { const b = e.target.closest('[data-zone]'); if (b) setEx({ zone: b.dataset.zone }, true); });
         $('#ex-layer').addEventListener('click', e => { const b = e.target.closest('[data-layer]'); if (b) setEx({ layer: b.dataset.layer }); });
         $('#ex-prod').addEventListener('click', e => { const b = e.target.closest('[data-xprod]'); if (b && !b.disabled) setEx({ product: b.dataset.xprod }); });
-        $('#ex-year').addEventListener('click', e => { const b = e.target.closest('[data-year]'); if (b) { stopPlay(); setEx({ period: b.dataset.year }); } });
+        $('#ex-year').addEventListener('click', e => { const b = e.target.closest('[data-year]'); if (b) { stop(); setEx({ period: b.dataset.year }); } });
         $('#ex-play').addEventListener('click', () => {
-            if (playTimer) return stopPlay();
+            if (timer) return stop();
             let i = S.ex.period === 'mean' ? -1 : YEARS.indexOf(S.ex.period);
-            const step = () => { i += 1; if (i >= YEARS.length) return stopPlay(); setEx({ period: YEARS[i] }); };
-            playTimer = setInterval(step, 1000); step();
+            const next = () => { i += 1; if (i >= YEARS.length) return stop(); setEx({ period: YEARS[i] }); };
+            timer = setInterval(next, 1000); next();
         });
-        $('#ex-base').addEventListener('change', e => ex.setBase(e.target.value));
         setEx({}, false);
         ex.fit(S.ex.zone, false, exPad());
-        new ResizeObserver(() => { ex.map.invalidateSize(); }).observe($('.explore-map'));
+        new ResizeObserver(() => ex.map.invalidateSize()).observe($('.explorer-map'));
     }
 
-    // ---------- query string (shareable explore state) ----------
+    // ---------- URL state ----------
     function writeQuery() {
         const p = new URLSearchParams();
         if (S.ex.zone !== 'ALL') p.set('zone', S.ex.zone);
         if (S.ex.layer !== 'surplus') p.set('layer', S.ex.layer);
         if (S.ex.period !== 'mean') p.set('year', S.ex.period);
         if (S.ex.product !== 'chirps2') p.set('rain', S.ex.product);
-        if (S.product !== 'chirps2') p.set('story_rain', S.product);
+        if (S.product !== 'chirps2') p.set('product', S.product);
         const q = p.toString();
         try { history.replaceState(null, '', `${location.pathname}${q ? `?${q}` : ''}${location.hash}`); } catch (e) {}
     }
     function readQuery() {
         const p = new URLSearchParams(location.search);
         if (BIDS.includes(p.get('zone'))) S.ex.zone = p.get('zone');
-        if (EXL[p.get('layer')]) S.ex.layer = p.get('layer');
+        if (LAYERS[p.get('layer')]) S.ex.layer = p.get('layer');
         if (YEARS.includes(p.get('year'))) S.ex.period = p.get('year');
         if (PROD[p.get('rain')]) S.ex.product = p.get('rain');
-        if (PROD[p.get('story_rain')]) S.product = p.get('story_rain');
+        if (PROD[p.get('product')]) S.product = p.get('product');
     }
 
-    // ---------- chrome: theme, share, dialogs, progress, reading time ----------
-    function paintThemeButton() {
-        $('#btn-theme').innerHTML = dark()
-            ? '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>'
-            : '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
-        $('#btn-theme').setAttribute('aria-label', dark() ? 'Switch to light theme' : 'Switch to dark theme');
-    }
-    function repaint() {
-        paintThemeButton(); drawGauge(); drawSection(); renderProducts(); renderScale(); renderFix(); renderOgun();
-        if (story) { story.setBase(); applyStep(storyStep, false); }
-        if (ex) { ex.setBase(); setEx({}); }
-    }
-    function initChrome() {
-        paintThemeButton();
-        $('#btn-theme').addEventListener('click', () => {
-            const next = dark() ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', next);
-            try { localStorage.setItem('mm_theme', next); } catch (e) {}
-            repaint();
+    // ---------- section navigation, citation ----------
+    function initNav() {
+        // The current section is the last one whose heading has passed 30% of the viewport height. This also
+        // holds for the figures between sections, which an intersection test on the sections would miss.
+        const links = $$('.toc a'), targets = links.map(a => document.getElementById(a.getAttribute('href').slice(1)));
+        let queued = false, current = null;
+        const update = () => {
+            queued = false;
+            const line = innerHeight * 0.3;
+            let i = -1;
+            targets.forEach((t, j) => { if (t && t.getBoundingClientRect().top <= line) i = j; });
+            if (i === current) return;
+            current = i;
+            links.forEach((a, j) => { if (j === i) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
+        };
+        addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(update); } }, { passive: true });
+        addEventListener('resize', update);
+        update();
+        $('#copy-cite').addEventListener('click', () => {
+            const t = $('#cite-text').textContent.replace(/\s+/g, ' ').trim();
+            const done = () => snack('Citation copied');
+            if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, () => window.prompt('Copy the citation:', t));
+            else window.prompt('Copy the citation:', t);
         });
-        matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (!document.documentElement.getAttribute('data-theme')) repaint(); });
-        $('#btn-share').addEventListener('click', () => {
-            const done = () => snack('Link copied');
-            if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(location.href).then(done, () => window.prompt('Copy this link:', location.href));
-            else window.prompt('Copy this link:', location.href);
-        });
-        document.addEventListener('click', e => {
-            const o = e.target.closest('[data-open]'); if (o) { const d = document.getElementById(o.dataset.open); if (d && !d.open) d.showModal(); }
-            const c = e.target.closest('[data-close]'); if (c) c.closest('dialog').close();
-            if (e.target.tagName === 'DIALOG') e.target.close();
-            const pr = e.target.closest('[data-prod]'); if (pr) setProduct(pr.dataset.prod);
-        });
-        $('#prod-table').addEventListener('keydown', e => { const tr = e.target.closest('tr[data-prod]'); if (tr && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); setProduct(tr.dataset.prod); } });
-        const bar = $('#progress');
-        const onScroll = () => { const h = document.documentElement.scrollHeight - innerHeight; bar.style.width = `${h > 0 ? 100 * scrollY / h : 0}%`; };
-        addEventListener('scroll', onScroll, { passive: true }); onScroll();
-        const words = ($('main').innerText || '').split(/\s+/).filter(Boolean).length;
-        $('#read-time').textContent = Math.max(1, Math.round(words / 230));
-        $('#sy').addEventListener('input', e => { S.sy = Number(e.target.value); drawSection(); });
+        document.addEventListener('click', e => { const b = e.target.closest('[data-prod]'); if (b) setProduct(b.dataset.prod); });
     }
-    function snack(msg) { const el = document.createElement('div'); el.className = 'snack'; el.setAttribute('role', 'status'); el.textContent = msg; document.body.append(el); setTimeout(() => el.remove(), 2200); }
+    // A table that scrolls sideways must be reachable by keyboard; one that fits must not add a tab stop.
+    let wrapCheck = null;
+    function initTableWraps() {
+        const check = wrapCheck = w => {
+            const fig = w.closest('figure'), cap = fig && $('figcaption', fig);
+            if (w.scrollWidth > w.clientWidth + 1 && cap) { w.tabIndex = 0; w.setAttribute('role', 'region'); w.setAttribute('aria-labelledby', cap.id); }
+            else ['tabindex', 'role', 'aria-labelledby'].forEach(a => w.removeAttribute(a));
+        };
+        const ro = new ResizeObserver(es => es.forEach(e => check(e.target)));
+        $$('.table-wrap').forEach(w => { check(w); ro.observe(w); });
+    }
+    function snack(msg) { const el = document.createElement('div'); el.className = 'snack'; el.setAttribute('role', 'status'); el.textContent = msg; document.body.append(el); setTimeout(() => el.remove(), 2000); }
 
     // ---------- start ----------
-    Promise.all([
-        fetch('data/app_data.json').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
-        fetch('data/basins.geojson').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
-    ]).then(([data, geo]) => {
-        D = data; GEO = geo;
+    const get = (u, json = true) => fetch(u).then(r => { if (!r.ok) throw new Error(`${u}: HTTP ${r.status}`); return json ? r.json() : r.text(); });
+    Promise.all([get('data/app_data.json'), get('data/basins.geojson'), get('data/context.geojson')]).then(([data, geo, ctx]) => {
+        D = data; GEO = geo; CTX = ctx;
         readQuery();
-        FX.ratio = ratioObs();
+        S.fx.ratio = ratioObs();
         fill();
-        initChrome();
-        animateLedger(); drawGauge(); drawMiniYears();
-        renderProducts(); drawSection(); renderScale(); initFix(); syncFix(); renderOgun();
-        initStory(); initExplore();
+        drawLocator();
+        new ResizeObserver(() => { if (($('#locator').getBoundingClientRect().width < 520) !== locSmall) drawLocator(); }).observe($('#locator'));
+        renderTables();
+        buildProdSegs();
+        drawSection();
+        renderScale();
+        initFix(); syncFix();
+        initNav();
+        initStory();
+        initExplorer();
+        initTableWraps();
     }).catch(err => {
         console.error(err);
         const m = document.createElement('p');
-        m.className = 'fine'; m.style.cssText = 'text-align:center;padding:12px';
-        m.textContent = `The data could not be loaded (${err.message}). Please reload the page.`;
-        document.querySelector('main').prepend(m);
+        m.className = 'small'; m.style.cssText = 'grid-column: main; padding: 16px 0';
+        m.textContent = `The data could not be loaded (${err.message}). Reload the page to try again.`;
+        $('main').prepend(m);
     });
 })();
