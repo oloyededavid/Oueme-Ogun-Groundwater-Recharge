@@ -134,12 +134,11 @@ The validation code is written and tested on synthetic data only; no well data h
 Live: <https://oloyededavid.github.io/Oueme-Ogun-Groundwater-Recharge/>
 
 `docs/index.html` is a single-page atlas with no build step:
-- a map of both catchments showing rain left after ET, rainfall or ET, at the real grid size of each dataset and on one colour scale for every year;
-- catchment, year, rainfall-estimate, layer and basemap selectors;
-- five numbered sections in plain language: the selected catchment, where the rain goes, whether the gap is real water, the three rainfall estimates, and a year-by-year table;
-- a Methods panel, a short guide, and CSV/GeoJSON downloads.
+- a map of both catchments showing rain left after ET, rainfall or ET on the 5 km grid, one colour scale for every year, with a year slider;
+- five tabs in plain language: Overview (short answer and findings), Catchment (where the rain goes), Year by year (charts and table), Is the gap real?, and Compare;
+- a switch between the three rainfall estimates, light and dark themes, a guided tour, glossary, Methods, shareable links, and data and image downloads.
 
-All numbers in it are computed from `docs/data/app_data.json`, which `scripts/06_build_app.py` writes from the analysis outputs, together with the map overlays in `docs/overlays/`. To view it locally:
+All numbers in it are computed from `docs/data/app_data.json`, which `scripts/06_build_app.py` writes from the analysis outputs. The map draws every 5 km rainfall cell as a square (evapotranspiration averaged onto the same cells), so it stays sharp at any zoom and never implies more detail than the data has. To view it locally:
 
 ```bash
 python -m http.server 8000 --directory docs
