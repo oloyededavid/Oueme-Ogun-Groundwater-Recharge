@@ -1,0 +1,63 @@
+   basin_id  year  p_chirps2_mm  p_chirps3_mm  p_tamsat_mm  et_wapor_mm  surplus_chirps2_mm  surplus_chirps3_mm  surplus_tamsat_mm rain_class_chirps2 rain_class_chirps3
+upper_oueme  2018        1177.0        1270.0       1388.0        915.0               262.0               355.0              473.0             normal             normal
+upper_oueme  2019        1244.0        1331.0       1236.0        951.0               293.0               380.0              285.0                wet                wet
+upper_oueme  2020        1240.0        1234.0       1178.0        926.0               314.0               307.0              252.0             normal             normal
+upper_oueme  2021        1328.0        1376.0       1333.0        981.0               347.0               396.0              352.0                wet                wet
+upper_oueme  2022        1262.0        1286.0       1227.0        974.0               288.0               312.0              253.0                wet             normal
+upper_oueme  2023        1280.0        1329.0       1214.0        908.0               372.0               421.0              306.0                wet                wet
+upper_oueme  2024        1270.0        1262.0       1124.0        962.0               309.0               301.0              162.0                wet             normal
+ upper_ogun  2018        1296.0        1498.0       1326.0        948.0               348.0               550.0              377.0                wet                wet
+ upper_ogun  2019        1465.0        1652.0       1381.0       1025.0               439.0               627.0              356.0                wet                wet
+ upper_ogun  2020        1017.0        1322.0       1163.0        895.0               122.0               427.0              268.0                dry             normal
+ upper_ogun  2021        1386.0        1595.0       1390.0        960.0               425.0               635.0              430.0                wet                wet
+ upper_ogun  2022        1257.0        1445.0       1249.0        999.0               258.0               445.0              250.0             normal                wet
+ upper_ogun  2023        1367.0        1477.0       1350.0        911.0               455.0               566.0              439.0                wet                wet
+ upper_ogun  2024        1386.0        1453.0       1209.0        885.0               501.0               568.0              324.0                wet                wet
+{
+ "qa": {
+  "min_valid_fraction": 1.0,
+  "wapor_pcp_minus_chirps3_mm": {
+   "mean": -0.19169681551477424,
+   "max_abs": 0.25331069869139355
+  },
+  "upper_oueme_chirps3_minus_chirps2_mm": {
+   "mean": 41.11852570212545,
+   "min": -7.739459168317126,
+   "max": 92.99665991744723
+  },
+  "upper_oueme_tamsat_minus_chirps2_mm_mean": -14.407000952361127,
+  "upper_oueme_product_spread_mm": {
+   "mean": 105.3111315449191,
+   "max": 211.1267717924868
+  },
+  "upper_ogun_chirps3_minus_chirps2_mm": {
+   "mean": 181.17699350259997,
+   "min": 67.40523937255102,
+   "max": 304.70708057499155
+  },
+  "upper_ogun_tamsat_minus_chirps2_mm_mean": -15.0751022016677,
+  "upper_ogun_product_spread_mm": {
+   "mean": 221.9319203240605,
+   "max": 304.70708057499155
+  }
+ },
+ "beterou": {
+  "area_km2": 10072.0,
+  "periods": {
+   "1971-1987": {
+    "runoff_mm": 148.827045274027,
+    "rain_mm": 1091.0,
+    "runoff_ratio": 0.13641342371588175
+   },
+   "1988-2010": {
+    "runoff_mm": 170.75945194598887,
+    "rain_mm": 1202.0,
+    "runoff_ratio": 0.14206277200165462
+   }
+  },
+  "ratio_range": [
+   0.13641342371588175,
+   0.14206277200165462
+  ]
+ }
+}

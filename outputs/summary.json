@@ -1,0 +1,273 @@
+{
+ "basins": {
+  "upper_oueme": {
+   "name": "Upper Ouémé at Bétérou",
+   "country": "Benin",
+   "area_km2": 10101.7,
+   "baseline_1991_2020_mean_chirps2_mm": 1208.8506528357464,
+   "baseline_terciles_chirps2_mm": [
+    1140.4664689618105,
+    1241.4396296878904
+   ],
+   "baseline_1991_2020_mean_chirps3_mm": 1245.3568904691397,
+   "baseline_terciles_chirps3_mm": [
+    1201.9474899855634,
+    1301.3903757885869
+   ],
+   "mean_2018_2024": {
+    "p_chirps2_mm": 1257.2812746507147,
+    "p_chirps3_mm": 1298.3998003528402,
+    "p_tamsat_mm": 1242.8742736983536,
+    "p_wapor_mm": 1298.2096543761834,
+    "et_wapor_mm": 945.2987544465343,
+    "ret_wapor_mm": 1729.7219479842945,
+    "rain_anomaly_sd_chirps2": 0.3948758736332269,
+    "rain_anomaly_sd_chirps3": 0.4089856557725345,
+    "p_min_mm": 1212.0135372962693,
+    "p_max_mm": 1317.3246688411887,
+    "p_spread_mm": 105.3111315449191,
+    "et_over_ret": 0.5468167052697749,
+    "surplus_chirps2_mm": 311.9825202041804,
+    "et_over_p_chirps2": 0.7522982205152803,
+    "surplus_chirps3_mm": 353.1010459063059,
+    "et_over_p_chirps3": 0.728692329825014,
+    "surplus_tamsat_mm": 297.57551925181934,
+    "et_over_p_tamsat": 0.7640408210939919,
+    "surplus_change_if_et_plus10pct_mm": -94.52987544465346,
+    "kotchoni_4pct_low_mm": 48.48054149185077,
+    "kotchoni_4pct_high_mm": 52.69298675364754,
+    "q_expected_chirps2_mm": 178.6128630626542,
+    "closure_residual_chirps2_mm": 133.36965714152623,
+    "q_expected_chirps3_mm": 184.45427480451943,
+    "closure_residual_chirps3_mm": 168.64677110178647,
+    "q_expected_tamsat_mm": 176.5661645711313,
+    "closure_residual_tamsat_mm": 121.009354680688
+   },
+   "rain_classes_chirps2": {
+    "2018": "normal",
+    "2019": "wet",
+    "2020": "normal",
+    "2021": "wet",
+    "2022": "wet",
+    "2023": "wet",
+    "2024": "wet"
+   },
+   "rain_class_counts_chirps2": {
+    "dry": 0,
+    "normal": 2,
+    "wet": 5
+   },
+   "period_vs_baseline_pct_chirps2": 4.006336241897124,
+   "rain_classes_chirps3": {
+    "2018": "normal",
+    "2019": "wet",
+    "2020": "normal",
+    "2021": "wet",
+    "2022": "normal",
+    "2023": "wet",
+    "2024": "normal"
+   },
+   "rain_class_counts_chirps3": {
+    "dry": 0,
+    "normal": 4,
+    "wet": 3
+   },
+   "period_vs_baseline_pct_chirps3": 4.259253735988788
+  },
+  "upper_ogun": {
+   "name": "Upper Ogun above the Oyan confluence",
+   "country": "Nigeria",
+   "area_km2": 9534.2,
+   "baseline_1991_2020_mean_chirps2_mm": 1211.407260965786,
+   "baseline_terciles_chirps2_mm": [
+    1174.4299449826813,
+    1290.0440068743796
+   ],
+   "baseline_1991_2020_mean_chirps3_mm": 1319.867417168244,
+   "baseline_terciles_chirps3_mm": [
+    1238.099290386068,
+    1428.1001841173768
+   ],
+   "mean_2018_2024": {
+    "p_chirps2_mm": 1310.5827702785152,
+    "p_chirps3_mm": 1491.7597637811152,
+    "p_tamsat_mm": 1295.5076680768475,
+    "p_wapor_mm": 1491.5665161267425,
+    "et_wapor_mm": 946.3889031631855,
+    "ret_wapor_mm": 1445.0617797570053,
+    "rain_anomaly_sd_chirps2": 0.6535291701554843,
+    "rain_anomaly_sd_chirps3": 1.042556674398028,
+    "p_min_mm": 1269.8278434570548,
+    "p_max_mm": 1491.7597637811152,
+    "p_spread_mm": 221.9319203240605,
+    "et_over_ret": 0.6554296629554146,
+    "surplus_chirps2_mm": 364.1938671153296,
+    "et_over_p_chirps2": 0.7292280352546195,
+    "surplus_chirps3_mm": 545.3708606179296,
+    "et_over_p_chirps3": 0.6357800518803343,
+    "surplus_tamsat_mm": 349.1187649136619,
+    "et_over_p_tamsat": 0.7321471651602288,
+    "surplus_change_if_et_plus10pct_mm": -94.63889031631857,
+    "kotchoni_4pct_low_mm": 50.793113738282194,
+    "kotchoni_4pct_high_mm": 59.67039055124461,
+    "q_expected_chirps2_mm": null,
+    "closure_residual_chirps2_mm": null,
+    "q_expected_chirps3_mm": null,
+    "closure_residual_chirps3_mm": null,
+    "q_expected_tamsat_mm": null,
+    "closure_residual_tamsat_mm": null
+   },
+   "rain_classes_chirps2": {
+    "2018": "wet",
+    "2019": "wet",
+    "2020": "dry",
+    "2021": "wet",
+    "2022": "normal",
+    "2023": "wet",
+    "2024": "wet"
+   },
+   "rain_class_counts_chirps2": {
+    "dry": 1,
+    "normal": 1,
+    "wet": 5
+   },
+   "period_vs_baseline_pct_chirps2": 8.186801623895024,
+   "rain_classes_chirps3": {
+    "2018": "wet",
+    "2019": "wet",
+    "2020": "normal",
+    "2021": "wet",
+    "2022": "wet",
+    "2023": "wet",
+    "2024": "wet"
+   },
+   "rain_class_counts_chirps3": {
+    "dry": 0,
+    "normal": 1,
+    "wet": 6
+   },
+   "period_vs_baseline_pct_chirps3": 13.023455566594988
+  }
+ },
+ "qa": {
+  "min_valid_fraction": 1.0,
+  "wapor_pcp_minus_chirps3_mm": {
+   "mean": -0.19169681551477424,
+   "max_abs": 0.25331069869139355
+  },
+  "upper_oueme_chirps3_minus_chirps2_mm": {
+   "mean": 41.11852570212545,
+   "min": -7.739459168317126,
+   "max": 92.99665991744723
+  },
+  "upper_oueme_tamsat_minus_chirps2_mm_mean": -14.407000952361127,
+  "upper_oueme_product_spread_mm": {
+   "mean": 105.3111315449191,
+   "max": 211.1267717924868
+  },
+  "upper_ogun_chirps3_minus_chirps2_mm": {
+   "mean": 181.17699350259997,
+   "min": 67.40523937255102,
+   "max": 304.70708057499155
+  },
+  "upper_ogun_tamsat_minus_chirps2_mm_mean": -15.0751022016677,
+  "upper_ogun_product_spread_mm": {
+   "mean": 221.9319203240605,
+   "max": 304.70708057499155
+  }
+ },
+ "beterou_observed_runoff": {
+  "area_km2": 10072.0,
+  "periods": {
+   "1971-1987": {
+    "runoff_mm": 148.827045274027,
+    "rain_mm": 1091.0,
+    "runoff_ratio": 0.13641342371588175
+   },
+   "1988-2010": {
+    "runoff_mm": 170.75945194598887,
+    "rain_mm": 1202.0,
+    "runoff_ratio": 0.14206277200165462
+   }
+  },
+  "ratio_range": [
+   0.13641342371588175,
+   0.14206277200165462
+  ]
+ },
+ "closure_upper_oueme_2018_2024": {
+  "chirps2": {
+   "mean_surplus_mm": 311.9825202041804,
+   "mean_expected_flow_mm": 178.6128630626542,
+   "mean_closure_residual_mm": 133.36965714152623,
+   "residual_as_pct_of_expected_flow": 74.66968215762968,
+   "et_increase_needed_pct": 14.108730865684173,
+   "rain_decrease_needed_pct": 10.607782031795365,
+   "runoff_ratio_needed": 0.24814059231960822,
+   "years_with_positive_residual": 7,
+   "residual_pct_of_rainfall": 10.607782031795365,
+   "residual_over_4pct_recharge": 2.6519455079488408,
+   "cumulative_residual_mm": 933.5875999906837,
+   "sy_range": [
+    0.002,
+    0.015
+   ],
+   "water_table_rise_if_stored_m": [
+    62.23917333271224,
+    466.79379999534183
+   ]
+  },
+  "chirps3": {
+   "mean_surplus_mm": 353.1010459063059,
+   "mean_expected_flow_mm": 184.45427480451943,
+   "mean_closure_residual_mm": 168.64677110178647,
+   "residual_as_pct_of_expected_flow": 91.43012341704447,
+   "et_increase_needed_pct": 17.840579003039938,
+   "rain_decrease_needed_pct": 12.988816777078732,
+   "runoff_ratio_needed": 0.27195093977244195,
+   "years_with_positive_residual": 7,
+   "residual_pct_of_rainfall": 12.988816777078732,
+   "residual_over_4pct_recharge": 3.247204194269683,
+   "cumulative_residual_mm": 1180.5273977125053,
+   "sy_range": [
+    0.002,
+    0.015
+   ],
+   "water_table_rise_if_stored_m": [
+    78.70182651416702,
+    590.2636988562526
+   ]
+  },
+  "tamsat": {
+   "mean_surplus_mm": 297.57551925181923,
+   "mean_expected_flow_mm": 176.5661645711313,
+   "mean_closure_residual_mm": 121.009354680688,
+   "residual_as_pct_of_expected_flow": 68.53484923037918,
+   "et_increase_needed_pct": 12.801175724762073,
+   "rain_decrease_needed_pct": 9.736250660383133,
+   "runoff_ratio_needed": 0.23942527860548588,
+   "years_with_positive_residual": 7,
+   "residual_pct_of_rainfall": 9.736250660383133,
+   "residual_over_4pct_recharge": 2.434062665095783,
+   "cumulative_residual_mm": 847.065482764816,
+   "sy_range": [
+    0.002,
+    0.015
+   ],
+   "water_table_rise_if_stored_m": [
+    56.47103218432107,
+    423.532741382408
+   ]
+  }
+ },
+ "published_recharge_fraction": {
+  "kotchoni2019": [
+   0.04,
+   0.04
+  ],
+  "kamagate2007": [
+   0.05,
+   0.24
+  ]
+ }
+}
