@@ -4,7 +4,7 @@ title: "A Satellite Water Balance for Groundwater Recharge in Tropical Basement 
 authors:
   - family-names: Oloyede
     given-names: David Oluwayinka
-version: 0.1.0
+version: 0.2.0
 date-released: 2026-11-06
 license: MIT
 repository-code: "https://github.com/oloyededavid/Oueme-Ogun-Groundwater-Recharge"
