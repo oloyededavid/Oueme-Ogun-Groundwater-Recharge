@@ -1,5 +1,5 @@
 // Checks for the reader features: catchment selection, equation, datasets drawer, figure viewer and links,
-// feedback (FormSubmit, mocked; mailto fallback), reading progress and back to top. Set URL to the page to test.
+// feedback (one reaction, note fallbacks), reading progress and back to top. Set URL to the page to test.
 const { chromium } = require('playwright');
 (async () => { const b = await chromium.launch(), fails = [], errs = [];
   const ok = (n, c) => { if (!c) fails.push(n); console.log(c ? 'PASS' : 'FAIL', n); };
