@@ -202,7 +202,7 @@
    "mean_closure_residual_mm": 133.36965714152623,
    "residual_as_pct_of_expected_flow": 74.66968215762968,
    "et_increase_needed_pct": 14.108730865684173,
-   "rain_decrease_needed_pct": 10.607782031795365,
+   "rain_decrease_needed_pct": 12.364286903069116,
    "runoff_ratio_needed": 0.24814059231960822,
    "years_with_positive_residual": 7,
    "residual_pct_of_rainfall": 10.607782031795365,
@@ -223,7 +223,7 @@
    "mean_closure_residual_mm": 168.64677110178647,
    "residual_as_pct_of_expected_flow": 91.43012341704447,
    "et_increase_needed_pct": 17.840579003039938,
-   "rain_decrease_needed_pct": 12.988816777078732,
+   "rain_decrease_needed_pct": 15.139588717210652,
    "runoff_ratio_needed": 0.27195093977244195,
    "years_with_positive_residual": 7,
    "residual_pct_of_rainfall": 12.988816777078732,
@@ -244,7 +244,7 @@
    "mean_closure_residual_mm": 121.009354680688,
    "residual_as_pct_of_expected_flow": 68.53484923037918,
    "et_increase_needed_pct": 12.801175724762073,
-   "rain_decrease_needed_pct": 9.736250660383133,
+   "rain_decrease_needed_pct": 11.348441753831796,
    "runoff_ratio_needed": 0.23942527860548588,
    "years_with_positive_residual": 7,
    "residual_pct_of_rainfall": 9.736250660383133,
@@ -258,6 +258,18 @@
     56.47103218432107,
     423.532741382408
    ]
+  }
+ },
+ "closure_check_own_product_ratio": {
+  "chirps2": {
+   "p_1988_2010_mm": 1231.5792583436887,
+   "runoff_ratio": 0.13865080204065613,
+   "mean_closure_residual_mm": 137.65946308316026
+  },
+  "chirps3": {
+   "p_1988_2010_mm": 1272.414481990545,
+   "runoff_ratio": 0.13420112263957848,
+   "mean_closure_residual_mm": 178.85433506395006
   }
  },
  "published_recharge_fraction": {

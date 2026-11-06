@@ -162,7 +162,9 @@ def main() -> None:
             "mean_closure_residual_mm": res,
             "residual_as_pct_of_expected_flow": 100 * res / float(o[f"q_expected_{k}_mm"].mean()),
             "et_increase_needed_pct": 100 * res / et_m,
-            "rain_decrease_needed_pct": 100 * res / p_m,
+            # Expected flow is r_hi x rainfall, so lowering rainfall also lowers expected flow:
+            # (1 - r_hi)(P - dP) = ET  ->  dP = residual / (1 - r_hi)
+            "rain_decrease_needed_pct": 100 * res / ((1 - r_hi) * p_m),
             "runoff_ratio_needed": float(o[f"surplus_{k}_mm"].mean()) / p_m,
             "years_with_positive_residual": int((o[f"closure_residual_{k}_mm"] > 0).sum()),
             "residual_pct_of_rainfall": 100 * res / p_m,
@@ -173,6 +175,17 @@ def main() -> None:
                                              float(head_change_for_storage_m(cum, sy_min))],
         }
     summary["closure_upper_oueme_2018_2024"] = closure
+
+    # Robustness: the runoff ratio from each CHIRPS version's own 1988-2010 rainfall, instead of the
+    # rainfall published with the flow record, and the gap it gives for 2018-2024
+    q8810 = ratios["1988-2010"]["runoff_mm"]
+    own = {}
+    for key in ("chirps2", "chirps3"):
+        p_hist = float(lt[(lt.basin_id == "upper_oueme") & lt.year.between(1988, 2010)][f"p_{key}_mm"].mean())
+        r_own = q8810 / p_hist
+        p_m, et_m = float(o[f"p_{key}_mm"].mean()), float(o.et_wapor_mm.mean())
+        own[key] = {"p_1988_2010_mm": p_hist, "runoff_ratio": r_own, "mean_closure_residual_mm": p_m - et_m - r_own * p_m}
+    summary["closure_check_own_product_ratio"] = own
     summary["published_recharge_fraction"] = {k: list(v) for k, v in RECHARGE_REFS.items()}
 
     # Multi-year means (2018-2024)
