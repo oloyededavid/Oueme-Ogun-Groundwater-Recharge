@@ -6,7 +6,8 @@ Sources (all open data):
       Read as windows from the public cloud-optimised GeoTIFFs (no full download).
   CHIRPS v2.0 global annual totals, 1981-2024 (Climate Hazards Center, UCSB).
   CHIRPS v3.0 Africa annual totals, 1981-2024 (the version behind WaPOR v3's precipitation layer).
-  TAMSAT v3.1 monthly rainfall (University of Reading), 2018-2024, summed to annual totals.
+  TAMSAT v3.1 monthly rainfall (University of Reading), 2018-2024 for both catchments and 1988-2010
+      for the Upper Ouémé, summed to annual totals.
 
 Outputs: data/processed/rasters/<source>/<basin>_<year>.tif and data/processed/provenance.json.
 Large original files are deleted after clipping; their URL, size and SHA-256 are recorded.
@@ -33,6 +34,7 @@ from recharge.rasters import Subset, read_subset, save_subset  # noqa: E402
 
 YEARS = range(2018, 2025)
 CHIRPS_YEARS = range(1981, 2025)
+TAMSAT_HIST_YEARS = range(1988, 2011)  # period of the published Bétérou mean flow
 PAD = 0.1  # degrees of padding around each catchment
 
 WAPOR = "https://storage.googleapis.com/fao-gismgr-wapor-3-data/DATA/WAPOR-3/MAPSET/{m}/WAPOR-3.{m}.{y}.tif"
@@ -131,35 +133,45 @@ def main() -> None:
 
     # 3) TAMSAT v3.1 monthly -> annual totals (rfe_filled), clip, delete monthly files
     for y in YEARS:
-        dests = {b: OUT / "tamsat_v3.1" / f"{b}_{y}.tif" for b in basins}
-        if all(d.exists() for d in dests.values()):
-            continue
-        totals: dict[str, np.ndarray] = {}
-        grids: dict[str, tuple] = {}
-        for mo in range(1, 13):
-            url = TAMSAT.format(y=y, m=mo)
-            tmp = TMP / f"rfe{y}_{mo:02d}.v3.1.nc"
-            curl(url, tmp, min_bytes=1_000_000)
-            with xr.open_dataset(tmp) as ds:
-                for b, geom in basins.items():
-                    minx, miny, maxx, maxy = geom.bounds
-                    da = ds["rfe_filled"].isel(time=0).sel(
-                        lat=slice(maxy + PAD, miny - PAD), lon=slice(minx - PAD, maxx + PAD))
-                    arr = da.values.astype(np.float64)
-                    totals[b] = arr if mo == 1 else totals[b] + arr
-                    grids[b] = (float(da.lon.values[0]), float(da.lat.values[0]), arr.shape)
-            prov[url] = {"accessed_utc": now(), "bytes": tmp.stat().st_size, "sha256": sha256(tmp),
-                         "variable": "rfe_filled"}
-            tmp.unlink()
-            time.sleep(1)
-        for b in basins:
-            lon0, lat0, _ = grids[b]
-            res = 0.0375
-            sub = Subset(data=totals[b], transform=from_origin(lon0 - res / 2, lat0 + res / 2, res, res),
-                         crs="EPSG:4326")
-            save_subset(sub, dests[b], description=f"TAMSAT v3.1 rfe_filled, sum of 12 months {y}, mm/year")
-        PROV.write_text(json.dumps(prov, indent=1))
-        print(f"TAMSAT {y} done", flush=True)
+        tamsat_year(y, basins, prov)
+
+    # 4) TAMSAT v3.1 for 1988-2010, Upper Ouémé only: its own rainfall over the period of the published
+    #    Bétérou mean flow, so the runoff ratio can be recomputed from TAMSAT as it is from CHIRPS.
+    for y in TAMSAT_HIST_YEARS:
+        tamsat_year(y, {"upper_oueme": basins["upper_oueme"]}, prov)
+
+
+def tamsat_year(y: int, basins: dict, prov: dict) -> None:
+    """Sum the 12 monthly TAMSAT v3.1 files of year y and save one clip per catchment."""
+    dests = {b: OUT / "tamsat_v3.1" / f"{b}_{y}.tif" for b in basins}
+    if all(d.exists() for d in dests.values()):
+        return
+    totals: dict[str, np.ndarray] = {}
+    grids: dict[str, tuple] = {}
+    for mo in range(1, 13):
+        url = TAMSAT.format(y=y, m=mo)
+        tmp = TMP / f"rfe{y}_{mo:02d}.v3.1.nc"
+        curl(url, tmp, min_bytes=1_000_000)
+        with xr.open_dataset(tmp) as ds:
+            for b, geom in basins.items():
+                minx, miny, maxx, maxy = geom.bounds
+                da = ds["rfe_filled"].isel(time=0).sel(
+                    lat=slice(maxy + PAD, miny - PAD), lon=slice(minx - PAD, maxx + PAD))
+                arr = da.values.astype(np.float64)
+                totals[b] = arr if mo == 1 else totals[b] + arr
+                grids[b] = (float(da.lon.values[0]), float(da.lat.values[0]), arr.shape)
+        prov[url] = {"accessed_utc": now(), "bytes": tmp.stat().st_size, "sha256": sha256(tmp),
+                     "variable": "rfe_filled"}
+        tmp.unlink()
+        time.sleep(1)
+    for b in basins:
+        lon0, lat0, _ = grids[b]
+        res = 0.0375
+        sub = Subset(data=totals[b], transform=from_origin(lon0 - res / 2, lat0 + res / 2, res, res),
+                     crs="EPSG:4326")
+        save_subset(sub, dests[b], description=f"TAMSAT v3.1 rfe_filled, sum of 12 months {y}, mm/year")
+    PROV.write_text(json.dumps(prov, indent=1))
+    print(f"TAMSAT {y} done", flush=True)
 
 
 if __name__ == "__main__":
