@@ -7,7 +7,7 @@ const n = s => Number(String(s).replace(/,/g, '').replace('−', '-'));
 (async () => {
   const b = await chromium.launch(), fails = [], errs = [];
   const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } });
-  await ctx.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: 'http://127.0.0.1:8767' });
+  await ctx.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: new (require('url').URL)(URL).origin });
   const p = await ctx.newPage();
   await p.route(/arcgisonline/, r => r.abort());
   p.on('pageerror', e => errs.push(e.message));
