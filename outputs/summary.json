@@ -36,12 +36,12 @@
     "surplus_change_if_et_plus10pct_mm": -94.52987544465346,
     "kotchoni_4pct_low_mm": 48.48054149185077,
     "kotchoni_4pct_high_mm": 52.69298675364754,
-    "q_expected_chirps2_mm": 178.6128630626542,
-    "closure_residual_chirps2_mm": 133.36965714152623,
-    "q_expected_chirps3_mm": 184.45427480451943,
-    "closure_residual_chirps3_mm": 168.64677110178647,
-    "q_expected_tamsat_mm": 176.5661645711313,
-    "closure_residual_tamsat_mm": 121.009354680688
+    "q_expected_chirps2_mm": 178.0877235284213,
+    "closure_residual_chirps2_mm": 133.89479667575912,
+    "q_expected_chirps3_mm": 183.91196094034862,
+    "closure_residual_chirps3_mm": 169.18908496595722,
+    "q_expected_tamsat_mm": 176.047042533478,
+    "closure_residual_tamsat_mm": 121.52847671834128
    },
    "rain_classes_chirps2": {
     "2018": "normal",
@@ -165,6 +165,31 @@
    "mean": 105.3111315449191,
    "max": 211.1267717924868
   },
+  "upper_oueme_product_agreement": {
+   "chirps2_vs_chirps3": {
+    "pearson_r": 0.6343861828068195,
+    "mean_abs_diff_mm": 45.21680214309634
+   },
+   "chirps2_vs_tamsat": {
+    "pearson_r": -0.2567326511352291,
+    "mean_abs_diff_mm": 76.1284737565297
+   },
+   "chirps3_vs_tamsat": {
+    "pearson_r": 0.39391429704183667,
+    "mean_abs_diff_mm": 89.27698719021217
+   }
+  },
+  "upper_oueme_interannual_cv_pct": {
+   "chirps2": 3.6393135667500123,
+   "chirps3": 3.786737003043534,
+   "tamsat": 7.250511415842695
+  },
+  "upper_oueme_et_cv_pct": 3.072367699210142,
+  "upper_oueme_p_et_pearson_r": {
+   "chirps2": 0.5853565071194443,
+   "chirps3": 0.34502334918204813,
+   "tamsat": -0.08399346847169165
+  },
   "upper_ogun_chirps3_minus_chirps2_mm": {
    "mean": 181.17699350259997,
    "min": 67.40523937255102,
@@ -174,102 +199,247 @@
   "upper_ogun_product_spread_mm": {
    "mean": 221.9319203240605,
    "max": 304.70708057499155
+  },
+  "upper_ogun_product_agreement": {
+   "chirps2_vs_chirps3": {
+    "pearson_r": 0.8630023577146956,
+    "mean_abs_diff_mm": 181.17699350259997
+   },
+   "chirps2_vs_tamsat": {
+    "pearson_r": 0.7422949143307324,
+    "mean_abs_diff_mm": 66.43475144125341
+   },
+   "chirps3_vs_tamsat": {
+    "pearson_r": 0.8893949728045076,
+    "mean_abs_diff_mm": 196.25209570426767
+   }
+  },
+  "upper_ogun_interannual_cv_pct": {
+   "chirps2": 11.104914188889305,
+   "chirps3": 7.1892701605796745,
+   "tamsat": 6.861706967166191
+  },
+  "upper_ogun_et_cv_pct": 5.58792097922901,
+  "upper_ogun_p_et_pearson_r": {
+   "chirps2": 0.4042020457952342,
+   "chirps3": 0.6780543724313484,
+   "tamsat": 0.5625249099103112
   }
  },
  "beterou_observed_runoff": {
-  "area_km2": 10072.0,
+  "area_km2": 10101.7,
+  "published_area_km2": [
+   10070.0,
+   10076.0
+  ],
+  "rain_source": "30 rain gauges, Thiessen polygons (Kodja et al., 2020)",
   "periods": {
    "1971-1987": {
-    "runoff_mm": 148.827045274027,
+    "runoff_mm": 148.3894789985844,
     "rain_mm": 1091.0,
-    "runoff_ratio": 0.13641342371588175
+    "runoff_ratio": 0.13601235471914244
    },
    "1988-2010": {
-    "runoff_mm": 170.75945194598887,
+    "runoff_mm": 170.25740221942843,
     "rain_mm": 1202.0,
-    "runoff_ratio": 0.14206277200165462
+    "runoff_ratio": 0.14164509336058936
    }
   },
   "ratio_range": [
-   0.13641342371588175,
-   0.14206277200165462
+   0.13601235471914244,
+   0.14164509336058936
   ]
  },
  "closure_upper_oueme_2018_2024": {
   "chirps2": {
    "mean_surplus_mm": 311.9825202041804,
-   "mean_expected_flow_mm": 178.6128630626542,
-   "mean_closure_residual_mm": 133.36965714152623,
-   "residual_as_pct_of_expected_flow": 74.66968215762968,
-   "et_increase_needed_pct": 14.108730865684173,
-   "rain_decrease_needed_pct": 12.364286903069116,
+   "mean_expected_flow_mm": 178.08772352842132,
+   "mean_closure_residual_mm": 133.89479667575912,
+   "residual_as_pct_of_expected_flow": 75.1847426778919,
+   "et_increase_needed_pct": 14.164283624191757,
+   "rain_decrease_needed_pct": 12.406930762004365,
    "runoff_ratio_needed": 0.24814059231960822,
    "years_with_positive_residual": 7,
-   "residual_pct_of_rainfall": 10.607782031795365,
-   "residual_over_4pct_recharge": 2.6519455079488408,
-   "cumulative_residual_mm": 933.5875999906837,
+   "residual_pct_of_rainfall": 10.649549895901888,
+   "residual_over_4pct_recharge": 2.662387473975472,
+   "cumulative_residual_mm": 937.2635767303138,
    "sy_range": [
     0.002,
     0.015
    ],
    "water_table_rise_if_stored_m": [
-    62.23917333271224,
-    466.79379999534183
-   ]
+    62.48423844868759,
+    468.6317883651569
+   ],
+   "sy_for_plausible_rise": 0.09372635767303139
   },
   "chirps3": {
    "mean_surplus_mm": 353.1010459063059,
-   "mean_expected_flow_mm": 184.45427480451943,
-   "mean_closure_residual_mm": 168.64677110178647,
-   "residual_as_pct_of_expected_flow": 91.43012341704447,
-   "et_increase_needed_pct": 17.840579003039938,
-   "rain_decrease_needed_pct": 15.139588717210652,
+   "mean_expected_flow_mm": 183.91196094034862,
+   "mean_closure_residual_mm": 169.18908496595722,
+   "residual_as_pct_of_expected_flow": 91.99460660464236,
+   "et_increase_needed_pct": 17.897948576586902,
+   "rain_decrease_needed_pct": 15.180882104119343,
    "runoff_ratio_needed": 0.27195093977244195,
    "years_with_positive_residual": 7,
-   "residual_pct_of_rainfall": 12.988816777078732,
-   "residual_over_4pct_recharge": 3.247204194269683,
-   "cumulative_residual_mm": 1180.5273977125053,
+   "residual_pct_of_rainfall": 13.030584641185257,
+   "residual_over_4pct_recharge": 3.257646160296314,
+   "cumulative_residual_mm": 1184.3235947617006,
    "sy_range": [
     0.002,
     0.015
    ],
    "water_table_rise_if_stored_m": [
-    78.70182651416702,
-    590.2636988562526
-   ]
+    78.95490631744671,
+    592.1617973808503
+   ],
+   "sy_for_plausible_rise": 0.11843235947617006
   },
   "tamsat": {
    "mean_surplus_mm": 297.57551925181923,
-   "mean_expected_flow_mm": 176.5661645711313,
-   "mean_closure_residual_mm": 121.009354680688,
-   "residual_as_pct_of_expected_flow": 68.53484923037918,
-   "et_increase_needed_pct": 12.801175724762073,
-   "rain_decrease_needed_pct": 11.348441753831796,
+   "mean_expected_flow_mm": 176.04704253347805,
+   "mean_closure_residual_mm": 121.5284767183413,
+   "residual_as_pct_of_expected_flow": 69.03181954631859,
+   "et_increase_needed_pct": 12.856091912391797,
+   "rain_decrease_needed_pct": 11.391579926736926,
    "runoff_ratio_needed": 0.23942527860548588,
    "years_with_positive_residual": 7,
-   "residual_pct_of_rainfall": 9.736250660383133,
-   "residual_over_4pct_recharge": 2.434062665095783,
-   "cumulative_residual_mm": 847.065482764816,
+   "residual_pct_of_rainfall": 9.778018524489656,
+   "residual_over_4pct_recharge": 2.444504631122414,
+   "cumulative_residual_mm": 850.6993370283891,
    "sy_range": [
     0.002,
     0.015
    ],
    "water_table_rise_if_stored_m": [
-    56.47103218432107,
-    423.532741382408
+    56.71328913522594,
+    425.34966851419455
+   ],
+   "sy_for_plausible_rise": 0.08506993370283891
+  }
+ },
+ "plausible_rise_m": 10.0,
+ "runoff_ratio_sensitivity": {
+  "ratio": [
+   0.1,
+   0.11,
+   0.12,
+   0.13,
+   0.14,
+   0.15,
+   0.16,
+   0.17,
+   0.18,
+   0.19,
+   0.2,
+   0.21,
+   0.22,
+   0.23,
+   0.24,
+   0.25,
+   0.26,
+   0.27,
+   0.28,
+   0.29,
+   0.3
+  ],
+  "mean_residual_mm": {
+   "chirps2": [
+    186.25439273910885,
+    173.6815799926017,
+    161.10876724609457,
+    148.5359544995874,
+    135.96314175308024,
+    123.39032900657313,
+    110.81751626006596,
+    98.24470351355882,
+    85.67189076705168,
+    73.09907802054454,
+    60.52626527403737,
+    47.95345252753026,
+    35.38063978102309,
+    22.807827034515924,
+    10.235014288008813,
+    -2.337798458498355,
+    -14.910611205005523,
+    -27.48342395151269,
+    -40.05623669801986,
+    -52.62904944452691,
+    -65.20186219103408
+   ],
+   "chirps3": [
+    223.26106587102177,
+    210.27706786749337,
+    197.29306986396497,
+    184.30907186043655,
+    171.32507385690815,
+    158.34107585337975,
+    145.35707784985135,
+    132.37307984632292,
+    119.38908184279455,
+    106.40508383926615,
+    93.42108583573776,
+    80.43708783220933,
+    67.45308982868096,
+    54.46909182515253,
+    41.48509382162416,
+    28.501095818095735,
+    15.517097814567308,
+    2.5330998110388805,
+    -10.45089819248949,
+    -23.43489619601786,
+    -36.41889419954629
+   ],
+   "tamsat": [
+    173.2880918819838,
+    160.85934914500027,
+    148.43060640801676,
+    136.0018636710332,
+    123.57312093404965,
+    111.14437819706615,
+    98.71563546008258,
+    86.28689272309904,
+    73.85814998611554,
+    61.429407249132,
+    49.00066451214843,
+    36.571921775164924,
+    24.14317903818136,
+    11.71443630119785,
+    -0.7143064357856588,
+    -13.143049172769224,
+    -25.57179190975279,
+    -38.0005346467363,
+    -50.429277383719864,
+    -62.858020120703316,
+    -75.28676285768688
+   ]
+  },
+  "reference_ratios": {
+   "beterou_1971_2010": [
+    0.13601235471914244,
+    0.14164509336058936
+   ],
+   "donga_single_years_kamagate2007": [
+    0.14,
+    0.28
    ]
   }
  },
  "closure_check_own_product_ratio": {
   "chirps2": {
    "p_1988_2010_mm": 1231.5792583436887,
-   "runoff_ratio": 0.13865080204065613,
-   "mean_closure_residual_mm": 137.65946308316026
+   "runoff_ratio": 0.13824315492971367,
+   "mean_closure_residual_mm": 138.1719901624137
   },
   "chirps3": {
    "p_1988_2010_mm": 1272.414481990545,
-   "runoff_ratio": 0.13420112263957848,
-   "mean_closure_residual_mm": 178.85433506395006
+   "runoff_ratio": 0.13380655802744437,
+   "mean_closure_residual_mm": 179.36663767757128
+  },
+  "tamsat": {
+   "p_1988_2010_mm": 1195.4014254575188,
+   "runoff_ratio": 0.14242696937914845,
+   "mean_closure_residual_mm": 120.55670312965239
   }
  },
  "published_recharge_fraction": {

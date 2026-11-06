@@ -35,11 +35,20 @@ LONG_YEARS = list(range(1981, 2025))
 BASELINE = (1991, 2020)
 PRODUCTS = {"chirps2": "chirps_v2", "chirps3": "chirps_v3", "tamsat": "tamsat_v3.1"}
 
-# Observed mean flow at Ouémé-Bétérou (Proc. IAHS 383, 163-169, 2020, doi:10.5194/piahs-383-163-2020)
-# and published catchment area at Bétérou (10,070-10,076 km²; 10,072 km² used).
-BETEROU = {"area_km2": 10072.0,
+# Observed mean flow at Ouémé-Bétérou (Kodja et al., 2020, Proc. IAHS 383, 163-169,
+# doi:10.5194/piahs-383-163-2020). Its rainfall is the catchment mean of 30 rain gauges (Thiessen
+# polygons), not a satellite product. The flow is converted to a depth over the area of the catchment
+# polygon used for every other term (geodesic_area_km2 in basins.geojson, about 10,102 km²), not over
+# the published 10,070-10,076 km², so that all terms of the balance refer to the same area.
+BETEROU = {"rain_source": "30 rain gauges, Thiessen polygons (Kodja et al., 2020)",
+           "published_area_km2": [10070.0, 10076.0],
            "periods": {"1971-1987": {"q_m3s": 47.5, "rain_mm": 1091.0},
                        "1988-2010": {"q_m3s": 54.5, "rain_mm": 1202.0}}}
+# Runoff ratios reported elsewhere in the Upper Ouémé, for judging the sensitivity range:
+#   Kamagaté et al. (2007): 0.14-0.28 in single years in the Donga sub-basin.
+DONGA_RATIO_RANGE = (0.14, 0.28)
+RATIO_GRID = np.round(np.arange(0.10, 0.3001, 0.01), 2)
+PLAUSIBLE_RISE_M = 10.0  # a large seven-year water-table rise, for the specific yield it would imply
 # Published groundwater recharge in Benin crystalline basement, as fractions of annual rainfall:
 #   Kotchoni et al. (2019), Hydrogeology Journal 27, 447-457, doi:10.1007/s10040-018-1806-2:
 #     about 4%, from 19-25-year hydrographs of a weathered-crystalline aquifer;
@@ -134,8 +143,9 @@ def main() -> None:
 
     # Observed runoff ratio at Bétérou (Upper Ouémé only)
     ratios = {}
+    area = float(basins["upper_oueme"][1]["geodesic_area_km2"])
     for per, v in BETEROU["periods"].items():
-        q_mm = float(runoff_depth_mm(v["q_m3s"], BETEROU["area_km2"]))
+        q_mm = float(runoff_depth_mm(v["q_m3s"], area))
         ratios[per] = {"runoff_mm": q_mm, "rain_mm": v["rain_mm"], "runoff_ratio": q_mm / v["rain_mm"]}
     r_lo = min(r["runoff_ratio"] for r in ratios.values())
     r_hi = max(r["runoff_ratio"] for r in ratios.values())
@@ -145,7 +155,8 @@ def main() -> None:
         q_hi = r_hi * p
         df.loc[oue, f"q_expected_{k}_mm"] = q_hi
         df.loc[oue, f"closure_residual_{k}_mm"] = closure_residual(p, df.loc[oue, "et_wapor_mm"], q_hi)
-    summary["beterou_observed_runoff"] = {"area_km2": BETEROU["area_km2"], "periods": ratios, "ratio_range": [r_lo, r_hi]}
+    summary["beterou_observed_runoff"] = {"area_km2": area, "published_area_km2": BETEROU["published_area_km2"],
+                                          "rain_source": BETEROU["rain_source"], "periods": ratios, "ratio_range": [r_lo, r_hi]}
 
     # What it would take to close the 2018-2024 mean balance at Bétérou (one term at a time), and whether
     # the residual could be water stored underground (it would raise the water table by the amounts below)
@@ -173,15 +184,34 @@ def main() -> None:
             "sy_range": [sy_min, sy_max],
             "water_table_rise_if_stored_m": [float(head_change_for_storage_m(cum, sy_max)),
                                              float(head_change_for_storage_m(cum, sy_min))],
+            # specific yield that would hold the cumulative residual in a rise of PLAUSIBLE_RISE_M
+            "sy_for_plausible_rise": cum / (PLAUSIBLE_RISE_M * 1000.0),
         }
     summary["closure_upper_oueme_2018_2024"] = closure
+    summary["plausible_rise_m"] = PLAUSIBLE_RISE_M
 
-    # Robustness: the runoff ratio from each CHIRPS version's own 1988-2010 rainfall, instead of the
-    # rainfall published with the flow record, and the gap it gives for 2018-2024
+    # Sensitivity of the mean residual to the runoff ratio, the least constrained term: Q is not
+    # measured for 2018-2024, so the residual is conditional on the ratio assumed.
+    p_means = {k: float(o[f"p_{k}_mm"].mean()) for k in PRODUCTS}
+    et_mean = float(o.et_wapor_mm.mean())
+    summary["runoff_ratio_sensitivity"] = {
+        "ratio": [float(r) for r in RATIO_GRID],
+        "mean_residual_mm": {k: [p_means[k] - et_mean - float(r) * p_means[k] for r in RATIO_GRID] for k in PRODUCTS},
+        "reference_ratios": {"beterou_1971_2010": [r_lo, r_hi], "donga_single_years_kamagate2007": list(DONGA_RATIO_RANGE)},
+    }
+
+    # Robustness: the runoff ratio from each product's own 1988-2010 rainfall, instead of the gauge
+    # rainfall published with the flow record, and the residual it gives for 2018-2024
     q8810 = ratios["1988-2010"]["runoff_mm"]
+    hist = {"chirps2": lt[(lt.basin_id == "upper_oueme") & lt.year.between(1988, 2010)]["p_chirps2_mm"].values,
+            "chirps3": lt[(lt.basin_id == "upper_oueme") & lt.year.between(1988, 2010)]["p_chirps3_mm"].values}
+    tamsat_hist = [RASTERS / "tamsat_v3.1" / f"upper_oueme_{y}.tif" for y in range(1988, 2011)]
+    if all(f.exists() for f in tamsat_hist):
+        geom_o = basins["upper_oueme"][0]
+        hist["tamsat"] = np.array([basin_mean("tamsat_v3.1", "upper_oueme", y, geom_o)[0] for y in range(1988, 2011)])
     own = {}
-    for key in ("chirps2", "chirps3"):
-        p_hist = float(lt[(lt.basin_id == "upper_oueme") & lt.year.between(1988, 2010)][f"p_{key}_mm"].mean())
+    for key, vals in hist.items():
+        p_hist = float(np.mean(vals))
         r_own = q8810 / p_hist
         p_m, et_m = float(o[f"p_{key}_mm"].mean()), float(o.et_wapor_mm.mean())
         own[key] = {"p_1988_2010_mm": p_hist, "runoff_ratio": r_own, "mean_closure_residual_mm": p_m - et_m - r_own * p_m}
@@ -210,6 +240,16 @@ def main() -> None:
                                                "max": float((s.p_chirps3_mm - s.p_chirps2_mm).max())}
         qa[f"{b}_tamsat_minus_chirps2_mm_mean"] = float((s.p_tamsat_mm - s.p_chirps2_mm).mean())
         qa[f"{b}_product_spread_mm"] = {"mean": float(s.p_spread_mm.mean()), "max": float(s.p_spread_mm.max())}
+        # Agreement between rainfall products, year by year (n = 7, so correlations are indicative only).
+        # No gauge reference is available, so these are agreement statistics, not error statistics.
+        pairs = {}
+        for a, c in [("chirps2", "chirps3"), ("chirps2", "tamsat"), ("chirps3", "tamsat")]:
+            x, z = s[f"p_{a}_mm"].values, s[f"p_{c}_mm"].values
+            pairs[f"{a}_vs_{c}"] = {"pearson_r": float(np.corrcoef(x, z)[0, 1]), "mean_abs_diff_mm": float(np.mean(np.abs(x - z)))}
+        qa[f"{b}_product_agreement"] = pairs
+        qa[f"{b}_interannual_cv_pct"] = {k: float(100 * s[f"p_{k}_mm"].std(ddof=1) / s[f"p_{k}_mm"].mean()) for k in PRODUCTS}
+        qa[f"{b}_et_cv_pct"] = float(100 * s.et_wapor_mm.std(ddof=1) / s.et_wapor_mm.mean())
+        qa[f"{b}_p_et_pearson_r"] = {k: float(np.corrcoef(s[f"p_{k}_mm"], s.et_wapor_mm)[0, 1]) for k in PRODUCTS}
 
     # Mean 2018-2024 grids: ET at native 300 m; surplus on the CHIRPS 0.05° grid (no false detail)
     (OUT / "maps").mkdir(exist_ok=True)
