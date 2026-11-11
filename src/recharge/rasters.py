@@ -36,13 +36,13 @@ def read_subset(path: str, bounds: tuple[float, float, float, float], scale: flo
     with rasterio.Env(**GDAL_ENV), rasterio.open(path) as src:
         win = from_bounds(minx - pad_deg, miny - pad_deg, maxx + pad_deg, maxy + pad_deg, src.transform)
         win = win.round_offsets().round_lengths()
-        raw = src.read(1, window=win, boundless=True, fill_value=src.nodata if src.nodata is not None else 0)
+        raw = src.read(1, window=win, boundless=True, masked=True)  # cells outside the file are masked, whatever its nodata
         transform = src.window_transform(win)
         nodata = src.nodata
         crs = src.crs.to_string() if src.crs else "EPSG:4326"
-    data = raw.astype(np.float64)
+    data = np.ma.filled(raw.astype(np.float64), np.nan)
     if nodata is not None:
-        data[raw == nodata] = np.nan
+        data[data == nodata] = np.nan
     data = data * scale + offset
     if valid_min is not None:
         data[data < valid_min] = np.nan

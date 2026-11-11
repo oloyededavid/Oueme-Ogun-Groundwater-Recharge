@@ -55,6 +55,19 @@ def test_save_read_roundtrip_and_valid_min(tmp_path):
     assert sub.data.shape == (4, 4) and np.isnan(sub.data[1, 1]) and sub.data[0, 0] == 1.0
 
 
+def test_read_beyond_the_file_edge_is_nan_even_without_a_declared_nodata(tmp_path):
+    import rasterio
+    from recharge.rasters import read_subset
+
+    tr = from_origin(2.0, 10.0, 0.5, 0.5)
+    with rasterio.open(tmp_path / "u.tif", "w", driver="GTiff", height=4, width=4, count=1, dtype="float32", crs="EPSG:4326", transform=tr) as dst:
+        dst.write(np.full((1, 4, 4), 7.0, dtype="float32"))
+    sub = read_subset(str(tmp_path / "u.tif"), (1.5, 7.5, 4.5, 10.5), pad_deg=0.0)
+    assert sub.data.shape == (6, 6)
+    assert np.isnan(sub.data[0, 0]) and np.isnan(sub.data[-1, -1])  # outside the file
+    assert sub.data[2, 2] == 7.0
+
+
 def test_pixel_weights_shape():
     w = pixel_area_weights((3, 4), from_origin(0, 60, 1, 1))
     assert w.shape == (3, 4) and w[0, 0] < w[-1, 0]  # cells nearer the equator are larger
