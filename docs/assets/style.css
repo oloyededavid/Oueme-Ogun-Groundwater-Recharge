@@ -699,3 +699,7 @@ figcaption { hyphens: manual; -webkit-hyphens: manual; }
 .react-row { margin-bottom: 16px; }
 .react-row .reactions { margin-bottom: 0; }
 .explore-page .ex-intro h1 { margin-bottom: 10px; }
+
+@media (max-width: 768px) {
+  .tool { min-height: 28px; padding: 4px 8px; }
+}
