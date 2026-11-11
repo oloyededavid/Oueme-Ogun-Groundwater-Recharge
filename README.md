@@ -148,7 +148,7 @@ The web version is a short research note in plain language: a summary, why the t
 - **Figure 3:** the water balance on the 5 km grid; the map changes with the text beside it.
 - **Figure 4:** the gap against the assumed runoff ratio.
 - **Figure 5:** the water-table rise needed to store the gap, with a specific-yield slider.
-- **Figure 6:** the gap against recharge measured in Benin's wells.
+- **Figure 6:** the gap against recharge estimated from well hydrographs in Benin.
 - **Figure 7:** the balance with each term adjustable.
 - **Tables 1–4:** data, the Upper Ouémé balance, how the gap changes with each assumption, and annual values on the **explorer page**.
 
