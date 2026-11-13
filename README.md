@@ -242,4 +242,4 @@ The full annotated list, with what each source was used for, is in [`research/li
 - **Derived data and figures:** CC BY 4.0. Source datasets keep their own terms ([LICENSE-DATA.md](LICENSE-DATA.md)).
 - **Citation:** please cite this work using [CITATION.cff](CITATION.cff).
 
-Author: Oloyede David Oluwayinka.
+Author: David Oloyede.
