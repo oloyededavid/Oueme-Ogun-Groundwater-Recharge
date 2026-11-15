@@ -711,3 +711,6 @@ figcaption { hyphens: manual; -webkit-hyphens: manual; }
 /* explorer: the selected cell's value, under the map */
 .cell-readout { margin: 8px 0 0; font-size: 13.5px; line-height: 1.45; color: var(--ink-2); min-height: 1.45em; }
 .cell-readout b { color: var(--ink); font-weight: 500; }
+
+/* touch: sliders and checkboxes at least 24 px for a finger */
+@media (pointer: coarse), (max-width: 760px) { input[type="range"] { min-height: 32px; } input[type="checkbox"] { width: 24px; height: 24px; } }
