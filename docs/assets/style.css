@@ -709,7 +709,8 @@ figcaption { hyphens: manual; -webkit-hyphens: manual; }
 .article section > p, .article section li, .note p, .citation p, figcaption, .eqx-text { text-align: left; hyphens: manual; -webkit-hyphens: manual; }
 
 /* explorer: the selected cell's value, under the map */
-.cell-readout { margin: 8px 0 0; font-size: 13.5px; line-height: 1.45; color: var(--ink-2); min-height: 1.45em; }
+.cell-readout { position: absolute; top: 100%; left: 0; right: 0; margin: 8px 0 0; font-size: 13.5px; line-height: 1.45; color: var(--ink-2); }
+.explorer-map:has(.cell-readout) { margin-bottom: 48px; }
 .cell-readout b { color: var(--ink); font-weight: 500; }
 
 /* touch: sliders and checkboxes at least 24 px for a finger */
