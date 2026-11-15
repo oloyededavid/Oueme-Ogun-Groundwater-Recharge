@@ -707,3 +707,7 @@ figcaption { hyphens: manual; -webkit-hyphens: manual; }
 /* consistency with the portfolio: left-aligned text, portfolio blue */
 :root { --accent: #1f5fae; }
 .article section > p, .article section li, .note p, .citation p, figcaption, .eqx-text { text-align: left; hyphens: manual; -webkit-hyphens: manual; }
+
+/* explorer: the selected cell's value, under the map */
+.cell-readout { margin: 8px 0 0; font-size: 13.5px; line-height: 1.45; color: var(--ink-2); min-height: 1.45em; }
+.cell-readout b { color: var(--ink); font-weight: 500; }

@@ -210,6 +210,9 @@
         // Catchment labels sit outside the catchments so they never cover cells: the Upper Ouémé label
         // above its northern edge, the Upper Ogun label west of it.
         const labels = L.layerGroup().addTo(map), anchors = {}, rects = {};
+        // the selected cell's value is also written under the map, for touch screens and screen readers
+        let picked = null;
+        const showPicked = () => { const out = opts.readout && document.getElementById(opts.readout); if (out && picked) out.innerHTML = picked.getTooltip().getContent().replace('<br>', ' · '); };
         outline.eachLayer(l => {
             const b = l.feature.properties.basin_id, bb = l.getBounds();
             if (b !== 'upper_ogun') { anchors[b] = { at: L.latLng(bb.getNorth(), bb.getCenter().lng), side: 'n' }; return; }
@@ -224,7 +227,8 @@
                     r.bindTooltip('', { sticky: true, className: 'tip', direction: 'top', offset: [0, -8] });
                     r.on('mouseover', () => r.setStyle({ weight: 1.6, color: '#111' }));
                     r.on('mouseout', () => r.setStyle({ weight: 0.5, color: r.options.fillColor }));
-                    r.on('click', () => opts.onSelect && opts.onSelect(b));
+                    // a tap has no hover: open the cell's value where it was tapped
+                    r.on('click', e => { if (opts.onSelect) opts.onSelect(b); picked = r; showPicked(); r.openTooltip(e.latlng); });
                 }
                 return r.addTo(map);
             });
@@ -249,6 +253,7 @@
                     labels.addLayer(L.marker(anchors[b].at, { interactive: false, keyboard: false, icon: L.divIcon({ className: `basin-label at-${anchors[b].side}${st.zone === b ? ' is-on' : ''}`, iconSize: [0, 0], html: `<div>${esc(BASIN[b])}<span>${fmtInt(v)} mm, catchment mean</span></div>` }) }));
                 });
                 const pin = gauge.getElement(); if (pin) pin.classList.toggle('is-on', !!st.gauge);
+                showPicked();
             },
             fit(zone, animate, pad) {
                 map.invalidateSize();
@@ -680,7 +685,7 @@
     }
     function stop() { if (timer) clearInterval(timer); timer = null; syncExControls(); }
     function initExplorer() {
-        ex = gridMap('explore-map', { interactive: true, onSelect: b => setEx({ zone: b }) });
+        ex = gridMap('explore-map', { interactive: true, readout: 'ex-cell', onSelect: b => setEx({ zone: b }) });
         buildExControls();
         $('#ex-table').addEventListener('click', e => { const tr = e.target.closest('tbody tr[data-year]'); if (tr) { stop(); setEx({ period: tr.dataset.year }); } });
         $('#ex-zone').addEventListener('click', e => { const b = e.target.closest('[data-zone]'); if (b) setEx({ zone: b.dataset.zone }, true); });
