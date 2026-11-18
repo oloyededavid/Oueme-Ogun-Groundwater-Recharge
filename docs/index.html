@@ -97,14 +97,14 @@
         <ol class="findings">
             <li><b class="hl">At least <span data-v="riseMin">—</span> m</b><span class="f-text">The water table would have to rise this much to store the missing water, using the rainfall product that gives the smallest gap (Section 4.4 gives the range for the selected product). It is not stored as a water-table rise.</span></li>
             <li><b class="hl">A ratio of <span data-v="needRatioRange">—</span></b><span class="f-text">If the river carried this share of the rain instead of <span data-v="ratio">—</span>, the gap would close. No recent flow record exists to check.</span></li>
-            <li><b class="hl"><span data-v="gapPctRange">—</span>% of rainfall</b><span class="f-text">The gap is as large as recharge estimated from well hydrographs in Benin (4% and 5–24%), so the method cannot measure recharge here.</span></li>
+            <li><b class="hl"><span data-v="gapPctRange">—</span>% of rainfall</b><span class="f-text">The gap is the same size as recharge estimated from well hydrographs in Benin (4% and 5–24%). It is not recharge, but an error this size hides any recharge, so the method cannot measure it here.</span></li>
         </ol>
         <p class="small">The Upper Ogun in Nigeria has no flow record, so it can be described but not tested.</p>
     </section>
 
     <section id="introduction" data-reveal aria-labelledby="h-intro">
         <h2 id="h-intro"><span class="n">1</span>Why test it</h2>
-        <p>Rural water in Benin and south-west Nigeria comes largely from weathered crystalline rock, aquifers that across tropical Africa hold little water but are refilled often <span class="cite">(MacDonald et al., 2021)</span>. Wells in Benin show recharge of about 4% of rainfall <span class="cite">(Kotchoni et al., 2019)</span> and 5–24% in the Donga sub-basin of the Upper Ouémé <span class="cite">(Kamagaté et al., 2007)</span>, but such records are rare. Satellites measure rainfall and evapotranspiration everywhere, so subtracting river flow should leave what recharged the aquifer. Each of those terms, though, has errors of 20–30% (<span class="cite">Blatchford et al., 2020</span>; <span class="cite">Ogbu et al., 2020</span>), as large as recharge itself. The approach has to be tested where an independent check exists before it is used where none does <span class="cite">(Scanlon et al., 2002)</span>.</p>
+        <p>Rural water in Benin and south-west Nigeria comes largely from weathered crystalline rock, aquifers that across tropical Africa hold little water but are refilled often <span class="cite">(MacDonald et al., 2021)</span>. Wells in Benin show recharge of about 4% of rainfall <span class="cite">(Kotchoni et al., 2019)</span> and 5–24% in the Donga sub-basin of the Upper Ouémé <span class="cite">(Kamagaté et al., 2007)</span>, but such records are rare. Satellites measure rainfall and evapotranspiration everywhere, and over several years rainfall minus evapotranspiration minus river flow should be close to zero. That makes the balance a test of the satellite data, not a measure of recharge: recharge that drains back to the river is already part of the river flow, so estimating recharge needs a split of the flow or a storage term. Each term, though, has errors of 20–30% (<span class="cite">Blatchford et al., 2020</span>; <span class="cite">Ogbu et al., 2020</span>), which in millimetres is as large as recharge itself or larger. The approach has to be tested where an independent check exists before it is used where none does <span class="cite">(Scanlon et al., 2002)</span>.</p>
         <p>This note asks: does the balance close at Bétérou; if not, what is the leftover water; and what can the same method say about the Upper Ogun?</p>
     </section>
 
@@ -243,12 +243,12 @@
     </figure>
 
     <section aria-labelledby="h-scale">
-        <h3 id="h-scale"><span class="n">4.5</span>The gap is as large as recharge</h3>
-        <p>At <span class="num" data-v="gapPctRange">—</span>% of rainfall, the gap is the same size as recharge estimated from well hydrographs in Benin (Figure 6). A balance this uncertain cannot measure the recharge it is meant to find.</p>
+        <h3 id="h-scale"><span class="n">4.5</span>The gap is as large as the recharge it is meant to find</h3>
+        <p>At <span class="num" data-v="gapPctRange">—</span>% of rainfall, the gap is the same size as recharge estimated from well hydrographs in Benin (Figure 6). The gap is not itself recharge, but a balance this uncertain cannot measure recharge.</p>
     </section>
     <figure class="wide reveal" id="fig-recharge" data-source="Kotchoni et al. (2019); Kamagaté et al. (2007); residuals computed in scripts/03_analysis.py">
         <div id="scale" role="img" aria-label="Residual and published recharge as a share of rainfall"></div>
-        <figcaption><b>Figure 6.</b> The gap, for each rainfall product, against recharge estimated from wells in Benin, as a share of rainfall.</figcaption>
+        <figcaption><b>Figure 6.</b> The size of the gap, for each rainfall product, against the size of recharge estimated from wells in Benin, as a share of rainfall. The two are different quantities; the figure compares their magnitudes.</figcaption>
     </figure>
 
     <section aria-labelledby="h-sens">
@@ -296,7 +296,7 @@
 
     <section id="discussion" data-reveal aria-labelledby="h-disc">
         <h2 id="h-disc"><span class="n">5</span>What it means</h2>
-        <p>The leftover water is not storage, so it is error: most likely river flow that was higher than assumed, or evapotranspiration that WaPOR underestimates. Even a balance that closed would show <em>net</em> recharge, because satellite evapotranspiration includes water roots draw back from the water table, while wells show <em>gross</em> recharge <span class="cite">(Kamagaté et al., 2007)</span>. And a gap that is a fixed share of rainfall will look like recharge, which also scales with rainfall <span class="cite">(MacDonald et al., 2021)</span>, without being recharge. In the Upper Ogun the method gives rainfall minus evapotranspiration of <span class="num" data-v="gLeftRange">—</span> mm, untested.</p>
+        <p>The leftover water is too large to be stored, so it is most likely error, with underground outflow and pumping as smaller possibilities: most likely river flow that was higher than assumed, or evapotranspiration that WaPOR underestimates. Even with perfect data this balance would not measure recharge, because recharge that drains back to the river is counted in the river flow. And satellite evapotranspiration includes water roots draw back from the water table, so it can only ever reflect <em>net</em> recharge, while wells show <em>gross</em> recharge <span class="cite">(Kamagaté et al., 2007)</span>. And a gap that is a fixed share of rainfall will look like recharge, which also scales with rainfall <span class="cite">(MacDonald et al., 2021)</span>, without being recharge. In the Upper Ogun the method gives rainfall minus evapotranspiration of <span class="num" data-v="gLeftRange">—</span> mm, untested.</p>
     </section>
 
     <section id="limitations" data-reveal aria-labelledby="h-lim">

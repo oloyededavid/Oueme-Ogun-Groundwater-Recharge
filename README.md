@@ -39,7 +39,7 @@ All numbers are computed by the scripts and stored in [`outputs/summary.json`](o
 
    ![Residual against the runoff ratio](figures/fig7_runoff_ratio.png)
 
-4. **The uncertainty is as large as recharge.** Recharge estimated from groundwater levels in Benin's crystalline basement is about 4% of rainfall from 19–25-year records (Kotchoni et al., 2019), and 5–24% from two years of water-table data in the Donga sub-basin of the Upper Ouémé (Kamagaté et al., 2007). The residual, at 10–13% of rainfall, sits inside that range. A balance with this uncertainty cannot measure recharge.
+4. **The uncertainty is as large as recharge.** Recharge estimated from groundwater levels in Benin's crystalline basement is about 4% of rainfall from 19–25-year records (Kotchoni et al., 2019), and 5–24% from two years of water-table data in the Donga sub-basin of the Upper Ouémé (Kamagaté et al., 2007). The residual, at 10–13% of rainfall, is the same size. It is not recharge, because recharge that drains back to the river is already part of the river flow, but an error this size would hide recharge. A balance with this uncertainty cannot measure recharge.
 
    ![Closure residual against published recharge](figures/fig6_residual_vs_recharge.png)
 
