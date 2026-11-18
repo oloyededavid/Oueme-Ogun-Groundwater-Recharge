@@ -20,7 +20,7 @@ The web version is a research paper with interactive figures: <https://oloyededa
 | Rainfall: CHIRPS v2.0 / CHIRPS v3.0 / TAMSAT v3.1 | 1,257 / 1,298 / 1,243 mm/yr | 1,311 / 1,492 / 1,296 mm/yr |
 | Actual ET (WaPOR v3) | 945 mm/yr | 946 mm/yr |
 | Rainfall − ET (range over the three products) | 298–353 mm/yr | 349–545 mm/yr |
-| Runoff ratio that would close the balance | 0.24–0.27 (observed 1971–2010: 0.136–0.142) | — |
+| Runoff ratio that would close the balance | 0.24–0.27 (observed 1971–1987 and 1988–2010: 0.136 and 0.142) | — |
 | Spread of the three rainfall estimates: mean (largest year) | 105 (211) mm/yr | 222 (305) mm/yr |
 | 2018–2024 rainfall vs 1991–2020 (CHIRPS v2.0 / v3.0) | +4.0% / +4.3% | +8.2% / +13.0% |
 | Estimated river flow (1988–2010 runoff ratio × rainfall) | 176–184 mm/yr | no flow data |
@@ -35,7 +35,7 @@ All numbers are computed by the scripts and stored in [`outputs/summary.json`](o
 
 2. **The residual is not stored groundwater.** Summed over 2018–2024 it is 851–1,184 mm. With the specific yield of weathered crystalline aquifers (0.2–1.5%; Lachassagne et al., 2021), storing that much water would raise the water table by 57–79 m even at the highest specific yield, and by up to 592 m at the lowest. Holding it in a 10 m rise would need a specific yield of 8.5–11.8%. None of this is physically plausible, so the residual must be error in one or more terms, most plausibly the estimated river flow or ET.
 
-3. **The result depends on river flow that was not measured.** Each 0.01 added to the runoff ratio lowers the residual by about 13 mm/year. The balance closes at 0.24–0.27, 1.7–1.9 times the ratio observed in 1971–2010 but inside the 0.14–0.28 found in single years in the Donga sub-basin (Kamagaté et al., 2007). Across that range the residual runs from +171 to −50 mm/year.
+3. **The result depends on river flow that was not measured.** Each 0.01 added to the runoff ratio lowers the residual by about 13 mm/year. The balance closes at 0.24–0.27, 1.7–1.9 times the ratio observed in 1988–2010 but inside the 0.14–0.28 found in single years in the Donga sub-basin (Kamagaté et al., 2007). Across that range the residual runs from +171 to −50 mm/year.
 
    ![Residual against the runoff ratio](figures/fig7_runoff_ratio.png)
 
@@ -46,7 +46,7 @@ All numbers are computed by the scripts and stored in [`outputs/summary.json`](o
 5. **The data cannot say which term is wrong.** Taken one at a time, closing the balance needs:
    - ET 12.9–17.9% higher (the overall error reported for WaPOR v2 across Africa was 29–31%; Blatchford et al., 2020); or
    - rainfall 11.4–15.2% lower (the estimated river flow falls with it); or
-   - a runoff ratio of 0.24–0.27 instead of the 0.14 observed at Bétérou in 1971–2010. Single-year runoff coefficients of 0.14–0.28 were calculated for the 586 km² Donga sub-basin (Kamagaté et al., 2007), and 0.10–0.26 downstream at Bonou, a much larger catchment. Such a ratio is possible in a single year, but the balance needs it on average over seven years for the whole 10,000 km².
+   - a runoff ratio of 0.24–0.27 instead of the 0.14 observed at Bétérou in 1988–2010. Single-year runoff coefficients of 0.14–0.28 were calculated for the 586 km² Donga sub-basin (Kamagaté et al., 2007), and 0.10–0.26 downstream at Bonou, a much larger catchment. Such a ratio is possible in a single year, but the balance needs it on average over seven years for the whole 10,000 km².
 
    Any one of these, or a mix, is possible. Measured river flow for 2018–2024 would separate them.
 
